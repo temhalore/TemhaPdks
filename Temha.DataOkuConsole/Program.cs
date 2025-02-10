@@ -8,6 +8,7 @@ using System.Diagnostics;
 
 class Program
 {
+    private static string appName="TemhaDosyaOkuYaz";
     private static FileSystemWatcher watcher;
     private static bool isProcessing = false;
     private static string kaynakDosyaYolu;
@@ -47,6 +48,12 @@ class Program
                 kaynakDosyaYolu = File.ReadAllText(configDosyaYolu).Trim();
             }
 
+            Console.WriteLine("Sıfırlama yapmak istiyorsanız 'S' tuşuna basın.");
+            if (Console.ReadKey(true).Key == ConsoleKey.S)
+            {
+                Sifirla();
+            }
+
             if (!File.Exists(kaynakDosyaYolu))
             {
                 LogYaz("Belirtilen dosya bulunamadı!");
@@ -73,7 +80,59 @@ class Program
             mutex.ReleaseMutex();
         }
     }
+    private static void Sifirla()
+    {
+        try
+        {
+            // Registry kaydını sil
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            {
+              
+                if (key.GetValue(appName) != null)
+                {
+                    key.DeleteValue(appName);
+                    Console.WriteLine("Başlangıç kaydı silindi.");
+                }
+            }
 
+            // config.txt dosyasını sil
+            string configDosyaYolu = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "config.txt");
+            if (File.Exists(configDosyaYolu))
+            {
+                File.Delete(configDosyaYolu);
+                Console.WriteLine("config.txt dosyası silindi.");
+            }
+
+            // Log dosyasını sil
+            string logDosyaYolu = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "service_log.txt");
+            if (File.Exists(logDosyaYolu))
+            {
+                File.Delete(logDosyaYolu);
+                Console.WriteLine("service_log.txt dosyası silindi.");
+            }
+
+            // Hatalı satır dosyasını sil
+            string hataliDosyaYolu = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "hatalilar.txt");
+            if (File.Exists(hataliDosyaYolu))
+            {
+                File.Delete(hataliDosyaYolu);
+                Console.WriteLine("hatalilar.txt dosyası silindi.");
+            }
+
+            Console.WriteLine("Uygulama başarıyla sıfırlandı.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Sıfırlama sırasında hata oluştu: {ex.Message}");
+        }
+    }
     private static void StartupKaydiEkle()
     {
         try
@@ -83,7 +142,7 @@ class Program
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
                 true))
             {
-                string appName = "FileWatcherService";
+        
 
                 // Kayıt yoksa ekle
                 if (key.GetValue(appName) == null)
