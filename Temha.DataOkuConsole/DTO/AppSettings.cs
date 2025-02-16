@@ -9,10 +9,9 @@ namespace Temha.DataOkuConsole.DTO
     public class AppSettings
     {
         public string FirmaKod { get; set; }
-        public string KaynakDosyaYolu { get; set; }
-        public string HataliDosyaYolu { get; set; }
-        public string LogDosyaYolu { get; set; }
+        public string IzlenecekDosya { get; set; }
+        public string HataliDosya { get; set; }
+        public string LogDosya { get; set; }
         public bool IsDebugMode { get; set; }
-        public int MaxRetryCount { get; set; }
     }
 }

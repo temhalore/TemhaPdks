@@ -1,0 +1,4 @@
+00007,14:00,060125,1,001
+
+ilk 5 hane - parmak izi id
+saat,tarih,cihaz id,sonuncu hatırlamıyorum şimdi

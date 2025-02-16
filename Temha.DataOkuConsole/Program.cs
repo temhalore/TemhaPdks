@@ -21,16 +21,11 @@ class Program
 
     static async Task Main(string[] args)
     {
-        if (!mutex.WaitOne(TimeSpan.Zero, true))
-        {
-            LogYaz("Uygulama zaten çalışıyor. Yeni instance kapatılıyor.");
-            return;
-        }
+        
 
         try
         {
-            // Başlangıçta çalıştırma kaydını kontrol et ve ekle
-            StartupKaydiEkle();
+          
 
             // application.json dosyasını oluştur veya yükle
             InitializeConfiguration();
@@ -38,13 +33,35 @@ class Program
             // application.json dosyasını izle
             SetupConfigWatcher();
 
-            Console.WriteLine("Sıfırlama yapmak istiyorsanız 'S' tuşuna basın.");
+          
+            Console.WriteLine("Kuruluma  devam için 'D' tuşuna, var olan kurulumu sıfırlama için 'S' tuşuna basınız.");
             if (Console.ReadKey(true).Key == ConsoleKey.S)
             {
-                Sifirla();
+                Console.WriteLine("Sıfırlama için gerekli özel kodu giriniz ve enter a basınız.");
+                if (Console.ReadLine() == "df@ABb9bdNGgSvs62v6f9")
+                {
+                    Sifirla();
+                }
+                else
+                {
+                    LogYaz("Sıfırlama için özel şifre yanlış girildi.!");
+                    return;
+                }
+            }
+            //devam dendiğinde kontrol et çalışıyorsa işlem yaptırma sıfırlama yapsaı gerek yada config dosyasını düzneleyebilir
+            if (Console.ReadKey(true).Key == ConsoleKey.D)
+            {
+                if (!mutex.WaitOne(TimeSpan.Zero, true))
+                {
+                    LogYaz("Uygulama zaten çalışıyor. Yeni instance kapatılıyor.");
+                    return;
+                }
+
+                // Console.WriteLine("İzlenecek Dosya Yolunu giriniz.Örnek 'C:\\TemhaPdks\\data.txt'");
             }
 
-            if (!File.Exists(_configuration.AppSettings.KaynakDosyaYolu))
+
+            if (!File.Exists(_configuration.AppSettings.IzlenecekDosya))
             {
                 LogYaz("Belirtilen dosya bulunamadı!");
                 return;
@@ -54,7 +71,10 @@ class Program
             SetupFileWatcher();
 
             LogYaz("Dosya izleme servisi başlatıldı.");
-            LogYaz($"Firma Kodu: {_configuration.AppSettings.FirmaKod}");
+            LogYaz($"Firma İzlenecek Dosya: {_configuration.AppSettings.IzlenecekDosya}");
+
+            // Başlangıçta çalıştırma kaydını kontrol et ve ekle oto başlangıç için
+            StartupKaydiEkle();
 
             // İlk okuma işlemini başlat
             ProcessFile();
@@ -77,42 +97,51 @@ class Program
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
             "application.json");
 
+        //dosya yoksa hata verir
         if (!File.Exists(configFilePath))
         {
-            CreateDefaultConfiguration();
+            LogYaz("configFilePath te application dosyası bulunamadı!");
+            return;
         }
+
+        // Tüm gerekli dosya ve klasörleri kontrol et
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.IzlenecekDosya);
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.HataliDosya);
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.LogDosya);
 
         LoadConfiguration();
     }
 
-    private static void CreateDefaultConfiguration()
-    {
-        var defaultConfig = new AppConfiguration
-        {
-            AppSettings = new AppSettings
-            {
-                FirmaKod = "FIRMA001",
-                KaynakDosyaYolu = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "data.txt"),
-                HataliDosyaYolu = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "hatalilar.txt"),
-                LogDosyaYolu = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "service_log.txt"),
-                IsDebugMode = true,
-                MaxRetryCount = 3
-            }
-        };
+    ///// <summary>
+    ///// default dataları  app settings e yazar unu dışarıdan ilk çalışmada alabiliriz bakcağız şimdilik buradan sabit yada bu hiç olmayacak
+    ///// </summary>
+    //private static void CreateDefaultConfiguration(AppSettings appSetiings)
+    //{
+    //    var defaultConfig = new AppConfiguration
+    //    {
+    //        AppSettings = new AppSettings
+    //        {
+    //            FirmaKod = "FIRMA001",
+    //            IzlenecekDosya = Path.Combine(
+    //                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+    //                "data.txt"),
+    //            HataliDosya = Path.Combine(
+    //                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+    //                "hatalilar.txt"),
+    //            LogDosya = Path.Combine(
+    //                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+    //                "service_log.txt"),
+    //            IsDebugMode = true
+    //        }
+    //    };
 
-        string jsonContent = JsonSerializer.Serialize(defaultConfig, new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
+    //    string jsonContent = JsonSerializer.Serialize(defaultConfig, new JsonSerializerOptions
+    //    {
+    //        WriteIndented = true
+    //    });
 
-        File.WriteAllText(configFilePath, jsonContent);
-    }
+    //    File.WriteAllText(configFilePath, jsonContent);
+    //}
 
     private static void LoadConfiguration()
     {
@@ -131,17 +160,24 @@ class Program
         configWatcher.EnableRaisingEvents = true;
     }
 
+    /// <summary>
+    /// confşg osyası takipta değişiklik varsa işlemleri yenilemek için çalışan metod
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private static void OnConfigurationChanged(object sender, FileSystemEventArgs e)
     {
         try
         {
-            Thread.Sleep(100); // Dosyanın yazılmasını bekle
+            Thread.Sleep(1000); // Dosyanın yazılmasını bekle
             LoadConfiguration();
-            LogYaz("Yapılandırma dosyası güncellendi.");
-            LogYaz($"Yeni Firma Kodu: {_configuration.AppSettings.FirmaKod}");
 
-            // Dosya izleyiciyi güncelle
-            watcher?.Dispose();
+            string jsonSring= JsonSerializer.Serialize(_configuration.AppSettings);
+            LogYaz("Yapılandırma dosyası güncellendi.");
+            LogYaz($"Yeni Yapılandırma Dosyası: {jsonSring}");
+           
+           // Dosya izleyiciyi güncelle
+           watcher?.Dispose();
             SetupFileWatcher();
         }
         catch (Exception ex)
@@ -157,15 +193,15 @@ class Program
 
         try
         {
-            File.AppendAllText(_configuration.AppSettings.LogDosyaYolu, logMesaj + Environment.NewLine);
+            File.AppendAllText(_configuration.AppSettings.LogDosya, logMesaj + Environment.NewLine);
         }
         catch { }
     }
 
     private static void SetupFileWatcher()
     {
-        string directory = Path.GetDirectoryName(_configuration.AppSettings.KaynakDosyaYolu);
-        string filename = Path.GetFileName(_configuration.AppSettings.KaynakDosyaYolu);
+        string directory = Path.GetDirectoryName(_configuration.AppSettings.IzlenecekDosya);
+        string filename = Path.GetFileName(_configuration.AppSettings.IzlenecekDosya);
 
         watcher = new FileSystemWatcher(directory, filename);
         watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
@@ -183,27 +219,38 @@ class Program
                 if (isProcessing) return;
                 isProcessing = true;
 
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
 
-                string kopyaDosyaYolu = Path.Combine(
-                    Path.GetDirectoryName(_configuration.AppSettings.KaynakDosyaYolu),
-                    $"kopya_{Path.GetFileName(_configuration.AppSettings.KaynakDosyaYolu)}");
+                string kopyaDosya = Path.Combine(
+                    Path.GetDirectoryName(_configuration.AppSettings.IzlenecekDosya),
+                    $"kopya_{Path.GetFileName(_configuration.AppSettings.IzlenecekDosya)}");
 
-                if (new FileInfo(_configuration.AppSettings.KaynakDosyaYolu).Length == 0)
+                // her işlemde yedek alalım
+                var simdi = DateTime.Now;
+                string yedekDate = simdi.Year.ToString()+simdi.Month.ToString() + simdi.Day.ToString()+"-"+simdi.Hour.ToString()+simdi.Minute.ToString()+simdi.Second.ToString();
+                
+                string yedekDosya = Path.Combine(
+    Path.GetDirectoryName(_configuration.AppSettings.IzlenecekDosya),
+    $"yedek_{yedekDate}_{Path.GetFileName(_configuration.AppSettings.IzlenecekDosya)}");
+
+
+                if (new FileInfo(_configuration.AppSettings.IzlenecekDosya).Length == 0)
                 {
                     isProcessing = false;
                     return;
                 }
-
-                File.Copy(_configuration.AppSettings.KaynakDosyaYolu, kopyaDosyaYolu, true);
-                File.WriteAllText(_configuration.AppSettings.KaynakDosyaYolu, string.Empty);
+                File.Copy(_configuration.AppSettings.IzlenecekDosya, yedekDosya, true);
+                File.Copy(_configuration.AppSettings.IzlenecekDosya, kopyaDosya, true);
+                Thread.Sleep(1000);
+                File.WriteAllText(_configuration.AppSettings.IzlenecekDosya, string.Empty);
 
                 int satirSayisi = 0;
                 int hataliSatirSayisi = 0;
 
+
                 LogYaz("Yeni değişiklikler işleniyor:");
 
-                using (StreamReader sr = new StreamReader(kopyaDosyaYolu))
+                using (StreamReader sr = new StreamReader(kopyaDosya))
                 {
                     string satir;
                     while ((satir = sr.ReadLine()) != null)
@@ -213,14 +260,14 @@ class Program
                         {
                             if (_configuration.AppSettings.IsDebugMode)
                             {
-                                LogYaz($"Debug: İşlenen satır {satirSayisi}: {satir}");
+                                LogYaz($"Debug: İşlenen satır burada apiyi çağıracağız şuan satır bilgisi : {satirSayisi}: {satir}");
                             }
                             // API çağrısı ve diğer işlemler
                         }
                         catch (Exception ex)
                         {
                             hataliSatirSayisi++;
-                            using (StreamWriter sw = new StreamWriter(_configuration.AppSettings.HataliDosyaYolu, true))
+                            using (StreamWriter sw = new StreamWriter(_configuration.AppSettings.HataliDosya, true))
                             {
                                 sw.WriteLine($"{DateTime.Now} - Satır {satirSayisi}: {satir} - Hata: {ex.Message}");
                             }
@@ -228,15 +275,15 @@ class Program
                         }
                     }
                 }
-
-                File.Delete(kopyaDosyaYolu);
+                // kopya dosyamızla işimiz bitti sil
+                File.Delete(kopyaDosya);
 
                 LogYaz($"Toplam {satirSayisi} satır okundu.");
                 LogYaz($"Toplam {hataliSatirSayisi} hatalı satır bulundu.");
             }
             catch (Exception ex)
             {
-                LogYaz($"İşlem sırasında hata oluştu: {ex.Message}");
+                LogYaz($"Data işleme sırasında hata oluştu: {ex.Message}");
             }
             finally
             {
@@ -264,26 +311,34 @@ class Program
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
                 true))
             {
-
-
                 // Kayıt yoksa ekle
                 if (key.GetValue(appName) == null)
                 {
                     key.SetValue(appName, appPath);
-                    LogYaz("Başlangıç kaydı eklendi.");
+                    LogYaz("Başlangıç kaydı Registry ye eklendi.");
                 }
             }
         }
         catch (Exception ex)
         {
-            LogYaz($"Başlangıç kaydı eklenirken hata: {ex.Message}");
+            LogYaz($"Başlangıç kaydı Registry ye eklenirken hata: {ex.Message}");
         }
     }
-
+    /// <summary>
+    /// sıfırlama istenirse yapılacak işlemler
+    /// </summary>
     private static void Sifirla()
     {
         try
         {
+            LogYaz("Sıfırlama işlemi başlatıldı:");
+
+
+            // her işlemde yedek alalım
+            var simdi = DateTime.Now;
+            string sifirlamaAniString = simdi.Year.ToString() + simdi.Month.ToString() + simdi.Day.ToString() + "-" + simdi.Hour.ToString() + simdi.Minute.ToString() + simdi.Second.ToString();
+
+
             // Registry kaydını sil
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
@@ -292,46 +347,71 @@ class Program
                 if (key.GetValue(appName) != null)
                 {
                     key.DeleteValue(appName);
-                    Console.WriteLine("Başlangıç kaydı silindi.");
+                    Console.WriteLine("Başlangıç kaydı Registry den silindi.");
                 }
             }
 
-            // config.txt dosyasını sil
-            string configDosyaYolu = Path.Combine(
+            LogYaz("Sıfılama:Registry kaydı silindi:");
+
+
+            // config.txt dosyasını sil silmeden önce kopyasını yani yedeğini al öyle sil
+            string configDosya = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "config.txt");
-            if (File.Exists(configDosyaYolu))
+            if (File.Exists(configDosya))
             {
-                File.Delete(configDosyaYolu);
+                string yedekDosya = Path.Combine(
+                Path.GetDirectoryName(configDosya),
+                $"sifirlamaOncesi_{sifirlamaAniString}_{Path.GetFileName(configDosya)}");
+                File.Copy(configDosya, yedekDosya, true);
+                LogYaz($"sıfırlama öncesi configDosya yedeklendi yedek:{yedekDosya}");
+                Thread.Sleep(1000);
+                File.Delete(configDosya);
+                LogYaz($"sıfırlama: config.txt dosyası silindi.");
                 Console.WriteLine("config.txt dosyası silindi.");
             }
 
-            // Log dosyasını sil
-            string logDosyaYolu = Path.Combine(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                "service_log.txt");
-            if (File.Exists(logDosyaYolu))
-            {
-                File.Delete(logDosyaYolu);
-                Console.WriteLine("service_log.txt dosyası silindi.");
-            }
-
-            // Hatalı satır dosyasını sil
-            string hataliDosyaYolu = Path.Combine(
+            // Hatalı satır dosyasını silmeden önce kopyasını al öyle sil
+            string hataliDosya = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "hatalilar.txt");
-            if (File.Exists(hataliDosyaYolu))
+            if (File.Exists(hataliDosya))
             {
-                File.Delete(hataliDosyaYolu);
+                string yedekDosya = Path.Combine(
+               Path.GetDirectoryName(hataliDosya),
+               $"sifirlamaOncesi_{sifirlamaAniString}_{Path.GetFileName(hataliDosya)}");
+                File.Copy(hataliDosya, yedekDosya, true);
+                LogYaz($"sıfırlama öncesi hataliDosya yedeklendi yedek:{yedekDosya}");
+                Thread.Sleep(1000);
+
+                File.Delete(hataliDosya);
+                LogYaz($"sıfırlama: hatalilar.txt dosyası silindi.");
                 Console.WriteLine("hatalilar.txt dosyası silindi.");
+            }
+
+            // Log dosyasını silmeden önce kopyasını yani yedeğini al öyle sil
+            string logDosya = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "service_log.txt");
+            if (File.Exists(logDosya))
+            {
+                string yedekDosya = Path.Combine(
+                Path.GetDirectoryName(logDosya),
+                $"sifirlamaOncesi_{sifirlamaAniString}_{Path.GetFileName(logDosya)}");
+                File.Copy(logDosya, yedekDosya, true);
+                Thread.Sleep(1000);
+                LogYaz($"sıfırlama öncesi logDosya yedeklendi yedek:{yedekDosya}");
+
+                File.Delete(logDosya);
+                Console.WriteLine("service_log.txt dosyası silindi.");
             }
 
             Console.WriteLine("Uygulama başarıyla sıfırlandı.");
         }
         catch (Exception ex)
         {
+            LogYaz($"Sıfırlama sırasında hata oluştu: {ex.Message}");
             Console.WriteLine($"Sıfırlama sırasında hata oluştu: {ex.Message}");
         }
     }
-    // Diğer metodlar aynı kalacak (OnFileChanged, StartupKaydiEkle, Sifirla)
 }

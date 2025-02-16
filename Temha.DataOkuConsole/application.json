@@ -1,10 +1,9 @@
 ﻿{
   "AppSettings": {
     "FirmaKod": "FIRMA001",
-    "KaynakDosyaYolu": "C:\\TemhaPdks\\Logs\\data.txt",
-    "HataliDosyaYolu": "C:\\TemhaPdks\\Logs\\hatalilar.txt",
-    "LogDosyaYolu": "C:\\Logs\\TemhaPdks\\service_log.txt",
-    "IsDebugMode": true,
-    "MaxRetryCount": 3
+    "IzlenecekDosya": "C:\\TemhaPdks\\data.txt",
+    "HataliDosya": "C:\\TemhaPdks\\Logs\\hatalilar.txt",
+    "LogDosya": "C:\\Logs\\TemhaPdks\\service_log.txt",
+    "IsDebugMode": true
   }
 }
