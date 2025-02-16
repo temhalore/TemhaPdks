@@ -12,6 +12,6 @@ namespace Temha.DataOkuConsole.DTO
         public string saat { get; set; }
         public string tarih { get; set; } // bu modelde ggmmyy
         public string cihazId { get; set; }
-        public bool digerId { get; set; }
+        public bool digerId { get; set; } // bunu bilmiyor
     }
 }

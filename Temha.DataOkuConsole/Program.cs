@@ -154,7 +154,8 @@ class Program
         {
             DosyaIslemleri.DosyayaYazYeniSatir(_configuration.AppSettings.LogDosya, logMesaj);
         }
-        catch { }
+        catch { 
+        }
     }
 
     private static void SetupFileWatcher()
