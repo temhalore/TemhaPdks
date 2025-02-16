@@ -40,7 +40,7 @@
             string tarihEk = $"{simdi:yyyyMMdd-HHmmss}";
 
             string yedekDosya = Path.Combine(
-                Path.GetDirectoryName(kaynak),
+                Path.GetDirectoryName(kaynak)+"/yedek",//:TODO burada yeni bir clasör oluşturma olayı gerçekleşmeli yedek klasöründe olsun tüm yedekler
                 $"{yedekEk}_{tarihEk}_{Path.GetFileName(kaynak)}");
 
             DosyaKopyala(kaynak, yedekDosya);
@@ -54,7 +54,7 @@
         }
     }
 
-    public static void DosyayaYaz(string dosyaYolu, string icerik, bool ekle = true)
+    public static void DosyayaYaz(string dosyaYolu, string icerik)
     {
         try
         {
@@ -68,6 +68,20 @@
             {
                 File.WriteAllText(dosyaYolu, icerik);
             }
+            Thread.Sleep(100);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Dosyaya yazma hatası: {ex.Message}");
+        }
+    }
+    public static void DosyayaYazYeniSatir(string dosyaYolu, string icerik)
+    {
+        try
+        {
+            DosyaKlasorKontrol(dosyaYolu);
+            File.AppendAllText(dosyaYolu, icerik + Environment.NewLine);
+
             Thread.Sleep(100);
         }
         catch (Exception ex)
@@ -98,7 +112,7 @@
         }
     }
 
-    public static void DosyaSil(string dosyaYolu, bool yedekAl = true)
+    public static void DosyaSil(string dosyaYolu, bool yedekAl = true,string yedekOncesiEkIfade = "")
     {
         try
         {
@@ -107,7 +121,8 @@
 
             if (yedekAl)
             {
-                DosyaYedekAl(dosyaYolu, "silmeOncesi");
+               
+                DosyaYedekAl(dosyaYolu, yedekOncesiEkIfade );
             }
 
             File.Delete(dosyaYolu);
@@ -148,6 +163,19 @@
         {
             Console.WriteLine($"Dosya satırları okuma hatası: {ex.Message}");
             return new string[0];
+        }
+    }
+
+    public static void DosyaTemizle(string dosyaYolu, bool yedekAl = true)
+    {
+        try
+        {
+            DosyayaYaz(dosyaYolu, "", false);
+            Thread.Sleep(100);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Dosya temizleme hatası: {ex.Message}");
         }
     }
 
