@@ -85,20 +85,19 @@ class Program
 
     private static void InitializeConfiguration()
     {
-        configFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-            "application.json");
+        //KENDİ LOKASYONUNDAN BAKMA KODU
+        //configFilePath = Path.Combine(
+        //    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+        //    "application.json");
+        
+        configFilePath = ("C:\\TemhaPdks\\config\\application.json");
+
 
         if (!File.Exists(configFilePath))
         {
             LogYaz("Config dosyası bulunamadı!");
             return;
         }
-
-        // Tüm gerekli dosya ve klasörleri kontrol et
-        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.IzlenecekDosya);
-        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.HataliDosya);
-        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.LogDosya);
 
         LoadConfiguration();
     }
@@ -107,6 +106,11 @@ class Program
     {
         string jsonContent = DosyaIslemleri.DosyaOku(configFilePath);
         _configuration = JsonSerializer.Deserialize<AppConfiguration>(jsonContent);
+
+        // Tüm gerekli dosya ve klasörleri kontrol et
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.IzlenecekDosya);
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.HataliDosya);
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.LogDosya);
     }
 
     private static void SetupConfigWatcher()

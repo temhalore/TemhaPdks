@@ -40,7 +40,7 @@
             string tarihEk = $"{simdi:yyyyMMdd-HHmmss}";
 
             string yedekDosya = Path.Combine(
-                Path.GetDirectoryName(kaynak)+"/yedek",//:TODO burada yeni bir clasör oluşturma olayı gerçekleşmeli yedek klasöründe olsun tüm yedekler
+                Path.GetDirectoryName(kaynak)+"\\yedek",//:TODO burada yeni bir clasör oluşturma olayı gerçekleşmeli yedek klasöründe olsun tüm yedekler
                 $"{yedekEk}_{tarihEk}_{Path.GetFileName(kaynak)}");
 
             DosyaKopyala(kaynak, yedekDosya);
@@ -60,14 +60,8 @@
         {
             DosyaKlasorKontrol(dosyaYolu);
 
-            if (ekle)
-            {
-                File.AppendAllText(dosyaYolu, icerik + Environment.NewLine);
-            }
-            else
-            {
-                File.WriteAllText(dosyaYolu, icerik);
-            }
+            File.WriteAllText(dosyaYolu, icerik);
+
             Thread.Sleep(100);
         }
         catch (Exception ex)
@@ -170,7 +164,7 @@
     {
         try
         {
-            DosyayaYaz(dosyaYolu, "", false);
+            DosyayaYaz(dosyaYolu, "");
             Thread.Sleep(100);
         }
         catch (Exception ex)

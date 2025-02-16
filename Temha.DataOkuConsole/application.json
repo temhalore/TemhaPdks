@@ -1,9 +1,9 @@
 ﻿{
   "AppSettings": {
     "FirmaKod": "FIRMA001",
-    "IzlenecekDosya": "C:\\TemhaPdks\\data.txt",
-    "HataliDosya": "C:\\TemhaPdks\\Logs\\hatalilar.txt",
-    "LogDosya": "C:\\Logs\\TemhaPdks\\service_log.txt",
+    "IzlenecekDosya": "C:\\PdksDataAnaKlasor\\data.txt",
+    "HataliDosya": "C:\\TemhaPdks\\logs\\hatalilar.txt",
+    "LogDosya": "C:\\TemhaPdks\\service_log.txt",
     "IsDebugMode": true
   }
 }
