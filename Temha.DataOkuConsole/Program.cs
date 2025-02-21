@@ -275,7 +275,7 @@ class Program
                     {
                         
                         LogYaz($"İşlenen satır burada apiyi çağıracağız şuan satır bilgisi : {satirSayisi}: {satir}");
-                        Thread.Sleep(1000); //api isteği karşılanmasını bekliyormuş gibi yap
+                        Thread.Sleep(1000); //api isteği karşılanmasını bekliyormuş gibi yap 1 saniye bekle
                         // API çağrısı ve diğer işlemler
                     }
                     catch (Exception ex)

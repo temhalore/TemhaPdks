@@ -13,3 +13,4 @@ namespace Temha.DataOkuConsole.DTO
         public bool IsDebugMode { get; set; } = false;
     }
 }
+ 
