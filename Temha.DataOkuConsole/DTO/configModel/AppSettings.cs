@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Temha.DataOkuConsole.DTO
+namespace Temha.DataOkuConsole.DTO.configModel
 {
     public class AppSettings
     {
@@ -13,4 +13,3 @@ namespace Temha.DataOkuConsole.DTO
         public bool IsDebugMode { get; set; } = false;
     }
 }
- 

@@ -9,6 +9,7 @@ using System.Text.Json;
 using Temha.DataOkuConsole.DTO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+using Temha.DataOkuConsole.DTO.configModel;
 
 class Program
 {
