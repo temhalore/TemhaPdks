@@ -14,10 +14,29 @@ namespace Temha.DataOku.SetupDownloader
 {
     public partial class indir : Form
     {
-        // Asıl setup dosyasının URL'sini buraya girin.
-        private const string SetupUrl = "https://example.com/your-setup-file.exe";
-        // İndirilecek setup dosyasının yerel adını belirleyin.
-        private const string LocalSetupFileName = "setup.exe";
+        private const string ApiBaseUrl = "https://api.yourserver.com/"; // API base URL'iniz
+        private readonly HttpClient httpClient;
+        private string setupUrl;
+        private string firmaKodu;
+
+        // API'den dönecek versiyon bilgisi için modeller
+        public class FirmaVersiyon
+        {
+            public bool Success { get; set; }
+            public string Message { get; set; }
+            public string Version { get; set; }
+        }
+
+        public class SetupVersiyon
+        {
+            public string Version { get; set; }
+            public string SetupUrl { get; set; }
+            public string ReleaseNotes { get; set; }
+        }
+
+
+
+
 
         public indir()
         {
@@ -87,6 +106,16 @@ namespace Temha.DataOku.SetupDownloader
         {
             // İndirme işlemini başlat.
             DownloadSetupFile();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblStatus_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
