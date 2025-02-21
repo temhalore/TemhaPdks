@@ -1,5 +1,63 @@
 ﻿public static class DosyaIslemleri
 {
+    private static readonly int MaxRetryAttempts = 5;
+    private static readonly int RetryDelayMs = 1000;
+    private static readonly int FileCheckTimeoutMs = 30000;
+
+    private static bool IsFileLocked(FileInfo file)
+    {
+        try
+        {
+            using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                stream.Close();
+            }
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;
+        }
+    }
+
+    private static bool DosyaIsleminiGerceklestir(string dosyaYolu, Action<string> islemDelegate)
+    {
+        var dosya = new FileInfo(dosyaYolu);
+        var startTime = DateTime.Now;
+        var attempt = 1;
+
+        while (attempt <= MaxRetryAttempts)
+        {
+            try
+            {
+                if (dosya.Exists && IsFileLocked(dosya))
+                {
+                    var elapsedTime = DateTime.Now - startTime;
+                    if (elapsedTime.TotalMilliseconds >= FileCheckTimeoutMs)
+                    {
+                        Console.WriteLine($"Dosya zaman aşımı: {dosyaYolu}");
+                        return false;
+                    }
+
+                    Console.WriteLine($"Dosya meşgul: {dosyaYolu} - Deneme {attempt}/{MaxRetryAttempts}");
+                    Thread.Sleep(RetryDelayMs);
+                    attempt++;
+                    continue;
+                }
+
+                islemDelegate(dosyaYolu);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Dosya işlemi hatası (Deneme {attempt}/{MaxRetryAttempts}): {ex.Message}");
+                if (attempt == MaxRetryAttempts) throw;
+                Thread.Sleep(RetryDelayMs);
+                attempt++;
+            }
+        }
+        return false;
+    }
 
     public static void DosyaKlasorKontrol(string dosyaYolu)
     {
@@ -10,14 +68,12 @@
 
             string klasorYolu = Path.GetDirectoryName(dosyaYolu);
 
-            // Klasör yoksa oluştur
             if (!Directory.Exists(klasorYolu))
             {
                 Directory.CreateDirectory(klasorYolu);
                 Console.WriteLine($"Klasör oluşturuldu: {klasorYolu}");
             }
 
-            // Dosya yoksa oluştur
             if (!File.Exists(dosyaYolu))
             {
                 using (File.Create(dosyaYolu)) { }
@@ -39,15 +95,11 @@
 
             var simdi = DateTime.Now;
             string tarihEk = $"{simdi:yyyyMMdd-HHmmss}";
-
-            string yedekDosya = Path.Combine(
-                Path.GetDirectoryName(kaynak)+"\\yedek",//:TODO burada yeni bir clasör oluşturma olayı gerçekleşmeli yedek klasöründe olsun tüm yedekler
+            string yedekKlasor = Path.Combine(Path.GetDirectoryName(kaynak), "yedek");
+            string yedekDosya = Path.Combine(yedekKlasor,
                 $"{yedekEk}_{tarihEk}_{Path.GetFileName(kaynak)}");
 
             DosyaKopyala(kaynak, yedekDosya);
-
-           // File.Copy(kaynak, yedekDosya, true);
-            Thread.Sleep(100);
         }
         catch (Exception ex)
         {
@@ -60,24 +112,26 @@
         try
         {
             DosyaKlasorKontrol(dosyaYolu);
-
-            File.WriteAllText(dosyaYolu, icerik);
-
-            Thread.Sleep(100);
+            DosyaIsleminiGerceklestir(dosyaYolu, (yol) =>
+            {
+                File.WriteAllText(yol, icerik);
+            });
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Dosyaya yazma hatası: {ex.Message}");
         }
     }
+
     public static void DosyayaYazYeniSatir(string dosyaYolu, string icerik)
     {
         try
         {
             DosyaKlasorKontrol(dosyaYolu);
-            File.AppendAllText(dosyaYolu, icerik + Environment.NewLine);
-
-            Thread.Sleep(100);
+            DosyaIsleminiGerceklestir(dosyaYolu, (yol) =>
+            {
+                File.AppendAllText(yol, icerik + Environment.NewLine);
+            });
         }
         catch (Exception ex)
         {
@@ -98,8 +152,10 @@
                 Directory.CreateDirectory(hedefKlasor);
             }
 
-            File.Copy(kaynak, hedef, true);
-            Thread.Sleep(100);
+            DosyaIsleminiGerceklestir(kaynak, (yol) =>
+            {
+                File.Copy(yol, hedef, true);
+            });
         }
         catch (Exception ex)
         {
@@ -107,7 +163,7 @@
         }
     }
 
-    public static void DosyaSil(string dosyaYolu, bool yedekAl = true,string yedekOncesiEkIfade = "")
+    public static void DosyaSil(string dosyaYolu, bool yedekAl = true, string yedekOncesiEkIfade = "")
     {
         try
         {
@@ -116,12 +172,13 @@
 
             if (yedekAl)
             {
-               
-                DosyaYedekAl(dosyaYolu, yedekOncesiEkIfade );
+                DosyaYedekAl(dosyaYolu, yedekOncesiEkIfade);
             }
 
-            File.Delete(dosyaYolu);
-            Thread.Sleep(100);
+            DosyaIsleminiGerceklestir(dosyaYolu, (yol) =>
+            {
+                File.Delete(yol);
+            });
         }
         catch (Exception ex)
         {
@@ -136,7 +193,12 @@
             if (!File.Exists(dosyaYolu))
                 return string.Empty;
 
-            return File.ReadAllText(dosyaYolu);
+            string icerik = string.Empty;
+            DosyaIsleminiGerceklestir(dosyaYolu, (yol) =>
+            {
+                icerik = File.ReadAllText(yol);
+            });
+            return icerik;
         }
         catch (Exception ex)
         {
@@ -152,7 +214,12 @@
             if (!File.Exists(dosyaYolu))
                 return new string[0];
 
-            return File.ReadAllLines(dosyaYolu);
+            string[] satirlar = null;
+            DosyaIsleminiGerceklestir(dosyaYolu, (yol) =>
+            {
+                satirlar = File.ReadAllLines(yol);
+            });
+            return satirlar ?? new string[0];
         }
         catch (Exception ex)
         {
@@ -166,13 +233,10 @@
         try
         {
             DosyayaYaz(dosyaYolu, "");
-            Thread.Sleep(100);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Dosya temizleme hatası: {ex.Message}");
         }
     }
-
-
 }

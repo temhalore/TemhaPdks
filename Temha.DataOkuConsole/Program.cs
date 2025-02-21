@@ -124,7 +124,7 @@ class Program
 
     private static void LoadConfiguration()
     {
-        string jsonContent = DosyaIslemleri.DosyaOku(configFilePath);
+        string jsonContent =  DosyaIslemleri.DosyaOku(configFilePath);
         _configuration = JsonSerializer.Deserialize<AppConfiguration>(jsonContent);
 
         // Tüm gerekli dosya ve klasörleri kontrol et
@@ -352,20 +352,5 @@ class Program
         }
     }
 
-    // Dosyanın kilitli olup olmadığını kontrol eden yardımcı metod
-    private static bool IsFileLocked(FileInfo file)
-    {
-        try
-        {
-            using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
-            {
-                stream.Close();
-            }
-        }
-        catch (IOException)
-        {
-            return true;
-        }
-        return false;
-    }
+
 }
