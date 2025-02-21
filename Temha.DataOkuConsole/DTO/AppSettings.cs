@@ -10,8 +10,6 @@ namespace Temha.DataOkuConsole.DTO
     {
         public string FirmaKod { get; set; }
         public string IzlenecekDosya { get; set; }
-        public string HataliDosya { get; set; }
-        public string LogDosya { get; set; }
-        public bool IsDebugMode { get; set; }
+        public bool IsDebugMode { get; set; } = false;
     }
 }

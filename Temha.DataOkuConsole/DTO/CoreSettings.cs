@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Temha.DataOkuConsole.DTO
 {
-    public class AppConfiguration
+    public class CoreSettings
     {
-       
-        public CoreSettings CoreSettings { get; set; }
-        public AppSettings AppSettings { get; set; }
+        public string HataliDosya { get; set; }
     }
 }

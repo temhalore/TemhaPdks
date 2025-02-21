@@ -8,17 +8,25 @@ using System.Diagnostics;
 using System.Text.Json;
 using Temha.DataOkuConsole.DTO;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 class Program
 {
-    // Windows API işlevlerini tanımlayın
-    [DllImport("kernel32.dll")]
+    [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool AllocConsole();
 
-    [DllImport("kernel32.dll")]
-    private static extern bool FreeConsole();
+    // Windows API işlevlerini tanımlıyoruz
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    private static bool _consoleAllocated = false;
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr GetConsoleWindow();
+
+    // ShowWindow için sabitler
+    private const int SW_HIDE = 0; // Konsolu gizle
+    private const int SW_SHOW = 5; // Konsolu göster
+
+    private static bool _isKonsolPenceresiAcik = false;
 
     private static string appName = "TemhaDosyaOkuYaz";
     private static FileSystemWatcher watcher;
@@ -28,14 +36,21 @@ class Program
     private static Mutex mutex = new Mutex(true, "FileWatcherServiceUniqueMutex");
     private static AppConfiguration _configuration;
     private static string configFilePath;
+    private static string sifirlamaKod = "df@ABb9bdNGgSvs62v6f9";
+
+
+
+
 
     static async Task Main(string[] args)
     {
         try
         {
+            
+
             // İlk çalıştırmada konsol penceresini aç
             AllocConsole();
-            _consoleAllocated = true;
+            _isKonsolPenceresiAcik = true;
 
             // application.json dosyasını oluştur veya yükle
             InitializeConfiguration();
@@ -47,9 +62,13 @@ class Program
             if (Console.ReadKey(true).Key == ConsoleKey.S)
             {
                 Console.WriteLine("Sıfırlama için gerekli özel kodu giriniz ve enter'a basınız.");
-                if (Console.ReadLine() == "df@ABb9bdNGgSvs62v6f9")
+                if (Console.ReadLine() == sifirlamaKod)
                 {
                     Sifirla();
+                    Console.WriteLine("Programı yeniden başlatma gerekli!!Kapatmak için bir tuşa basın ve kapatın");
+                    Console.ReadKey();
+                    return;
+                    
                 }
                 else
                 {
@@ -104,6 +123,7 @@ class Program
 
     private static void InitializeConfiguration()
     {
+
         //KENDİ LOKASYONUNDAN BAKMA KODU
         configFilePath = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -115,6 +135,7 @@ class Program
 
         if (!File.Exists(configFilePath))
         {
+            //throw new Exception("application.json dosyası bulunamadı!");
             LogYaz("Config dosyası bulunamadı!");
             return;
         }
@@ -127,10 +148,23 @@ class Program
         string jsonContent =  DosyaIslemleri.DosyaOku(configFilePath);
         _configuration = JsonSerializer.Deserialize<AppConfiguration>(jsonContent);
 
-        // Tüm gerekli dosya ve klasörleri kontrol et
+
+        // app settings ten izleneck yolu vs dışarıdan al sonra confta iç tarafta core yolalrı üret 
+        //tüm dosyaları kontrol et yoksa oluştur.
         DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.IzlenecekDosya);
-        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.HataliDosya);
-        DosyaIslemleri.DosyaKlasorKontrol(_configuration.AppSettings.LogDosya);
+        string directoryAna = Path.GetDirectoryName(configFilePath);
+        string directoryIzlenecekAna = Path.GetDirectoryName(_configuration.AppSettings.IzlenecekDosya);
+
+        _configuration.CoreSettings = new CoreSettings();
+
+        _configuration.CoreSettings.HataliDosya = directoryIzlenecekAna + "\\hatalilar.txt";
+       
+
+        DosyaIslemleri.DosyaKlasorKontrol(_configuration.CoreSettings.HataliDosya);
+
+        string jsonStringAna = JsonSerializer.Serialize(_configuration);
+        LogYaz($"Ana Yapılandırma Dosyası İçerik: {jsonStringAna}");
+
     }
 
     private static void SetupConfigWatcher()
@@ -158,6 +192,7 @@ class Program
             // Dosya izleyiciyi güncelle
             watcher?.Dispose();
             SetupFileWatcher();
+            YonetimKonsol();
         }
         catch (Exception ex)
         {
@@ -167,12 +202,21 @@ class Program
 
     private static void LogYaz(string mesaj)
     {
-        string logMesaj = $"{DateTime.Now} - {mesaj}";
-        Console.WriteLine(logMesaj);
+        //önce log dosyasını oluştur
+        var anaKalsor = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var logDosyaYolu = anaKalsor + "\\logs\\service_log.txt";
+        DosyaIslemleri.DosyaKlasorKontrol(logDosyaYolu);
 
+        string logMesaj = $"{DateTime.Now} - {mesaj}";
+        if (_isKonsolPenceresiAcik)
+        {
+                    Console.WriteLine(logMesaj);
+             
+        }
+       
         try
         {
-            DosyaIslemleri.DosyayaYazYeniSatir(_configuration.AppSettings.LogDosya, logMesaj);
+            DosyaIslemleri.DosyayaYazYeniSatir(logDosyaYolu, logMesaj);
         }
         catch { 
         }
@@ -200,9 +244,9 @@ class Program
 
                 Thread.Sleep(1000);
 
-                string kopyaDosya = Path.Combine(
+                string isleneceklerDosyasi = Path.Combine(
                     Path.GetDirectoryName(_configuration.AppSettings.IzlenecekDosya),
-                    $"kopya_{Path.GetFileName(_configuration.AppSettings.IzlenecekDosya)}");
+                    $"islencekler_{Path.GetFileName(_configuration.AppSettings.IzlenecekDosya)}");
 
                 if (new FileInfo(_configuration.AppSettings.IzlenecekDosya).Length == 0)
                 {
@@ -214,7 +258,7 @@ class Program
                 DosyaIslemleri.DosyaYedekAl(_configuration.AppSettings.IzlenecekDosya, "yedek");
 
                 // Kopya oluştur
-                DosyaIslemleri.DosyaKopyala(_configuration.AppSettings.IzlenecekDosya, kopyaDosya);
+                DosyaIslemleri.DosyaKopyala(_configuration.AppSettings.IzlenecekDosya, isleneceklerDosyasi);
 
                 // Ana dosyayı temizle
                 DosyaIslemleri.DosyaTemizle(_configuration.AppSettings.IzlenecekDosya);
@@ -224,30 +268,29 @@ class Program
 
                 LogYaz("Yeni değişiklikler işleniyor:");
 
-                foreach (string satir in DosyaIslemleri.DosyaSatirlariniOku(kopyaDosya))
+                foreach (string satir in DosyaIslemleri.DosyaSatirlariniOku(isleneceklerDosyasi))
                 {
                     satirSayisi++;
                     try
                     {
-                        if (_configuration.AppSettings.IsDebugMode)
-                        {
-                            LogYaz($"Debug: İşlenen satır burada apiyi çağıracağız şuan satır bilgisi : {satirSayisi}: {satir}");
-                        }
+                        
+                        LogYaz($"İşlenen satır burada apiyi çağıracağız şuan satır bilgisi : {satirSayisi}: {satir}");
+                        Thread.Sleep(1000); //api isteği karşılanmasını bekliyormuş gibi yap
                         // API çağrısı ve diğer işlemler
                     }
                     catch (Exception ex)
                     {
                         hataliSatirSayisi++;
                         DosyaIslemleri.DosyayaYazYeniSatir(
-                            _configuration.AppSettings.HataliDosya,
-                            $"{DateTime.Now} - Satır {satirSayisi}: {satir} - Hata: {ex.Message}");
+                            _configuration.CoreSettings.HataliDosya,
+                            $"{DateTime.Now} - {satir} ");
 
-                        LogYaz($"Hata - Satır {satirSayisi}: {ex.Message}");
+                        LogYaz($"İşlenen satırda hata!! - {satir} Hata: {ex.Message}");
                     }
                 }
 
                 // Kopya dosyayı sil
-                DosyaIslemleri.DosyaSil(kopyaDosya, false);
+                DosyaIslemleri.DosyaSil(isleneceklerDosyasi, false);
 
                 LogYaz($"Toplam {satirSayisi} satır okundu.");
                 LogYaz($"Toplam {hataliSatirSayisi} hatalı satır bulundu.");
@@ -311,14 +354,11 @@ class Program
                 }
             }
 
-            // Config dosyasını sil
-            DosyaIslemleri.DosyaSil(configFilePath,true, "sifirlamaOncesi");
+            //// Config dosyasını sil
+            //DosyaIslemleri.DosyaSil(configFilePath,true, "sifirlamaOncesi");
 
             // Hatalı dosyayı sil
-            DosyaIslemleri.DosyaSil(_configuration.AppSettings.HataliDosya, true, "sifirlamaOncesi");
-
-            // Log dosyasını sil
-            DosyaIslemleri.DosyaSil(_configuration.AppSettings.LogDosya, true, "sifirlamaOncesi");
+            DosyaIslemleri.DosyaSil(_configuration.CoreSettings.HataliDosya, true, "sifirlamaOncesi");
 
             LogYaz("Uygulama başarıyla sıfırlandı.");
         }
@@ -333,16 +373,17 @@ class Program
     {
         try
         {
-            if (_configuration.AppSettings.IsDebugMode && !_consoleAllocated)
+            if (_configuration.AppSettings.IsDebugMode && !_isKonsolPenceresiAcik)
             {
-                AllocConsole();
-                _consoleAllocated = true;
+                ShowWindow(GetConsoleWindow(), SW_SHOW);
+                _isKonsolPenceresiAcik = true;
                 LogYaz("Debug modu aktif - Konsol açıldı");
             }
-            else if (!_configuration.AppSettings.IsDebugMode && _consoleAllocated)
+            else if (!_configuration.AppSettings.IsDebugMode && _isKonsolPenceresiAcik)
             {
-                FreeConsole();
-                _consoleAllocated = false;
+                Console.Clear();
+                ShowWindow(GetConsoleWindow(), SW_HIDE);
+                _isKonsolPenceresiAcik = false;
                 LogYaz("Debug modu pasif - Konsol kapatıldı");
             }
         }
@@ -351,6 +392,7 @@ class Program
             LogYaz($"Konsol yönetimi hatası: {ex.Message}");
         }
     }
+
 
 
 }
