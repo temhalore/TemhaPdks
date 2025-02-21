@@ -1,5 +1,6 @@
 ﻿public static class DosyaIslemleri
 {
+
     public static void DosyaKlasorKontrol(string dosyaYolu)
     {
         try

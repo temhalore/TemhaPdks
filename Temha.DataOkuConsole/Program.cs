@@ -7,9 +7,19 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Text.Json;
 using Temha.DataOkuConsole.DTO;
+using System.Runtime.InteropServices;
 
 class Program
 {
+    // Windows API işlevlerini tanımlayın
+    [DllImport("kernel32.dll")]
+    private static extern bool AllocConsole();
+
+    [DllImport("kernel32.dll")]
+    private static extern bool FreeConsole();
+
+    private static bool _consoleAllocated = false;
+
     private static string appName = "TemhaDosyaOkuYaz";
     private static FileSystemWatcher watcher;
     private static FileSystemWatcher configWatcher;
@@ -23,6 +33,10 @@ class Program
     {
         try
         {
+            // İlk çalıştırmada konsol penceresini aç
+            AllocConsole();
+            _consoleAllocated = true;
+
             // application.json dosyasını oluştur veya yükle
             InitializeConfiguration();
 
@@ -59,6 +73,8 @@ class Program
                 return;
             }
 
+         
+
             // Dosya izleyiciyi başlat
             SetupFileWatcher();
 
@@ -70,6 +86,9 @@ class Program
 
             // İlk okuma işlemini başlat
             ProcessFile();
+
+            // İlk kurulum tamamlandıktan sonra debug moduna göre konsolu yönet
+            YonetimKonsol();
 
             await Task.Delay(-1);
         }
@@ -86,11 +105,12 @@ class Program
     private static void InitializeConfiguration()
     {
         //KENDİ LOKASYONUNDAN BAKMA KODU
-        //configFilePath = Path.Combine(
-        //    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-        //    "application.json");
+        configFilePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            "application.json");
+        //kurulum olunca nereye kurulursa oradan alsın
         
-        configFilePath = ("C:\\TemhaPdks\\config\\application.json");
+        //configFilePath = ("C:\\TemhaPdks\\config\\application.json");
 
 
         if (!File.Exists(configFilePath))
@@ -306,5 +326,46 @@ class Program
         {
             LogYaz($"Sıfırlama sırasında hata oluştu: {ex.Message}");
         }
+    }
+
+    // Konsol yönetimi için yardımcı metod
+    private static void YonetimKonsol()
+    {
+        try
+        {
+            if (_configuration.AppSettings.IsDebugMode && !_consoleAllocated)
+            {
+                AllocConsole();
+                _consoleAllocated = true;
+                LogYaz("Debug modu aktif - Konsol açıldı");
+            }
+            else if (!_configuration.AppSettings.IsDebugMode && _consoleAllocated)
+            {
+                FreeConsole();
+                _consoleAllocated = false;
+                LogYaz("Debug modu pasif - Konsol kapatıldı");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogYaz($"Konsol yönetimi hatası: {ex.Message}");
+        }
+    }
+
+    // Dosyanın kilitli olup olmadığını kontrol eden yardımcı metod
+    private static bool IsFileLocked(FileInfo file)
+    {
+        try
+        {
+            using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                stream.Close();
+            }
+        }
+        catch (IOException)
+        {
+            return true;
+        }
+        return false;
     }
 }
