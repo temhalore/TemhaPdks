@@ -1,8 +1,8 @@
 ﻿//using System;
-//using Prj.COMMON.DTO.Organization;
-//using Prj.COMMON.DTO.HumanResources;
+//using LorePdks.COMMON.DTO.Organization;
+//using LorePdks.COMMON.DTO.HumanResources;
 
-//namespace Prj.COMMON.DTO.Security.Auth
+//namespace LorePdks.COMMON.DTO.Security.Auth
 //{
 //    public class AuthDTO
 //    {

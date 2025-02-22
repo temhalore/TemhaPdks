@@ -18,4 +18,17 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LorePdks.COMMON\LorePdks.COMMON.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Enums\OrmLite.Poco.Enums.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Model\Poco.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+
 </Project>

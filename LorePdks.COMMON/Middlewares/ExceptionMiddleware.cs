@@ -7,11 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
 using LorePdks.COMMON.Models;
+using LorePdks.COMMON.Models.ServiceResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Prj.COMMON.Enums;
-using Prj.COMMON.Models.ServiceResponse;
 
 namespace LorePdks.COMMON.Middlewares
 {

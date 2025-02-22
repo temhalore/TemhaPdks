@@ -4,7 +4,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace Prj.COMMON.DTO
+//namespace LorePdks.COMMON.DTO
 //{
 //    public class ActivityRequestDTO : BaseDTO
 //    {

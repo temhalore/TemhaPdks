@@ -1,11 +1,11 @@
-﻿//using Prj.COMMON.DTO.Base;
+﻿//using LorePdks.COMMON.DTO.Base;
 //using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace Prj.COMMON.DTO
+//namespace LorePdks.COMMON.DTO
 //{
 //    public class ActivityDTO : BaseDTO
 //    {
