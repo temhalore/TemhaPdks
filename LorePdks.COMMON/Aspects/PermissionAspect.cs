@@ -1,6 +1,5 @@
 ﻿using Castle.DynamicProxy;
 using LorePdks.COMMON.Aspects.Interceptors;
-using LorePdks.COMMON.Aspects.Logging.Serilog;
 using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
 using LorePdks.COMMON.Helpers;
 using Microsoft.AspNetCore.Http;

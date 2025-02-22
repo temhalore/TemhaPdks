@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using LorePdks.COMMON.Aspects.Interceptors;
 using LorePdks.COMMON.Aspects.Logging;
 using LorePdks.COMMON.Helpers;
-using LorePdks.COMMON.Aspects.Logging.Serilog;
+using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
 
 namespace LorePdks.COMMON.Aspects
 {

@@ -1,4 +1,5 @@
-﻿using LorePdks.COMMON.Helpers;
+﻿using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
+using LorePdks.COMMON.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

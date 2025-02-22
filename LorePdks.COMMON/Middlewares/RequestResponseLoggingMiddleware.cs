@@ -53,13 +53,13 @@ namespace LorePdks.COMMON.Middlewares
         {
             try
             {
-                string aa = context.Request.Path.ToString();
+                //string aa = context.Request.Path.ToString();
 
-                if (aa.Contains("save3dOdeme"))
-                {
-                    return "bankaçağrısı-save3dOdeme";
+                //if (aa.Contains("save3dOdeme"))
+                //{
+                //    return "bankaçağrısı-save3dOdeme";
 
-                }
+                //}
 
 
 

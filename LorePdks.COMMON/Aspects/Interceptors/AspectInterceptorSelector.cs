@@ -15,6 +15,7 @@ namespace LorePdks.COMMON.Aspects.Interceptors
 
 
             var methodAttributes = type.GetMethods().Where(m => m.Name == method.Name).FirstOrDefault()?.GetCustomAttributes<MethodInterceptionBaseAttribute>(true);
+            
             if (methodAttributes != null)
                 classAttributes.AddRange(methodAttributes);
 

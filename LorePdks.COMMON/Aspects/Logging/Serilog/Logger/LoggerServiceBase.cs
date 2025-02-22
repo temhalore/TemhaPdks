@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using System;
 
-namespace LorePdks.COMMON.Aspects.Logging.Serilog
+namespace LorePdks.COMMON.Aspects.Logging.Serilog.Logger
 {
     public abstract class LoggerServiceBase
     {

@@ -1,4 +1,7 @@
-﻿using Serilog;
+﻿using LorePdks.COMMON.Helpers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace LorePdks.COMMON.Aspects.Logging.Serilog.Logger
 
@@ -11,6 +14,9 @@ namespace LorePdks.COMMON.Aspects.Logging.Serilog.Logger
             Logger = _Logger;
             //var config = ServiceTool.ServiceProvider.GetService<IConfiguration>();
             //Logger = LoggingConfiguration.Configuration(config,"exception").CreateLogger();
+
         }
+
     }
+
 }

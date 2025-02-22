@@ -2,7 +2,7 @@
 <#
 	// Settings
 	ConnectionStringName = "repo";			// Uses last connection string in config if not specified
-	var Namespace = "Prj.COMMON.Enums";
+	var Namespace = "LorePdks.COMMON.Enums";
 	SchemaName = "";
 	ClassPrefix = "";
 	ClassSuffix = "";

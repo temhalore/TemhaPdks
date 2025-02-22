@@ -6,7 +6,7 @@ using Serilog.Events;
 using Serilog.Formatting.Elasticsearch;
 using Serilog.Sinks.Elasticsearch;
 
-namespace LorePdks.COMMON.Aspects.Logging.Serilog
+namespace LorePdks.COMMON.Aspects.Logging.Serilog.Logger
 {
     public class ElasticsearchLogger : LoggerServiceBase
     {

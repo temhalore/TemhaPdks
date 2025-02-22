@@ -2,7 +2,7 @@
 <#
 	// Settings
 	ConnectionStringName = "repo";			// Uses last connection string in config if not specified
-	var Namespace = "Prj.DAL.Model";
+	var Namespace = "LorePdksDAL.Model";
 	SchemaName = "";
 	IncludeViews = false;
 	ClassPrefix = "";

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Castle.DynamicProxy;
 using LorePdks.COMMON.Aspects.Interceptors;
 using LorePdks.COMMON.Aspects.Logging;
-using LorePdks.COMMON.Aspects.Logging.Serilog;
 using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
 using LorePdks.COMMON.Extensions;
 using LorePdks.COMMON.Helpers;

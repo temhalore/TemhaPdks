@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace LorePdks.COMMON.Aspects.Logging.Serilog
+namespace LorePdks.COMMON.Aspects.Logging.Serilog.Logger
 {
     public class FileLogger : LoggerServiceBase
     {
