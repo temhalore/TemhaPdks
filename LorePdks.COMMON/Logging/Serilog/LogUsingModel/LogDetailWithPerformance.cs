@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LorePdks.COMMON.Aspects.Logging
+namespace LorePdks.COMMON.Logging.Serilog.LogUsingModel
 {
     public class LogDetailWithPerformance : LogDetail
     {

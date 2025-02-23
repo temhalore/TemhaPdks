@@ -5,29 +5,29 @@ using System.Text;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
 using LorePdks.COMMON.Aspects.Interceptors;
-using LorePdks.COMMON.Aspects.Logging;
-using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
 using LorePdks.COMMON.Extensions;
 using LorePdks.COMMON.Helpers;
+using LorePdks.COMMON.Logging;
+using LorePdks.COMMON.Logging.Serilog.LogUsingModel;
 using LorePdks.COMMON.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace LorePdks.COMMON.Aspects
 {
-    public class ExceptionLogAspect : MethodInterception
+    /// <summary>
+    /// tüm excemtion alan metodlar loglanır
+    /// </summary>
+    public class ExceptionAspect : MethodInterception
     {
-        private readonly LoggerServiceBase _loggerServiceBase;
+        private readonly Serilog.ILogger _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public ExceptionLogAspect(Type loggerService)
+        public ExceptionAspect()
         {
-            if (loggerService.BaseType != typeof(LoggerServiceBase))
-            {
-                throw new ArgumentException("Wrong Logger Type");
-            }
-
-            _loggerServiceBase = (LoggerServiceBase)Activator.CreateInstance(loggerService);
+         
+            _logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig"), "ExceptionAspect").CreateLogger();
             _httpContextAccessor = ServiceProviderHelper.ServiceProvider.GetService<IHttpContextAccessor>();
         }
 
@@ -35,13 +35,13 @@ namespace LorePdks.COMMON.Aspects
         {
             var logDetailWithException = GetLogDetail(invocation);
 
-            //if (e is AggregateException)
-            //    logDetailWithException.ExceptionMessage = string.Join(Environment.NewLine, (e as AggregateException).InnerExceptions.Select(x => x.Message));
-            //else
-            //    logDetailWithException.ExceptionMessage = e.Message;
+            if (e is AggregateException)
+                logDetailWithException.Message = string.Join(Environment.NewLine, (e as AggregateException).InnerExceptions.Select(x => x.Message));
+            else
+                logDetailWithException.Message = e.Message;
             if (e.GetType() != typeof(AppException))
             {
-                _loggerServiceBase.Error(e, JsonConvert.SerializeObject(logDetailWithException).RemoveMessageBase64ImageData());
+                _logger.Error(e, JsonConvert.SerializeObject(logDetailWithException).RemoveMessageBase64ImageData());
             }
 
         }
@@ -59,7 +59,7 @@ namespace LorePdks.COMMON.Aspects
                 logParameters.Add(new LogParameter
                 {
                     Name = invocation.GetConcreteMethod()?.GetParameters()[i]?.Name ?? "Name empty",
-                    Value = invocation.Arguments[i],
+                    Value = invocation.GetConcreteMethod().GetParameters()[i].Name == "Password" ? "***" : invocation.Arguments[i],
                     Type = invocation.Arguments[i]?.GetType()?.Name
                 });
             }

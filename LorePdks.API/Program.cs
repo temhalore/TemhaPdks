@@ -16,7 +16,6 @@ using LorePdks.BAL.Services.DataTable.Interfaces;
 using LorePdks.BAL.Services.DataTable;
 using LorePdks.BAL.Services.Elasticsearch;
 using LorePdks.COMMON.Aspects.Caching;
-using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
 using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.Models.ServiceResponse.Interfaces;
 using LorePdks.COMMON.Models.ServiceResponse;
@@ -29,9 +28,12 @@ using LorePdks.BAL.BaseManager;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Autofac;
-using LorePdks.COMMON.Aspects.Logging;
 using Serilog;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using LorePdks.COMMON.Aspects.Interceptors;
+using System.Reflection;
+using LorePdks.COMMON.Helpers;
+using LorePdks.COMMON.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,18 +52,7 @@ sectionCoreConfig.Get<CoreConfig>(); // modele direk atama yapar //Prj.COMMON.Co
 CoreConfig.ConfigName = builder.Configuration.GetSection("ConfigName").Value;   // config name valuemizi uygun yere yazalım bilgi amaçlı
 
 
-//elastic search configs
-var sectionLogConfig = builder.Configuration.GetSection("LogConfig");
-LorePdks.COMMON.Aspects.Logging.Serilog.Logger.PerformanceLogger._Logger = LoggingConfiguration.Configuration(sectionLogConfig, "performance").CreateLogger();
-LorePdks.COMMON.Aspects.Logging.Serilog.Logger.ExceptionLogger._Logger = LoggingConfiguration.Configuration(sectionLogConfig, "exception").CreateLogger();
-LorePdks.COMMON.Aspects.Logging.Serilog.Logger.FileLogger._Logger = LoggingConfiguration.Configuration(sectionLogConfig, "logs", "File").CreateLogger();
 
-Log.Logger = LoggingConfiguration.Configuration(sectionLogConfig).CreateLogger();
-
-//buid anında kullanılmayacaklar .app ten sonra setlenecek
-builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
-builder.Services.Configure<ClientRateLimitOptions>(builder.Configuration.GetSection("ClientRateLimiting"));
-builder.Services.Configure<ClientRateLimitPolicies>(builder.Configuration.GetSection("ClientRateLimitPolicies"));
 
 #endregion
 //builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -69,6 +60,7 @@ builder.Services.Configure<ClientRateLimitPolicies>(builder.Configuration.GetSec
 //{
 //    containerBuilder.RegisterModule(new BusinessModule()); // BusinessModule'ü kaydet
 //});
+
 
 
 
@@ -102,9 +94,13 @@ builder.Services.AddTransient<IDataTableService, DataTableService>();
 //builder.Services.AddSingleton<ICacheManager, RedisCacheManager>();
 builder.Services.AddSingleton<ICacheManager, MemoryCacheManager>(); // redis değil bunu kullanacağız
 builder.Services.AddSingleton<Stopwatch>();
-builder.Services.AddTransient<ExceptionLogger>();
-builder.Services.AddTransient<UserActionLogger>();
-builder.Services.AddTransient<PerformanceLogger>();
+
+
+builder.Logging.AddSerilog(Log.Logger);
+//buid anında kullanılmayacaklar .app ten sonra setlenecek
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<ClientRateLimitOptions>(builder.Configuration.GetSection("ClientRateLimiting"));
+builder.Services.Configure<ClientRateLimitPolicies>(builder.Configuration.GetSection("ClientRateLimitPolicies"));
 
 //builder.Services.AddSingleton<IElasticsearchService, ElasticsearchService>();
 
@@ -203,7 +199,33 @@ builder.Services.AddTransient<IKodManager, KodManager>();
 
 builder.Services.AddControllers(options => options.Filters.Add(new SecurityFilter()));
 
+// Autofac container'ı yapılandır
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+// Autofac modüllerini yapılandır
+//builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+//{
+//    // Debug için
+//    Debug.WriteLine("Configuring Autofac container...");
+
+//    // Castle Dynamic Proxy için gerekli assembly'leri kaydet
+//    var assembly = Assembly.GetExecutingAssembly();
+//    containerBuilder.RegisterAssemblyTypes(assembly)
+//        .AsImplementedInterfaces();
+
+//    // BusinessModule'ü kaydet
+//    containerBuilder.RegisterModule(new BusinessModule());
+
+//    Debug.WriteLine("Autofac container configuration completed");
+//});
+
+builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
+ {
+     builder.RegisterModule(new LorePdks.BAL.BaseManager.BusinessModule());
+ });
+
+
 var app = builder.Build();
+ServiceProviderHelper.ServiceProvider = app.Services;
 
 var forwardingOptions = new ForwardedHeadersOptions()
 {

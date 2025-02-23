@@ -1,9 +1,12 @@
-﻿using LorePdks.COMMON.Configuration;
+﻿
+using LorePdks.COMMON.Configuration;
+using LorePdks.COMMON.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,18 +16,20 @@ using System.Threading.Tasks;
 
 namespace LorePdks.COMMON.Middlewares
 {
+    /// <summary>
+    /// tüm responce ve requestler loglanır
+    /// </summary>
     public class RequestResponseLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
+        private readonly Serilog.ILogger _logger;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
         private readonly IConfiguration _configuration;
 
-        public RequestResponseLoggingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory, IConfiguration configuration)
+        public RequestResponseLoggingMiddleware(RequestDelegate next,  IConfiguration configuration)
         {
             _next = next;
-
-            _logger = loggerFactory.CreateLogger<RequestResponseLoggingMiddleware>();
+            
             _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
             _configuration = configuration;
         }
@@ -47,7 +52,6 @@ namespace LorePdks.COMMON.Middlewares
                 await _next(context);
             }
         }
-
 
         private async Task<string> LogRequest(HttpContext context, string correlationId)
         {
@@ -97,7 +101,7 @@ namespace LorePdks.COMMON.Middlewares
                     log += $"appToken: {appToken} ";
                 }
 
-                _logger.LogInformation(log);
+                _logger.Information(log);
                 context.Request.Body.Position = 0;
                 return appToken;
             }
@@ -138,12 +142,10 @@ namespace LorePdks.COMMON.Middlewares
             }
             log += $"ReqResElapsedTime: {(DateTime.Now - requestStartDate).TotalMilliseconds.ToString()}";
 
-            _logger.LogInformation(log);
+            _logger.Information(log);
 
             await responseBody.CopyToAsync(originalBodyStream);
         }
-
-
 
         private async Task<string> LogRequest1(HttpContext context, string correlationId)
         {
@@ -194,7 +196,7 @@ namespace LorePdks.COMMON.Middlewares
                     stringBuilder.Append("{UserId}");
                     fieldValueList.Add(userIdClaims.Value);
                 }
-                _logger.LogInformation(stringBuilder.ToString(), fieldValueList.ToArray());
+                _logger.Information(stringBuilder.ToString(), fieldValueList.ToArray());
 
                 context.Request.Body.Position = 0;
 
@@ -245,7 +247,7 @@ namespace LorePdks.COMMON.Middlewares
 
                 stringBuilder.Append("{ReqResElapsedTime}");
                 fieldValueList.Add((DateTime.Now - requestStartDate).TotalMilliseconds.ToString());
-                _logger.LogInformation(stringBuilder.ToString(), fieldValueList.ToArray());
+                _logger.Information(stringBuilder.ToString(), fieldValueList.ToArray());
 
                 await responseBody.CopyToAsync(originalBodyStream);
             }
@@ -273,9 +275,6 @@ namespace LorePdks.COMMON.Middlewares
                 }
             }
         }
-
-
-
 
     }
 }

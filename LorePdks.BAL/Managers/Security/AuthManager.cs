@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using LorePdks.BAL.Managers.Security.Interfaces;
-using LorePdks.COMMON.Aspects.Logging.Serilog;
 using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.DTO.Security.Auth;
 using LorePdks.COMMON.Enums;
@@ -10,6 +9,7 @@ using LorePdks.COMMON.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using LorePdks.COMMON.Enums;
+using LorePdks.COMMON.Logging;
 
 namespace LorePdks.BAL.Managers.Security
 {

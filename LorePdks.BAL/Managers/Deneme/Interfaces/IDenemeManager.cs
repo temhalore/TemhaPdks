@@ -2,5 +2,7 @@
 {
     public interface IDenemeManager
     {
+        public string getTestString();
+        public List<string> GetDBTableNameList();
     }
 }

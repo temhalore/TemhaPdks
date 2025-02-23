@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using LorePdks.COMMON.DTO.Security.Auth;
-using LorePdks.COMMON.Aspects.Logging.Serilog;
 using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.DTO.Security.Auth;
 using LorePdks.COMMON.DTO.Security.User;
@@ -16,6 +15,7 @@ using LorePdks.COMMON.Enums;
 using LorePdks.BAL.Managers.Security.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using LorePdks.BAL.Managers.Common.Kod.Interfaces;
+using LorePdks.COMMON.Logging;
 
 namespace LorePdks.BAL.Managers.Security
 {

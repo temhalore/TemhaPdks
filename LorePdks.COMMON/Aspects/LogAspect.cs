@@ -9,30 +9,29 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using LorePdks.COMMON.Aspects.Interceptors;
-using LorePdks.COMMON.Aspects.Logging;
 using LorePdks.COMMON.Helpers;
-using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
+using LorePdks.COMMON.Logging;
+using Microsoft.Extensions.Configuration;
+using LorePdks.COMMON.Logging.Serilog.LogUsingModel;
 
 namespace LorePdks.COMMON.Aspects
 {
+    //tüm metodlar ilk giriş anında loglanır ve giriş parametreleri yazılır loga
     public class LogAspect : MethodInterception
     {
-        private readonly LoggerServiceBase _loggerServiceBase;
+        
+        private readonly Serilog.ILogger _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public LogAspect(Type loggerService)
+        public LogAspect()
         {
-            if (loggerService.BaseType != typeof(LoggerServiceBase))
-            {
-                //  throw new ArgumentException(AspectMessages.WrongLoggerType);
-            }
 
-            _loggerServiceBase = (LoggerServiceBase)ServiceProviderHelper.ServiceProvider.GetService(loggerService);
+            _logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig"), $"{"LogAspect"}").CreateLogger();
             _httpContextAccessor = ServiceProviderHelper.ServiceProvider.GetService<IHttpContextAccessor>();
         }
         protected override void OnBefore(IInvocation invocation)
         {
-            _loggerServiceBase?.Info(GetLogDetail(invocation));
-        }
+            _logger?.Information(GetLogDetail(invocation));
+       }
 
         private string GetLogDetail(IInvocation invocation)
         {

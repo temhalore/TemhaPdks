@@ -1,7 +1,6 @@
 ﻿
 using System.Reflection;
 using Castle.DynamicProxy;
-using LorePdks.COMMON.Aspects.Logging.Serilog.Logger;
 
 namespace LorePdks.COMMON.Aspects.Interceptors
 {
@@ -19,8 +18,9 @@ namespace LorePdks.COMMON.Aspects.Interceptors
             if (methodAttributes != null)
                 classAttributes.AddRange(methodAttributes);
 
-            classAttributes.Add(new ExceptionLogAspect(typeof(ExceptionLogger))); // Tüm methodlar hata aldığında loglanması sağlar
-            classAttributes.Add(new PermissionAspect()); // Tüm methodlar hata aldığında loglanması sağlar
+            classAttributes.Add(new ExceptionAspect()); // Tüm methodlar hata aldığında loglanması sağlar
+            classAttributes.Add(new PermissionAspect()); 
+            classAttributes.Add(new LogAspect()); // Tüm methodlar loglanır
 
             if (!method.Name.StartsWith("Get") && method.Name != "login" && method.Name != "logout")
             {
@@ -32,10 +32,10 @@ namespace LorePdks.COMMON.Aspects.Interceptors
                 //classAttributes.Add(new TransactionReadUncommitted()); // Get methodlarına yapılan her isteği transaction içerisine alır.
             }
 
-            classAttributes.Add(new LogAspect(typeof(UserActionLogger))); // Tüm methodlarda yapılan her isteğin loglanması sağlar
-
-            classAttributes.Add(new PerformanceAspect(5)); // Tüm methodların çalışma süreleri kontrol edilir. Çalışma süresi 5sn geçerse loglanır.
-
+            //classAttributes.Add(new LogAspect(typeof(UserActionLogger))); // Tüm methodlarda yapılan her isteğin loglanması sağlar
+            
+            // Tüm methodların çalışma süreleri kontrol edilir. Çalışma süresi 5sn geçerse loglanır.
+            classAttributes.Add(new PerformanceAspect(5));
             return classAttributes.OrderBy(x => x.Priority).ToArray();
         }
     }

@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
+using LorePdks.COMMON.Helpers;
+using LorePdks.COMMON.Logging;
 using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Models.ServiceResponse;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -21,8 +26,9 @@ namespace LorePdks.COMMON.Middlewares
 
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
+           
             _next = next;
-            _logger = logger;
+            _logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig"), $"{"LogAspect"}").CreateLogger();
         }
 
         public async Task InvokeAsync(HttpContext httpContext)

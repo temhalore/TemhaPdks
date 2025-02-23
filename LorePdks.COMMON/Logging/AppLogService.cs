@@ -1,11 +1,14 @@
-﻿using Serilog;
+﻿using LorePdks.COMMON.Helpers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using static LorePdks.COMMON.Enums.AppEnums;
 
-namespace LorePdks.COMMON.Aspects.Logging.Serilog
+namespace LorePdks.COMMON.Logging
 {
     /*
          var jsonBirModelimiz = new { Name = "Login2", Id = "2" };
@@ -29,7 +32,8 @@ namespace LorePdks.COMMON.Aspects.Logging.Serilog
                 {
                     instance = new AppLogService();
                 }
-                instance.Logger = Log.Logger;
+                // instance.Logger = Log.Logger;
+                instance.Logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig"), $"{"AppLogService"}").CreateLogger();
                 return instance;
             }
         }

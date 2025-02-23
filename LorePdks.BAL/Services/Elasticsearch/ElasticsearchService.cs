@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Nest;
 using Newtonsoft.Json;
-using LorePdks.COMMON.Aspects.Logging.Serilog;
 using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.DTO.Base;
 using System;
@@ -9,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LorePdks.COMMON.Logging.Serilog.LogUsingModel;
 
 namespace LorePdks.BAL.Services.Elasticsearch
 {

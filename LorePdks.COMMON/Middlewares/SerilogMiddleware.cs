@@ -12,6 +12,9 @@ using Serilog.Context;
 
 namespace LorePdks.COMMON.Middlewares
 {
+    /// <summary>
+    /// LogContext e header dan property ekler
+    /// </summary>
     public class SerilogMiddleware
     {
         private readonly RequestDelegate next;
@@ -26,7 +29,7 @@ namespace LorePdks.COMMON.Middlewares
 
             string headerdanAlinanToken = context == null ? "?" : context.Request.Headers[CoreConfig.TokenKeyName].ToString();
             LogContext.PushProperty(CoreConfig.TokenKeyName, headerdanAlinanToken);
-            LogContext.PushProperty("RemoteIPAddress", context.GetRemoteIPAddress());//
+            LogContext.PushProperty("RemoteIPAddress", context.GetRemoteIPAddress());
             return next(context);
         }
     }

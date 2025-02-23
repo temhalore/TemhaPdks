@@ -3,18 +3,45 @@ using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.DTO.Base;
 using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Models.ServiceResponse;
+using LorePdks.COMMON.Enums;
+using LorePdks.BAL.Managers.Deneme;
+using LorePdks.BAL.Managers.Deneme.Interfaces;
+using LorePdks.COMMON.Logging;
 
 namespace LorePdks.API.Controllers.Deneme
 {
     [Route("Api/Deneme")]
     [ApiController]
-    public class DenemeController : ControllerBase
+    public class DenemeController (ILogger<DenemeController> _logger, IDenemeManager _denemeManager ) : ControllerBase
     {
-        //   private readonly IDenemeManager _denemeManager;
+     
 
-        public DenemeController()
+        [HttpGet("test-log")]
+        public IActionResult TestLog()
         {
-            //        _denemeManager = denemeManager;
+            AppLogService.Instance.SetLogIndexTip(AppEnums.LOG_INDEX_TIP.LOGIN).Info($"AppEnums.LOG_INDEX_TIP.LOGIN aaaaaaaaaaaaaaaaa");
+
+            AppLogService.Instance.SetLogIndexTip(AppEnums.LOG_INDEX_TIP.GENEL).Info($"AppEnums.LOG_INDEX_TIP.GENEL aaaaaaaaaaa");
+
+            AppLogService.Instance.Info("AppLogService.Instance.Info aaaaaaaaaaaaaaaa");
+
+            AppLogService.Instance.Error("AppLogService.Instance.Error aaaaaaaaaaaaaaaa");
+
+            AppLogService.Instance.Warn("AppLogService.Instance.Warn aaaaaaaaaaaaaaaa");
+
+            AppLogService.Instance.Debug("AppLogService.Instance.Debug aaaaaaaaaaaaaaaa");
+
+           var aa =  _denemeManager.getTestString();
+
+            _logger.LogTrace("This is a trace log");
+            _logger.LogDebug("This is a debug log");
+            _logger.LogInformation("This is an information log");
+            _logger.LogWarning("This is a warning log");
+            _logger.LogError("This is an error log");
+            _logger.LogCritical("This is a critical log");
+
+
+            return Ok(aa);
         }
 
         //TODO: bunu muhakak kap
@@ -22,7 +49,7 @@ namespace LorePdks.API.Controllers.Deneme
         [Route("GetEnvironmentVariables")]
         public IActionResult getEnviromentName()
         {
-
+    
             var response = new ServiceResponse<object>();
             try
             {
