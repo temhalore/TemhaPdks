@@ -13,30 +13,18 @@ using LorePdks.COMMON.Extensions;
 
 namespace LorePdks.BAL.Managers.Deneme
 {
-    public class FirmaManager : IFirmaManager
+    public class FirmaManager(
+                IHelperManager _helperManager
+            , IHttpContextAccessor _httpContextAccessor
+            , IMapper _mapper
+            , IKodManager _kodManager
+        ) : IFirmaManager
     {
 
-        private IHelperManager _helperManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private IMapper _mapper;
-        private IKodManager _kodManager;
-
+     
         private readonly GenericRepository<t_firma> _repoFirma = new GenericRepository<t_firma>();
 
-        public FirmaManager(
-            IHelperManager helperManager
-            , IHttpContextAccessor httpContextAccessor
-            , IMapper mapper
-            , IKodManager kodManager
-          )
 
-        {
-
-            _helperManager = helperManager;
-            _httpContextAccessor = httpContextAccessor;
-            _mapper = mapper;
-            _kodManager = kodManager;
-        }
 
         public FirmaDTO saveFirma(FirmaDTO firmaDto)
         {
@@ -63,8 +51,7 @@ namespace LorePdks.BAL.Managers.Deneme
         {
 
             var dbFirma = getFirmaByFirmaId(firmaDto.id, isYoksaHataDondur: true);
-
-            //:TODO:burayı diğer metodlar olunca düzenle - müfredatlarda kullanılmış bir firma silinemez
+      
             bool isKullanilmis = false;
 
             if (isKullanilmis)

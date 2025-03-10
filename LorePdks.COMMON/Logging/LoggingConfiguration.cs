@@ -23,14 +23,14 @@ namespace LorePdks.COMMON.Logging
                 sink = logConfig.Serilog.ActiveSink;
             }
 
-            var seriLogConfig = new LoggerConfiguration()
-               .Enrich.FromLogContext()
-               .Enrich.With(new ThreadIdEnricher())
-               .Enrich.WithProperty("Application", logConfig.ProjectName)
-               //.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-               //.MinimumLevel.Override("System", LogEventLevel.Warning)
-               .MinimumLevel
-               .Verbose();
+            var seriLogConfig = new LoggerConfiguration();
+               //.Enrich.FromLogContext()
+               //.Enrich.With(new ThreadIdEnricher())
+               //.Enrich.WithProperty("Application", logConfig.ProjectName)
+               ////.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+               ////.MinimumLevel.Override("System", LogEventLevel.Warning)
+               //.MinimumLevel
+               //.Verbose();
 
 
             if (logConfig.Serilog.ActiveSink == "Elasticsearch")
@@ -69,7 +69,10 @@ namespace LorePdks.COMMON.Logging
                         rollingInterval: RollingInterval.Day,
                         retainedFileCountLimit: null,
                         fileSizeLimitBytes: 500000, //500MB
-                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}");
+                        shared: true, // Birden fazla process tarafından kullanılabilir bunu yazmazsan her bir log satırı ayrı dosyaya yazılıyor
+                        flushToDiskInterval: TimeSpan.FromSeconds(1), // Daha sık disk yazma
+                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}");
+
             }
             else if (logConfig.Serilog.ActiveSink == "MSSqlServer")
             {
@@ -101,70 +104,86 @@ namespace LorePdks.COMMON.Logging
 
             return seriLogConfig;
         }
-
         public static string CreateLogFilePath(IConfiguration config, string pattern = "logs")
         {
-            try
-            {
-                // Config kontrolü ve alınması
-                var logConfig = config.Get<LogingConfigurationModel>() ??
-                    throw new Exception("Logging configuration is null");
+            var logConfig = config.Get<LogingConfigurationModel>() ??
+                        throw new Exception("Null Options Message");
 
-                // Ana log klasörü yolu oluşturma
-                string baseLogDirectory = Path.Combine(
-                    logConfig.Serilog.File.Path.TrimEnd('\\'),
-                    logConfig.ProjectName,
-                    pattern);
+            // Ana log klasörü yolu
+            string baseLogDirectory = Path.Combine(
+                logConfig.Serilog.File.Path.TrimEnd('\\'),
+                logConfig.ProjectName,
+                pattern);
 
-                // Klasör yapısını ve izinleri ayarla
-                EnsureDirectoryExists(baseLogDirectory);
+            // Klasör yapısını oluştur
+            EnsureDirectoryExists(baseLogDirectory);
 
-                // Log dosyası yolu
-                string logFilePath = Path.Combine(baseLogDirectory, "logs.txt");
-
-                // Dosya izinlerini ayarla
-                EnsureFilePermissions(logFilePath);
-
-                return logFilePath;
-            }
-            catch (Exception ex)
-            {
-                // Hata durumunda fallback mekanizması
-                try
-                {
-                    string fallbackDirectory = Path.Combine(
-                        AppDomain.CurrentDomain.BaseDirectory,
-                        "FallbackLogs",
-                        pattern);
-
-                    EnsureDirectoryExists(fallbackDirectory);
-
-                    string fallbackPath = Path.Combine(fallbackDirectory, "error_logs.txt");
-
-                    // Hatayı loglama
-                    LogCreationError(ex, fallbackPath);
-
-                    return fallbackPath;
-                }
-                catch (Exception fallbackEx)
-                {
-                    // Son çare: Temp klasörüne yazma
-                    string tempPath = Path.Combine(
-                        Path.GetTempPath(),
-                        "EmergencyLogs",
-                        "emergency_log.txt");
-
-                    Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
-
-                    File.AppendAllText(tempPath,
-                        $"Critical Error in Log Creation: {DateTime.Now}\n" +
-                        $"Original Error: {ex.Message}\n" +
-                        $"Fallback Error: {fallbackEx.Message}\n\n");
-
-                    return tempPath;
-                }
-            }
+            // Sabit bir dosya adı formatı kullan, tarih bilgisini Serilog'a bırak
+            return Path.Combine(baseLogDirectory, "log-.txt");
         }
+        //public static string CreateLogFilePath(IConfiguration config, string pattern = "logs")
+        //{
+        //    try
+        //    {
+        //        // Config kontrolü ve alınması
+        //        var logConfig = config.Get<LogingConfigurationModel>() ??
+        //            throw new Exception("Logging configuration is null");
+
+        //        // Ana log klasörü yolu oluşturma
+        //        string baseLogDirectory = Path.Combine(
+        //            logConfig.Serilog.File.Path.TrimEnd('\\'),
+        //            logConfig.ProjectName,
+        //            pattern);
+
+        //        // Klasör yapısını ve izinleri ayarla
+        //        EnsureDirectoryExists(baseLogDirectory);
+
+        //        // Log dosyası yolu
+        //        string logFilePath = Path.Combine(baseLogDirectory, "logs.txt");
+
+        //        // Dosya izinlerini ayarla
+        //        EnsureFilePermissions(logFilePath);
+
+        //        return logFilePath;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Hata durumunda fallback mekanizması
+        //        try
+        //        {
+        //            string fallbackDirectory = Path.Combine(
+        //                AppDomain.CurrentDomain.BaseDirectory,
+        //                "FallbackLogs",
+        //                pattern);
+
+        //            EnsureDirectoryExists(fallbackDirectory);
+
+        //            string fallbackPath = Path.Combine(fallbackDirectory, "error_logs.txt");
+
+        //            // Hatayı loglama
+        //            LogCreationError(ex, fallbackPath);
+
+        //            return fallbackPath;
+        //        }
+        //        catch (Exception fallbackEx)
+        //        {
+        //            // Son çare: Temp klasörüne yazma
+        //            string tempPath = Path.Combine(
+        //                Path.GetTempPath(),
+        //                "EmergencyLogs",
+        //                "emergency_log.txt");
+
+        //            Directory.CreateDirectory(Path.GetDirectoryName(tempPath));
+
+        //            File.AppendAllText(tempPath,
+        //                $"Critical Error in Log Creation: {DateTime.Now}\n" +
+        //                $"Original Error: {ex.Message}\n" +
+        //                $"Fallback Error: {fallbackEx.Message}\n\n");
+
+        //            return tempPath;
+        //        }
+        //    }
+        //}
 
         private static void EnsureFilePermissions(string filePath)
         {

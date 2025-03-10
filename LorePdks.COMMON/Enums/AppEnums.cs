@@ -7,15 +7,6 @@ namespace LorePdks.COMMON.Enums
     {
 
 
-        public enum ParaBirim
-        {
-            Empty = 0,
-            TL = 1100001,
-            USD = 1100002,
-            EUR = 1100003,
-            GBP = 1100004,
-
-        }
         public enum KodTipList
         {
             Odeme_Yontem = 101,

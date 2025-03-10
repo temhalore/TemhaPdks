@@ -1,8 +1,10 @@
 ﻿
 using LorePdks.COMMON.Configuration;
+using LorePdks.COMMON.Helpers;
 using LorePdks.COMMON.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using Newtonsoft.Json;
@@ -29,7 +31,7 @@ namespace LorePdks.COMMON.Middlewares
         public RequestResponseLoggingMiddleware(RequestDelegate next,  IConfiguration configuration)
         {
             _next = next;
-            
+            _logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig"), $"{"RequestResponseLoggingMiddleware"}").CreateLogger();
             _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
             _configuration = configuration;
         }

@@ -21,6 +21,7 @@ namespace LorePdks.API.Controllers.Deneme
         {
             AppLogService.Instance.SetLogIndexTip(AppEnums.LOG_INDEX_TIP.LOGIN).Info($"AppEnums.LOG_INDEX_TIP.LOGIN aaaaaaaaaaaaaaaaa");
 
+
             AppLogService.Instance.SetLogIndexTip(AppEnums.LOG_INDEX_TIP.GENEL).Info($"AppEnums.LOG_INDEX_TIP.GENEL aaaaaaaaaaa");
 
             AppLogService.Instance.Info("AppLogService.Instance.Info aaaaaaaaaaaaaaaa");
@@ -39,6 +40,29 @@ namespace LorePdks.API.Controllers.Deneme
             _logger.LogWarning("This is a warning log");
             _logger.LogError("This is an error log");
             _logger.LogCritical("This is a critical log");
+
+
+            AppLogService.Instance.SetLogIndexTip(AppEnums.LOG_INDEX_TIP.LOGIN).Info($"AppEnums.LOG_INDEX_TIP.LOGIN aaaaaaaaaaaaaaaaa2");
+
+
+            AppLogService.Instance.SetLogIndexTip(AppEnums.LOG_INDEX_TIP.GENEL).Info($"AppEnums.LOG_INDEX_TIP.GENEL aaaaaaaaaaa2");
+
+            AppLogService.Instance.Info("AppLogService.Instance.Info aaaaaaaaaaaaaaaa2");
+
+            AppLogService.Instance.Error("AppLogService.Instance.Error aaaaaaaaaaaaaaaa2");
+
+            AppLogService.Instance.Warn("AppLogService.Instance.Warn aaaaaaaaaaaaaaaa2");
+
+            AppLogService.Instance.Debug("AppLogService.Instance.Debug aaaaaaaaaaaaaaaa2");
+
+            var aa2 = _denemeManager.getTestString();
+
+            _logger.LogTrace("This is a trace log2");
+            _logger.LogDebug("This is a debug log2");
+            _logger.LogInformation("This is an information log2");
+            _logger.LogWarning("This is a warning log2");
+            _logger.LogError("This is an error log2");
+            _logger.LogCritical("This is a critical log2");
 
 
             return Ok(aa);
