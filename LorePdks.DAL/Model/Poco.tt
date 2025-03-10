@@ -2,7 +2,7 @@
 <#
 	// Settings
 	ConnectionStringName = "Connection";			// Uses last connection string in config if not specified
-	var Namespace = "LorePdks.DAL.Models";
+	var Namespace = "LorePdks.DAL.Model";
 	//SchemaName = "borsa";
 	SchemaName = "u1555990_lorepdk";
 	
@@ -54,6 +54,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using <#=Namespace #>;
 namespace <#=Namespace #>
 {
 <#manager.EndBlock(); #>
@@ -65,12 +66,6 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 ///	if(!tbl.Name.StartsWith("v_"))
 ///		continue;
 ///	}
-
-
-
-		
-
-	
 
 manager.StartNewFile(tbl.Name + ".cs");
 #>
