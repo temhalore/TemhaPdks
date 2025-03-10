@@ -68,7 +68,7 @@ namespace LorePdks.COMMON.Logging
                     CreateLogFilePath(config, patern),
                         rollingInterval: RollingInterval.Day,
                         retainedFileCountLimit: null,
-                        fileSizeLimitBytes: 500000, //500MB
+                        fileSizeLimitBytes: 50000, //50MB
                         shared: true, // Birden fazla process tarafından kullanılabilir bunu yazmazsan her bir log satırı ayrı dosyaya yazılıyor
                         flushToDiskInterval: TimeSpan.FromSeconds(1), // Daha sık disk yazma
                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}");
