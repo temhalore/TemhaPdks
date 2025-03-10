@@ -17,21 +17,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
 namespace LorePdks.DAL.Model
 {
-    public partial class t_kod  : _BaseModel
+    public partial class t_pdks  : _BaseModel
     {
-		public t_kod() 
+		public t_pdks() 
 		{
 		}
 
+     //   [AutoIncrement]
+     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
+	  public int ID { get; set;}
         [Required]
-		[Key]
-        public int ID { get; set;}
-        public int? TIP_ID { get; set;}
-        public string KOD { get; set;}
-        public int? SIRA { get; set;}
-        public string KISA_AD { get; set;}
-        public string DIGER_UYG_ENUM_AD { get; set;}
-        public int? DIGER_UYG_ID { get; set;}
+        public int FIRMA_ID { get; set;}
+        [Required]
+        public int KISI_ID { get; set;}
+        [Required]
+        public int FIRMA_CIHAZ_ID { get; set;}
+        public DateTime? GIRIS_TARIH { get; set;}
+        public string CIKIS_TARIH { get; set;}
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -39,15 +41,14 @@ namespace LorePdks.DAL.Model
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
     } 
-	public enum t_kod_PROPERTIES {
+	public enum t_pdks_PROPERTIES {
 
 		ID,
-		TIP_ID,
-		KOD,
-		SIRA,
-		KISA_AD,
-		DIGER_UYG_ENUM_AD,
-		DIGER_UYG_ID,
+		FIRMA_ID,
+		KISI_ID,
+		FIRMA_CIHAZ_ID,
+		GIRIS_TARIH,
+		CIKIS_TARIH,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

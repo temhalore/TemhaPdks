@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Managers\FirmaKisi\" />
+    <Folder Include="Managers\Hareket\" />
+    <Folder Include="Managers\FirmaCihaz\" />
+    <Folder Include="Managers\Kisi\" />
+    <Folder Include="Managers\Pdks\" />
+    <Folder Include="Managers\User\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

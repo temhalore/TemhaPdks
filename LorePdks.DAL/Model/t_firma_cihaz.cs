@@ -17,21 +17,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
 namespace LorePdks.DAL.Model
 {
-    public partial class t_kod  : _BaseModel
+    public partial class t_firma_cihaz  : _BaseModel
     {
-		public t_kod() 
+		public t_firma_cihaz() 
 		{
 		}
 
+     //   [AutoIncrement]
+     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
+	  public int ID { get; set;}
         [Required]
-		[Key]
-        public int ID { get; set;}
-        public int? TIP_ID { get; set;}
-        public string KOD { get; set;}
-        public int? SIRA { get; set;}
-        public string KISA_AD { get; set;}
-        public string DIGER_UYG_ENUM_AD { get; set;}
-        public int? DIGER_UYG_ID { get; set;}
+        public int FIRMA_ID { get; set;}
+        [Required]
+        public int CIHAZ_MAKINE_GERCEK_ID { get; set;}
+        public int? FIRMA_CIHAZ_TIP_KID { get; set;}
+        public string AD { get; set;}
+        public string ACIKLAMA { get; set;}
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -39,15 +40,14 @@ namespace LorePdks.DAL.Model
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
     } 
-	public enum t_kod_PROPERTIES {
+	public enum t_firma_cihaz_PROPERTIES {
 
 		ID,
-		TIP_ID,
-		KOD,
-		SIRA,
-		KISA_AD,
-		DIGER_UYG_ENUM_AD,
-		DIGER_UYG_ID,
+		FIRMA_ID,
+		CIHAZ_MAKINE_GERCEK_ID,
+		FIRMA_CIHAZ_TIP_KID,
+		AD,
+		ACIKLAMA,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

@@ -10,11 +10,6 @@ using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Deneme;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using LorePdks.BAL.Managers.Helper;
-using LorePdks.BAL.Managers.Security.Interfaces;
-using LorePdks.BAL.Managers.Security;
-using LorePdks.BAL.Services.DataTable.Interfaces;
-using LorePdks.BAL.Services.DataTable;
-using LorePdks.BAL.Services.Elasticsearch;
 using LorePdks.COMMON.Aspects.Caching;
 using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.Models.ServiceResponse.Interfaces;
@@ -77,8 +72,11 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
 
+builder.Services.AddTransient<IFirmaManager, FirmaManager>();
+
+
 //builder.Services.AddTransient<IKisiTokenManager, KisiTokenManager>();
-builder.Services.AddTransient<IAuthManager, AuthManager>();
+//builder.Services.AddTransient<IAuthManager, AuthManager>();
 //builder.Services.AddTransient<IMenuManager, MenuManager>();
 //builder.Services.AddTransient<IWidgetManager, WidgetManager>();
 //builder.Services.AddTransient<IPermissionManager, PermissionManager>();

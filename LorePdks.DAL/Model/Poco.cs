@@ -14,9 +14,74 @@
 //     Include Views:          `True`
 
 //     Factory Name:          `MySqlClientFactory`
-//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_deneme
-//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_deneme
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_firma
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_firma
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : AD
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : KOD
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ACIKLAMA
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ADRES
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CIHAZ_TIP_KID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MESAI_SAAT
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MOLA_SAAT
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CUMARTESI_MESAI_SAAT
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CUMARTESI_MOLA_SAAT
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_firma_cihaz
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_firma_cihaz
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CIHAZ_MAKINE_GERCEK_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_CIHAZ_TIP_KID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : AD
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ACIKLAMA
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_firma_kisi
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_firma_kisi
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : KISI_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_KISI_TIP_KID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_hareket
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_hareket
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : HAREKET_TIP_KID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : HAREKET_DURUM_KID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : HAREKET_KAYIT_TARIH
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : HAREKET_DATA
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : HAREKET_ISLEME_TARIH
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_kisi
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_kisi
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : AD
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : SOYAD
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : TC
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CEP_TEL
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : EMAIL
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
 //   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_kod
 //   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_kod
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
@@ -26,7 +91,55 @@
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : KISA_AD
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : DIGER_UYG_ENUM_AD
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : DIGER_UYG_ID
-//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : COLUMN4
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_login_user
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_login_user
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : USER_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : USER_NAME
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : TOKEN
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : IP_ADRESI
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : USER_AGENT
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : EXP_DATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_pdk
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_pdks
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : KISI_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : FIRMA_CIHAZ_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : GIRIS_TARIH
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CIKIS_TARIH
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_pdks_hareket
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_pdks_hareket
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : PDKS_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : HAREKET_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDUSER
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MODIFIEDDATE
+//   foreach (var t in result) >> !makeSingular >>  t.ClassName : t_user
+//   foreach (var t in result) >> t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;  : t_user
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : KISI_ID
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : USER_NAME
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : SIFRE
+//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : AKTIF
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ISDELETED
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDUSER
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CREATEDDATE

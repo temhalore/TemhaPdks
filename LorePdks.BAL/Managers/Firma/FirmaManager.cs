@@ -1,0 +1,142 @@
+﻿using AutoMapper;
+using LorePdks.BAL.Managers.Common.Kod.Interfaces;
+using LorePdks.BAL.Managers.Deneme.Interfaces;
+using LorePdks.BAL.Managers.Helper.Interfaces;
+using Microsoft.AspNetCore.Http;
+using LorePdks.DAL.Model;
+using LorePdks.DAL.Repository;
+using LorePdks.COMMON.Enums;
+using LorePdks.COMMON.Models;
+using Org.BouncyCastle.Asn1;
+using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.Extensions;
+
+namespace LorePdks.BAL.Managers.Deneme
+{
+    public class FirmaManager : IFirmaManager
+    {
+
+        private IHelperManager _helperManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private IMapper _mapper;
+        private IKodManager _kodManager;
+
+        private readonly GenericRepository<t_firma> _repoFirma = new GenericRepository<t_firma>();
+
+        public FirmaManager(
+            IHelperManager helperManager
+            , IHttpContextAccessor httpContextAccessor
+            , IMapper mapper
+            , IKodManager kodManager
+          )
+
+        {
+
+            _helperManager = helperManager;
+            _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
+            _kodManager = kodManager;
+        }
+
+        public FirmaDTO saveFirma(FirmaDTO firmaDto)
+        {
+
+
+            bool isGuncelleniyor = false;
+
+            if (firmaDto.id > 0) isGuncelleniyor = true;
+
+            var dbFirma = getFirmaByFirmaId(firmaDto.id, isYoksaHataDondur: isGuncelleniyor); // güncelleniyor şeklinde bakılıyorsa bulunamazsa hata dönsün
+
+            checkFirmaDtoKayitEdilebilirMi(firmaDto);
+
+            t_firma firma = _mapper.Map<FirmaDTO, t_firma>(firmaDto);
+
+            _repoFirma.Save(firma);
+
+            firmaDto = _mapper.Map<t_firma, FirmaDTO>(firma);
+
+            return firmaDto;
+        }
+
+        public void deleteFirmaByFirmaDto(FirmaDTO firmaDto)
+        {
+
+            var dbFirma = getFirmaByFirmaId(firmaDto.id, isYoksaHataDondur: true);
+
+            //:TODO:burayı diğer metodlar olunca düzenle - müfredatlarda kullanılmış bir firma silinemez
+            bool isKullanilmis = false;
+
+            if (isKullanilmis)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Kullanılmış bir firma silinemez.");
+
+            }
+
+        }
+
+        public t_firma getFirmaByFirmaId(int firmaId, bool isYoksaHataDondur = false)
+        {
+
+            var firma = _repoFirma.Get(firmaId);
+
+            if (isYoksaHataDondur && firma == null)
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"{firmaId} id li firma sistemde bulunamadı");
+            }
+            return firma;
+
+        }
+
+        public FirmaDTO getFirmaDtoById(int firmaId, bool isYoksaHataDondur = false)
+        {
+            var firma = getFirmaByFirmaId(firmaId, isYoksaHataDondur);
+
+            FirmaDTO firmaDto = _mapper.Map<t_firma, FirmaDTO>(firma);
+
+            return firmaDto;
+        }
+
+        /// <summary>
+        /// bir firma değişiliğe uğramaya çalışırsa yada ilk defa kayıt edilyorsa yapılacak kontroller burada
+        /// </summary>
+        /// <param name="firmaDto"></param>
+        /// <exception cref="AppException"></exception>
+        public void checkFirmaDtoKayitEdilebilirMi(FirmaDTO firmaDto)
+        {
+            if (String.IsNullOrEmpty(firmaDto.ad))
+                throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"ad alanı boş olamaz");
+            if (String.IsNullOrEmpty(firmaDto.kod))
+                throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"kod alanı boş olamaz");
+
+            var allFirmaList = _repoFirma.GetList();
+
+            allFirmaList = allFirmaList.Where(x => x.ID != firmaDto.id).ToList();
+
+            //firma ad kontrolü
+            foreach (var item in allFirmaList)
+            {
+             
+                if (item.AD.ToLower().ToTurkishChars().Contains(firmaDto.ad.ToLower().ToTurkishChars()))
+                {
+                    throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Kayıt etmeye çalıştığınız firma {item.AD} firma adı ile zaten kaytlı lütfen bu firmayı kullanınız");
+                }
+                if (item.KOD.ToLower().ToTurkishChars().Contains(firmaDto.kod.ToLower().ToTurkishChars()))
+                {
+                    throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Kayıt etmeye çalıştığınız firma {item.AD} firma adı ile zaten kaytlı lütfen bu firmayı kullanınız");
+                }
+            }
+
+            // eğer önceden kayıtlı ve güncelleme oluyorsa farklı kontroller yapılması gerek
+            if (firmaDto.id > 0)
+            {
+                //önce db halini bul ve ne değiştiğini tespit et buna göre ek kontrolletini yaz 
+                var dbFirma = getFirmaByFirmaId(firmaDto.id, isYoksaHataDondur: true);
+
+              
+
+            }
+
+        }
+    }
+}

@@ -17,21 +17,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
 namespace LorePdks.DAL.Model
 {
-    public partial class t_kod  : _BaseModel
+    public partial class t_firma  : _BaseModel
     {
-		public t_kod() 
+		public t_firma() 
 		{
 		}
 
-        [Required]
-		[Key]
-        public int ID { get; set;}
-        public int? TIP_ID { get; set;}
+     //   [AutoIncrement]
+     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
+	  public int ID { get; set;}
+        public string AD { get; set;}
         public string KOD { get; set;}
-        public int? SIRA { get; set;}
-        public string KISA_AD { get; set;}
-        public string DIGER_UYG_ENUM_AD { get; set;}
-        public int? DIGER_UYG_ID { get; set;}
+        public string ACIKLAMA { get; set;}
+        public string ADRES { get; set;}
+        public int? CIHAZ_TIP_KID { get; set;}
+        public int? MESAI_SAAT { get; set;}
+        public int? MOLA_SAAT { get; set;}
+        public int? CUMARTESI_MESAI_SAAT { get; set;}
+        public int? CUMARTESI_MOLA_SAAT { get; set;}
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -39,15 +42,18 @@ namespace LorePdks.DAL.Model
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
     } 
-	public enum t_kod_PROPERTIES {
+	public enum t_firma_PROPERTIES {
 
 		ID,
-		TIP_ID,
+		AD,
 		KOD,
-		SIRA,
-		KISA_AD,
-		DIGER_UYG_ENUM_AD,
-		DIGER_UYG_ID,
+		ACIKLAMA,
+		ADRES,
+		CIHAZ_TIP_KID,
+		MESAI_SAAT,
+		MOLA_SAAT,
+		CUMARTESI_MESAI_SAAT,
+		CUMARTESI_MOLA_SAAT,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,
