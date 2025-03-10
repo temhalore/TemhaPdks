@@ -22,7 +22,7 @@ using LorePdks.COMMON.Models.ServiceResponse;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using System.Diagnostics;
-using LorePdks.BAL.Managers.Job;
+//using LorePdks.BAL.Managers.Job;
 using LorePdks.COMMON.Extensions;
 using LorePdks.BAL.BaseManager;
 using Autofac.Core;
@@ -77,17 +77,17 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
 
-builder.Services.AddTransient<IKisiTokenManager, KisiTokenManager>();
+//builder.Services.AddTransient<IKisiTokenManager, KisiTokenManager>();
 builder.Services.AddTransient<IAuthManager, AuthManager>();
-builder.Services.AddTransient<IMenuManager, MenuManager>();
-builder.Services.AddTransient<IWidgetManager, WidgetManager>();
-builder.Services.AddTransient<IPermissionManager, PermissionManager>();
-builder.Services.AddTransient<IPageManager, PageManager>();
-builder.Services.AddTransient<IRoleManager, RoleManager>();
-builder.Services.AddTransient<IRoleUserManager, RoleUserManager>();
-builder.Services.AddTransient<IUserManager, UserManager>();
-builder.Services.AddTransient<IRoleWidgetManager, RoleWidgetManager>();
-builder.Services.AddTransient<IDataTableService, DataTableService>();
+//builder.Services.AddTransient<IMenuManager, MenuManager>();
+//builder.Services.AddTransient<IWidgetManager, WidgetManager>();
+//builder.Services.AddTransient<IPermissionManager, PermissionManager>();
+//builder.Services.AddTransient<IPageManager, PageManager>();
+//builder.Services.AddTransient<IRoleManager, RoleManager>();
+//builder.Services.AddTransient<IRoleUserManager, RoleUserManager>();
+//builder.Services.AddTransient<IUserManager, UserManager>();
+//builder.Services.AddTransient<IRoleWidgetManager, RoleWidgetManager>();
+//builder.Services.AddTransient<IDataTableService, DataTableService>();
 
 
 //builder.Services.AddSingleton<RedisServer>();

@@ -46,7 +46,7 @@ namespace LorePdks.BAL.Managers.Common.Kod
 
             if (cacheYenilensinMi)
             {
-                var repo = new GenericRepository<T_Pos_Kod>();
+                var repo = new GenericRepository<t_kod>();
 
                 var data = repo.GetList();
 
@@ -57,7 +57,7 @@ namespace LorePdks.BAL.Managers.Common.Kod
                     KodDTO dto = new KodDTO();
                     try
                     {
-                        dto = _mapper.Map<T_Pos_Kod, KodDTO>(item);
+                        dto = _mapper.Map<t_kod, KodDTO>(item);
                     }
                     catch (Exception e)
                     {
@@ -137,9 +137,9 @@ namespace LorePdks.BAL.Managers.Common.Kod
 
         public KodDTO GetKodDtoByKodId(int kodId)
         {
-            var repoKod = new GenericRepository<T_Pos_Kod>();
+            var repoKod = new GenericRepository<t_kod>();
             var kod = repoKod.Get(kodId);
-            var dto = _mapper.Map<T_Pos_Kod, KodDTO>(kod);
+            var dto = _mapper.Map<t_kod, KodDTO>(kod);
             return dto;
         }
 

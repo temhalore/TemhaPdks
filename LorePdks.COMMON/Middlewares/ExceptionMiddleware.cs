@@ -28,7 +28,9 @@ namespace LorePdks.COMMON.Middlewares
         {
            
             _next = next;
-            _logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig"), $"{"LogAspect"}").CreateLogger();
+            _logger = logger;
+           // _logger = LoggingConfiguration.Configuration(ServiceProviderHelper.ServiceProvider.GetService<IConfiguration>().GetSection("LogConfig")).CreateLogger();
+
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
