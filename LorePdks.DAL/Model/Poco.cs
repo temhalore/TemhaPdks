@@ -21,7 +21,6 @@
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : KOD
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ACIKLAMA
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : ADRES
-//   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CIHAZ_TIP_KID
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MESAI_SAAT
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : MOLA_SAAT
 //   foreach (var t in result) >> foreach (var c in t.Columns) >>  c.PropertyName;  : CUMARTESI_MESAI_SAAT

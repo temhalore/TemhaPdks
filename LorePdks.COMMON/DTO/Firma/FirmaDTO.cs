@@ -15,9 +15,9 @@ namespace LorePdks.COMMON.DTO.Common
         public string kod { get; set; }
         public string aciklama { get; set; }
         public string adres { get; set; }
-        public int mesaiSaat { get; set; }
-        public int molaSaat { get; set; }
-        public int cumartesiMesaiSaat { get; set; }
-        public int cumartesiMolaSaat { get; set; }
+        public decimal? mesaiSaat { get; set; }
+        public decimal? molaSaat { get; set; }
+        public decimal? cumartesiMesaiSaat { get; set; }
+        public decimal? cumartesiMolaSaat { get; set; }
     }
 }

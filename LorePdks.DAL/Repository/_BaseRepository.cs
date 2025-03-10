@@ -47,7 +47,7 @@ namespace LorePdks.DAL.Repository
 
         //internal ILog log;
         static Type type;
-        private long _userID;
+        private int _userID;
 
         private string _idField
         {

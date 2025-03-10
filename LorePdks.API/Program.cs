@@ -72,8 +72,6 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
 
-builder.Services.AddTransient<IFirmaManager, FirmaManager>();
-
 
 //builder.Services.AddTransient<IKisiTokenManager, KisiTokenManager>();
 //builder.Services.AddTransient<IAuthManager, AuthManager>();
@@ -192,7 +190,9 @@ builder.Services.AddTransient(typeof(IServiceResponse<>), typeof(ServiceResponse
 builder.Services.AddTransient<IHelperManager, HelperManager>();
 builder.Services.AddTransient<IDenemeManager, DenemeManager>();
 builder.Services.AddTransient<IKodManager, KodManager>();
-//builder.Services.AddTransient<IOdemeIadeIptalManager, OdemeIadeIptalManager>();
+builder.Services.AddTransient<IFirmaManager, FirmaManager>();
+builder.Services.AddTransient<IFirmaCihazManager, FirmaCihazManager>();
+
 #endregion uygulamamızda yazılan bussines servislerin managerlerin vs eklendiği bölüm
 
 builder.Services.AddControllers(options => options.Filters.Add(new SecurityFilter()));

@@ -30,7 +30,8 @@ namespace LorePdks.DAL.Model
         public int FIRMA_ID { get; set;}
         [Required]
         public int CIHAZ_MAKINE_GERCEK_ID { get; set;}
-        public int? FIRMA_CIHAZ_TIP_KID { get; set;}
+        [Required]
+        public int FIRMA_CIHAZ_TIP_KID { get; set;}
         public string AD { get; set;}
         public string ACIKLAMA { get; set;}
         [Required]

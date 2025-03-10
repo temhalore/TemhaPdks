@@ -29,7 +29,6 @@ namespace LorePdks.BAL.Managers.Deneme
         public FirmaDTO saveFirma(FirmaDTO firmaDto)
         {
 
-
             bool isGuncelleniyor = false;
 
             if (firmaDto.id > 0) isGuncelleniyor = true;
@@ -47,10 +46,10 @@ namespace LorePdks.BAL.Managers.Deneme
             return firmaDto;
         }
 
-        public void deleteFirmaByFirmaDto(FirmaDTO firmaDto)
+        public void deleteFirmaByFirmaId(int firmaId)
         {
 
-            var dbFirma = getFirmaByFirmaId(firmaDto.id, isYoksaHataDondur: true);
+            var dbFirma = getFirmaByFirmaId(firmaId, isYoksaHataDondur: true);
       
             bool isKullanilmis = false;
 
@@ -59,6 +58,8 @@ namespace LorePdks.BAL.Managers.Deneme
                 throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Kullanılmış bir firma silinemez.");
 
             }
+
+            _repoFirma.Delete(dbFirma);
 
         }
 

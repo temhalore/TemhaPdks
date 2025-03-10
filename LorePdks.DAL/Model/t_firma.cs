@@ -30,11 +30,10 @@ namespace LorePdks.DAL.Model
         public string KOD { get; set;}
         public string ACIKLAMA { get; set;}
         public string ADRES { get; set;}
-        public int? CIHAZ_TIP_KID { get; set;}
-        public int? MESAI_SAAT { get; set;}
-        public int? MOLA_SAAT { get; set;}
-        public int? CUMARTESI_MESAI_SAAT { get; set;}
-        public int? CUMARTESI_MOLA_SAAT { get; set;}
+        public decimal? MESAI_SAAT { get; set;}
+        public decimal? MOLA_SAAT { get; set;}
+        public decimal? CUMARTESI_MESAI_SAAT { get; set;}
+        public decimal? CUMARTESI_MOLA_SAAT { get; set;}
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -49,7 +48,6 @@ namespace LorePdks.DAL.Model
 		KOD,
 		ACIKLAMA,
 		ADRES,
-		CIHAZ_TIP_KID,
 		MESAI_SAAT,
 		MOLA_SAAT,
 		CUMARTESI_MESAI_SAAT,

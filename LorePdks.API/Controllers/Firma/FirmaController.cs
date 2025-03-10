@@ -1,0 +1,56 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using LorePdks.COMMON.Configuration;
+using LorePdks.COMMON.DTO.Base;
+using LorePdks.COMMON.Models;
+using LorePdks.COMMON.Models.ServiceResponse;
+using LorePdks.COMMON.Enums;
+using LorePdks.BAL.Managers.Deneme;
+using LorePdks.BAL.Managers.Deneme.Interfaces;
+using LorePdks.COMMON.Logging;
+using LorePdks.COMMON.DTO.Common;
+
+namespace LorePdks.API.Controllers.Deneme
+{
+    [Route("Api/Firma")]
+    [ApiController]
+    public class FirmaController(ILogger<FirmaController> _logger, IFirmaManager _firmaManager) : ControllerBase
+    {
+     
+
+      
+
+        [HttpPost]
+        [Route("saveFirmaByFirmaDto")]
+        public IActionResult saveFirmaByFirmaDto(FirmaDTO request)
+        {
+
+            var response = new ServiceResponse<FirmaDTO>();
+            var dto = _firmaManager.saveFirma(request);
+            response.data = dto;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("deleteFirmaByFirmaDto")]
+        public IActionResult deleteFirmaByFirmaDto(EIdDTO request)
+        {
+
+            var response = new ServiceResponse<FirmaDTO>();
+            _firmaManager.deleteFirmaByFirmaId(request.id);
+            
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("getFirmaDtoByEIdDto")]
+        public IActionResult getFirmaDtoByEIdDto(EIdDTO request)
+        {
+
+            var response = new ServiceResponse<FirmaDTO>();
+            var dto = _firmaManager.getFirmaDtoById(request.id);
+            response.data = dto;
+            return Ok(response);
+        }
+
+    }
+}

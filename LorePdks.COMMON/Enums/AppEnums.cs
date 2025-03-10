@@ -5,33 +5,35 @@ namespace LorePdks.COMMON.Enums
 {
     public class AppEnums
     {
-
-
         public enum KodTipList
         {
-            Odeme_Yontem = 101,
-            Odeme_Yontem_Guvenlik = 102,
-            Odeme_Durum = 103,
-            Araci_Kurum = 104,
-            Iade_Iptal_Islem_Tip = 105,
-            Iade_Iptal_Durum = 109,
-            KISI_TOKEN_DELETE_REASON = 106,
-            LOGIN_ARACI_KURUM_TIP = 107,
-            Para_Birim = 110,
-            OdemeKeyUretimTip = 111,
+            FIRMA_CIHAZ_TIP = 101,
+            KISI_TOKEN_DELETE_REASON = 901,
 
 
         }
 
+        public enum FIRMA_CIHAZ_TIP{
+        QR_MODEL=1010001,
+	MODEL_1=1010002,
+	MODEL_2=1020003,
+	MODEL_3=1020004,
+	MODEL_4=1020005,
+        }
+	
+
+
+ 
+
         public enum KISI_TOKEN_DELETE_REASON
         {
-            YENIDEN_LOGIN_SEBEBI_ILE = 1060001,
-            IP_DEGISIKLIGI_SEBEBI_ILE = 1060002,
-            YERINE_LOGIN_OLUNMASI_SEBEBI_ILE = 1060003,
-            GECERLILIK_TARIHI_DOLMASI_SEBEBI_ILE = 1060004,
-            USER_AGENT_DEGISIKLIGI_SEBEBI_ILE = 1060005,
-            KENDI_ISTEGI_SEBEBI_ILE = 1060006,
-            KONTROLDEN_GECMEDIGI_ICIN = 1060007,
+            YENIDEN_LOGIN_SEBEBI_ILE = 9010001,
+            IP_DEGISIKLIGI_SEBEBI_ILE = 9010002,
+            YERINE_LOGIN_OLUNMASI_SEBEBI_ILE = 9010003,
+            GECERLILIK_TARIHI_DOLMASI_SEBEBI_ILE = 9010004,
+            USER_AGENT_DEGISIKLIGI_SEBEBI_ILE = 9010005,
+            KENDI_ISTEGI_SEBEBI_ILE = 9010006,
+            KONTROLDEN_GECMEDIGI_ICIN = 9010007,
         }
        
 

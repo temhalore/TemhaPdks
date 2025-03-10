@@ -8,8 +8,7 @@ namespace LorePdks.COMMON.Models.ServiceResponse
 {
     public class ServiceResponse<T> : IServiceResponse<T>
     {
-        //Taumlamalar//
-        //Mesaj Tipi
+ 
         string _messageType;
         string _messageTypeCode;
         int _code;
@@ -20,10 +19,6 @@ namespace LorePdks.COMMON.Models.ServiceResponse
         AppExceptionModel _AppException;
         //Data
         public T data { get; set; }
-        //Others
-        //public int pageNumber { get; set; }
-        //public int itemsPerPage { get; set; }
-        //public int totalItems { get; set; }
         ////////
         public ServiceResponse()
         {
@@ -34,6 +29,15 @@ namespace LorePdks.COMMON.Models.ServiceResponse
             _messageType = ServiceResponseMessageType.Success;
         }
 
+
+        //todo:ae  buna gerek yok aslına ama çok yerde kullanılmış ekledim bunu sonra düelt  //
+        public IActionResult OkResult(T data, string message = "İşlem tamamlandı")
+        {
+            this.data = data;
+            this.message = message;
+            return new OkObjectResult(this);
+        }
+
         public ServiceResponse(AppException appEx)
         {
             _messageType = ServiceResponseMessageType.Error;
@@ -41,7 +45,7 @@ namespace LorePdks.COMMON.Models.ServiceResponse
             _messageHeader = appEx.messageHeader;
             _messageTypeCode = Convert.ToString(appEx.errorCode);
             _code = Convert.ToInt16(appEx.code);
-            IsSuccess = false;
+            this.IsSuccess = false;
             _AppException = new AppExceptionModel()
             {
                 code = appEx.code,
@@ -98,7 +102,7 @@ namespace LorePdks.COMMON.Models.ServiceResponse
                 }
                 if (messageType == ServiceResponseMessageType.Error)
                 {
-                    IsSuccess = false;
+                    this.IsSuccess = false;
                     _messageHeader = "Hatalı İşlem";
                 }
                 if (messageType == ServiceResponseMessageType.Warning)
@@ -107,7 +111,6 @@ namespace LorePdks.COMMON.Models.ServiceResponse
                 }
             }
         }
-
 
 
     }
@@ -135,5 +138,6 @@ namespace LorePdks.COMMON.Models.ServiceResponse
         public string errorCode { get; set; }
 
     }
+
 
 }
