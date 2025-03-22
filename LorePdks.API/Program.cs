@@ -124,7 +124,11 @@ builder.Services.AddControllers().
 builder.Services.AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.ConstructServicesUsing(type => builder.Services.BuildServiceProvider().GetService(type));
+    cfg.AddProfile<MappingProfile>(); // MappingProfile'ı ekleyin
+});
 builder.Services.AddScoped<SecurityFilter>();
 
 builder.Services.AddSwaggerGen(c =>

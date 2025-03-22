@@ -9,5 +9,6 @@ namespace LorePdks.BAL.Managers.Deneme.Interfaces
         public void deleteFirmaByFirmaId(int firmaId);
         public t_firma getFirmaByFirmaId(int firmaId, bool isYoksaHataDondur = false);
         public FirmaDTO getFirmaDtoById(int firmaId, bool isYoksaHataDondur = false);
+        public List<FirmaDTO> getFirmaDtoListById(bool isYoksaHataDondur = false);
     }
 }

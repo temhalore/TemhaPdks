@@ -13,7 +13,7 @@ public class FirmaCihazMapper : MappingProfile
            .ForMember(x => x.ad, y => y.MapFrom(z => z.AD))
            .ForMember(x => x.aciklama, y => y.MapFrom(z => z.ACIKLAMA))
            .ForMember(x => x.cihazMakineGercekId, y => y.MapFrom(z => z.CIHAZ_MAKINE_GERCEK_ID))
-           .ForMember(x => x.firmaCihazTipKodDto, y => y.MapFrom(z => new KodDTO() { id = z.FIRMA_CIHAZ_TIP_KID }))
+           .ForMember(x => x.firmaCihazTipKodDto, y => y.MapFrom(z => _kodManager.Value.GetKodDtoByKodId(Convert.ToInt32(z.FIRMA_CIHAZ_TIP_KID)) ))
            .ForMember(x => x.firmaDto, y => y.MapFrom(z => new FirmaDTO() { id = z.FIRMA_ID }))
            .ReverseMap()
            .ForMember(x => x.ID, y => y.MapFrom(z => z.id))

@@ -17,22 +17,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
 namespace LorePdks.DAL.Model
 {
-    public partial class t_kisi  : _BaseModel
+    public partial class t_kisi_token  : _BaseModel
     {
-		public t_kisi() 
+		public t_kisi_token() 
 		{
 		}
 
      //   [AutoIncrement]
      [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
 	  public int ID { get; set;}
-        public string AD { get; set;}
-        public string SOYAD { get; set;}
-        public string TC { get; set;}
-        public string CEP_TEL { get; set;}
-        public string EMAIL { get; set;}
+        [Required]
+        public int KISI_ID { get; set;}
         public string LOGIN_NAME { get; set;}
-        public string SIFRE { get; set;}
+        public string TOKEN { get; set;}
+        public string IP_ADRESI { get; set;}
+        public string USER_AGENT { get; set;}
+        public DateTime? EXP_DATE { get; set;}
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -40,16 +40,15 @@ namespace LorePdks.DAL.Model
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
     } 
-	public enum t_kisi_PROPERTIES {
+	public enum t_kisi_token_PROPERTIES {
 
 		ID,
-		AD,
-		SOYAD,
-		TC,
-		CEP_TEL,
-		EMAIL,
+		KISI_ID,
 		LOGIN_NAME,
-		SIFRE,
+		TOKEN,
+		IP_ADRESI,
+		USER_AGENT,
+		EXP_DATE,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

@@ -17,6 +17,8 @@ namespace LorePdks.COMMON.DTO.Common
         public string tc { get; set; }
         public string cepTel { get; set; }
         public string email { get; set; }
+        public string loginName { get; set; }
+        public string sifre { get; set; }
 
     }
 }

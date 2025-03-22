@@ -8,6 +8,7 @@ namespace LorePdks.COMMON.Enums
         public enum KodTipList
         {
             FIRMA_CIHAZ_TIP = 101,
+            FIRMA_KISI_TIP = 102,
             KISI_TOKEN_DELETE_REASON = 901,
 
 
@@ -16,11 +17,17 @@ namespace LorePdks.COMMON.Enums
         public enum FIRMA_CIHAZ_TIP{
         QR_MODEL=1010001,
 	MODEL_1=1010002,
-	MODEL_2=1020003,
-	MODEL_3=1020004,
-	MODEL_4=1020005,
+	MODEL_2=1010003,
+	MODEL_3=1010004,
+	MODEL_4=1010005,
         }
 	
+
+        public enum FIRMA_KISI_TIP{
+            PERSONEL = 1020001,
+            YETKILI = 1020002,
+        }	
+
 
 
  

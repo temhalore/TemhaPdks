@@ -78,11 +78,24 @@ namespace LorePdks.BAL.Managers.Deneme
 
         public FirmaDTO getFirmaDtoById(int firmaId, bool isYoksaHataDondur = false)
         {
+
             var firma = getFirmaByFirmaId(firmaId, isYoksaHataDondur);
 
             FirmaDTO firmaDto = _mapper.Map<t_firma, FirmaDTO>(firma);
 
             return firmaDto;
+        }
+
+        public List<FirmaDTO> getFirmaDtoListById( bool isYoksaHataDondur = false)
+        {
+            var firmaList = _repoFirma.GetList();
+            if (isYoksaHataDondur && firmaList.Count<=0)
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Firma bulunamadı");
+            }
+            List<FirmaDTO> firmaDtoList = _mapper.Map<List<t_firma>, List<FirmaDTO>>(firmaList);
+
+            return firmaDtoList;
         }
 
         /// <summary>

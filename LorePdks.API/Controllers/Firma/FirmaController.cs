@@ -52,5 +52,17 @@ namespace LorePdks.API.Controllers.Deneme
             return Ok(response);
         }
 
+        // bir user a tanımlı firma listler
+        [HttpPost]
+        [Route("getAllFirmaListDto")]
+        public IActionResult getAllFirmaListDto()
+        {
+
+            var response = new ServiceResponse<List<FirmaDTO>>();
+            var dto = _firmaManager.getFirmaDtoListById();
+            response.data = dto;
+            return Ok(response);
+        }
+
     }
 }
