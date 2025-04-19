@@ -40,7 +40,6 @@ namespace LorePdks.BAL.Managers.Deneme
 
             checkFirmaKisiDtoKayitEdilebilirMi(firmaKisiDto);
 
-
            t_firma_kisi firmaKisi = _mapper.Map<FirmaKisiDTO, t_firma_kisi>(firmaKisiDto);
 
             //burada using transaction yapılarak önce kişi eklenir sonra firmaKisi eklenir. eğer firmaKisi eklenirken hata alınırsa kişi eklenen transaction geri alınır.
