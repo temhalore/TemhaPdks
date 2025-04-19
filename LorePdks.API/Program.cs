@@ -196,6 +196,7 @@ builder.Services.AddTransient<IDenemeManager, DenemeManager>();
 builder.Services.AddTransient<IKodManager, KodManager>();
 builder.Services.AddTransient<IFirmaManager, FirmaManager>();
 builder.Services.AddTransient<IFirmaCihazManager, FirmaCihazManager>();
+builder.Services.AddTransient<IHareketManager, HareketManager>();
 
 #endregion uygulamamızda yazılan bussines servislerin managerlerin vs eklendiği bölüm
 

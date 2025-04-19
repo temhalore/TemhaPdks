@@ -14,7 +14,7 @@ public class FirmaKisiMapper : MappingProfile
     {
         var kisiManager = ServiceProviderHelper.ServiceProvider.GetService<Lazy<IKisiManager>>();
         var firmaManager = ServiceProviderHelper.ServiceProvider.GetService<Lazy<IFirmaManager>>();
-        var aa = firmaManager.Value.getFirmaDtoById(1);
+        //var aa = firmaManager.Value.getFirmaDtoById(1);
         CreateMap<t_firma_kisi, FirmaKisiDTO>()
            .ForMember(x => x.id, y => y.MapFrom(z => z.ID))
           // .ForMember(x => x.firmaDto, y => y.MapFrom(z => firmaManager.Value.getFirmaDtoById(1)))

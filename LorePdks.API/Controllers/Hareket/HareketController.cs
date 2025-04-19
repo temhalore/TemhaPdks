@@ -15,16 +15,11 @@ namespace LorePdks.API.Controllers.Deneme
     /// <summary>
     /// firmalardan toplanan tüm hareket çağrıları buraya düşecek ilk
     /// </summary>
+    [Route("Api/Hareket")]
     [ApiController]
-    [Route("api/[controller]")]
-    public class HareketController : ControllerBase
+    public class HareketController(ILogger<HareketController> _logger, IHareketManager _hareketManager) : ControllerBase
     {
-        private readonly IHareketManager _hareketManager;
-
-        public HareketController(IHareketManager hareketManager)
-        {
-            _hareketManager = hareketManager;
-        }
+     
         [HttpPost]
         [Route("saveFirmaByFirmaDto")]
         public IActionResult SaveHareket(HareketDTO hareketDto)
@@ -33,6 +28,7 @@ namespace LorePdks.API.Controllers.Deneme
             return Ok(result);
         }
 
+        [HttpPost]
         [Route("GetHareketListByFirmaId")]
         public IActionResult GetHareketListByFirmaDto(FirmaDTO firmaDto)
         {

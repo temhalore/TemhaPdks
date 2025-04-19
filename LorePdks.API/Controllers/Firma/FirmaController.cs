@@ -15,9 +15,6 @@ namespace LorePdks.API.Controllers.Deneme
     [ApiController]
     public class FirmaController(ILogger<FirmaController> _logger, IFirmaManager _firmaManager) : ControllerBase
     {
-     
-
-      
 
         [HttpPost]
         [Route("saveFirmaByFirmaDto")]
