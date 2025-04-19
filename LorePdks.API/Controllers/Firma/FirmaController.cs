@@ -9,7 +9,7 @@ using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.COMMON.Logging;
 using LorePdks.COMMON.DTO.Common;
 
-namespace LorePdks.API.Controllers.Deneme
+namespace LorePdks.API.Controllers.Firma
 {
     [Route("Api/Firma")]
     [ApiController]
@@ -34,7 +34,7 @@ namespace LorePdks.API.Controllers.Deneme
 
             var response = new ServiceResponse<FirmaDTO>();
             _firmaManager.deleteFirmaByFirmaId(request.id);
-            
+
             return Ok(response);
         }
 

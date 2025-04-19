@@ -9,7 +9,7 @@ using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.COMMON.Logging;
 using LorePdks.COMMON.DTO.Common;
 
-namespace LorePdks.API.Controllers.Deneme
+namespace LorePdks.API.Controllers.Hareket
 {
 
     /// <summary>
@@ -19,7 +19,7 @@ namespace LorePdks.API.Controllers.Deneme
     [ApiController]
     public class HareketController(ILogger<HareketController> _logger, IHareketManager _hareketManager) : ControllerBase
     {
-     
+
         [HttpPost]
         [Route("saveFirmaByFirmaDto")]
         public IActionResult SaveHareket(HareketDTO hareketDto)

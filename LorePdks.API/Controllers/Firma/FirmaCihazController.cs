@@ -5,19 +5,19 @@ using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Models.ServiceResponse;
 using LorePdks.COMMON.Enums;
 using LorePdks.BAL.Managers.Deneme;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.COMMON.Logging;
 using LorePdks.COMMON.DTO.Common;
+using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 
-namespace LorePdks.API.Controllers.Deneme
+namespace LorePdks.API.Controllers.Firma
 {
     [Route("Api/FirmaCihaz")]
     [ApiController]
     public class FirmaCihazController(ILogger<FirmaCihazController> _logger, IFirmaCihazManager _firmaCihazManager) : ControllerBase
     {
-     
 
-      
+
+
 
         [HttpPost]
         [Route("saveFirmaCihazByFirmaCihazDto")]
@@ -37,7 +37,7 @@ namespace LorePdks.API.Controllers.Deneme
 
             var response = new ServiceResponse<FirmaDTO>();
             _firmaCihazManager.deleteFirmaCihazByFirmaCihazId(request.id);
-            
+
             return Ok(response);
         }
 

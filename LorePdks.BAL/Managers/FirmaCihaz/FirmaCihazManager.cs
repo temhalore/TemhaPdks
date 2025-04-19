@@ -11,8 +11,9 @@ using Org.BouncyCastle.Asn1;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Extensions;
 using System.Collections.Generic;
+using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 
-namespace LorePdks.BAL.Managers.Deneme
+namespace LorePdks.BAL.Managers.FirmaCihaz
 {
     public class FirmaCihazManager(
                 IHelperManager _helperManager
@@ -23,7 +24,7 @@ namespace LorePdks.BAL.Managers.Deneme
         ) : IFirmaCihazManager
     {
 
-     
+
         private readonly GenericRepository<t_firma_cihaz> _repoFirmaCihaz = new GenericRepository<t_firma_cihaz>();
 
 
@@ -51,7 +52,7 @@ namespace LorePdks.BAL.Managers.Deneme
         {
 
             var dbFirmaCihaz = getFirmaCihazByFirmaCihazId(firmaCihazId, isYoksaHataDondur: true);
-      
+
             bool isKullanilmis = false;
 
             if (isKullanilmis)
@@ -80,10 +81,10 @@ namespace LorePdks.BAL.Managers.Deneme
         public List<t_firma_cihaz> getFirmaCihazListByFirmaId(int firmaId)
         {
 
-            var modelList = _repoFirmaCihaz.GetList("FIRMA_ID=@firmaId", new { firmaId = firmaId });
+            var modelList = _repoFirmaCihaz.GetList("FIRMA_ID=@firmaId", new { firmaId });
 
-            
-        
+
+
             return modelList;
 
         }
@@ -93,7 +94,7 @@ namespace LorePdks.BAL.Managers.Deneme
 
             var modelList = getFirmaCihazListByFirmaId(firmaId);
 
-            var dtoList = _mapper.Map< List <t_firma_cihaz> , List <FirmaCihazDTO>>(modelList);
+            var dtoList = _mapper.Map<List<t_firma_cihaz>, List<FirmaCihazDTO>>(modelList);
             return dtoList;
 
         }
@@ -115,16 +116,16 @@ namespace LorePdks.BAL.Managers.Deneme
         /// <exception cref="AppException"></exception>
         public void checkFirmaCihazDtoKayitEdilebilirMi(FirmaCihazDTO firmaCihazDto)
         {
-            if (firmaCihazDto.firmaDto==null)
+            if (firmaCihazDto.firmaDto == null)
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"firma seçmelisiniz");
-            if (firmaCihazDto.firmaDto.id <=0)
+            if (firmaCihazDto.firmaDto.id <= 0)
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"firma seçmelisiniz");
-            if (String.IsNullOrEmpty(firmaCihazDto.ad))
+            if (string.IsNullOrEmpty(firmaCihazDto.ad))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"ad alanı boş olamaz");
-            if (Convert.ToInt32(firmaCihazDto.cihazMakineGercekId)==0)
+            if (Convert.ToInt32(firmaCihazDto.cihazMakineGercekId) == 0)
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"cihazMakineGercekId alanı boş olamaz");
 
-            var firma = _firmaManager.getFirmaByFirmaId(firmaCihazDto.firmaDto.id,true);
+            var firma = _firmaManager.getFirmaByFirmaId(firmaCihazDto.firmaDto.id, true);
 
             _kodManager.checkKodDTOIdInTipList(firmaCihazDto.firmaCihazTipKodDto, AppEnums.KodTipList.FIRMA_CIHAZ_TIP, $"firmaCihazTipKodDto alanı uygun değil");
 
@@ -136,8 +137,8 @@ namespace LorePdks.BAL.Managers.Deneme
             //firmaCihaz ad kontrolü
             foreach (var item in allFirmaCihazList)
             {
-             
-               
+
+
                 if (item.CIHAZ_MAKINE_GERCEK_ID == firmaCihazDto.cihazMakineGercekId)
                 {
                     throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Kayıt etmeye çalıştığınız firmaCihaz cihazMakineGercekId olarak aynı firmada zaten kaytlı");
@@ -150,7 +151,7 @@ namespace LorePdks.BAL.Managers.Deneme
                 //önce db halini bul ve ne değiştiğini tespit et buna göre ek kontrolletini yaz 
                 var dbFirmaCihaz = getFirmaCihazByFirmaCihazId(firmaCihazDto.id, isYoksaHataDondur: true);
 
-              
+
 
             }
 

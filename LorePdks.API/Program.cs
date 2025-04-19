@@ -29,6 +29,8 @@ using LorePdks.COMMON.Aspects.Interceptors;
 using System.Reflection;
 using LorePdks.COMMON.Helpers;
 using LorePdks.COMMON.Logging;
+using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
+using LorePdks.BAL.Managers.FirmaCihaz;
 
 var builder = WebApplication.CreateBuilder(args);
 

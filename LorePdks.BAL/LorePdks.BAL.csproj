@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Managers\FirmaCihaz\" />
     <Folder Include="Managers\Pdks\" />
     <Folder Include="Managers\User\" />
     <Folder Include="Services\" />
