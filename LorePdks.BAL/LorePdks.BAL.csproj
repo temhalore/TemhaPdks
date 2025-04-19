@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Managers\Pdks\" />
+    <Folder Include="Managers\NewFolder\" />
     <Folder Include="Managers\User\" />
     <Folder Include="Services\" />
   </ItemGroup>
