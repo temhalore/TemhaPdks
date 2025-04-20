@@ -30,6 +30,7 @@ using LorePdks.COMMON.Helpers;
 using LorePdks.COMMON.Logging;
 using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.BAL.Managers.FirmaCihaz;
+using LorePdks.BAL.Managers.User;
 
 var builder = WebApplication.CreateBuilder(args);
 

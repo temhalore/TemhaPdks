@@ -1,6 +1,6 @@
 using AutoMapper;
+using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
-using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
@@ -96,7 +96,7 @@ namespace LorePdks.BAL.Managers.User
 
         public List<UserDTO> getUserDtoList(bool isYoksaHataDondur = false)
         {
-            var userList = _repoUser.GetList(x => x.ISDELETED == 0);
+            var userList = _repoUser.GetList();
             if (isYoksaHataDondur && userList.Count <= 0)
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"User kaydı bulunamadı");
@@ -131,10 +131,11 @@ namespace LorePdks.BAL.Managers.User
             _kisiManager.getKisiByKisiId(userDto.kisiDto.id, isYoksaHataDondur: true);
 
             // Kullanıcı adı benzersiz olmalı
-            var existingUserWithSameUsername = _repoUser.GetList(x => 
-                x.USER_NAME == userDto.loginName && 
-                x.ID != userDto.id && 
-                x.ISDELETED == 0);
+            var existingUserWithSameUsername = _repoUser.GetList().Where(
+                x =>
+                x.USER_NAME == userDto.loginName &&
+                x.ID != userDto.id 
+                ).ToList();
 
             if (existingUserWithSameUsername.Count > 0)
             {
