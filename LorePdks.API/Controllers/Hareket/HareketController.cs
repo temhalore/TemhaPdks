@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.DTO.Base;
-using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Models.ServiceResponse;
-using LorePdks.COMMON.Enums;
-using LorePdks.BAL.Managers.Deneme;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
-using LorePdks.COMMON.Logging;
-using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Hareket;
+using LorePdks.COMMON.DTO.Firma;
+using LorePdks.BAL.Managers.Hareket.Interfaces;
 
 namespace LorePdks.API.Controllers.Hareket
 {
@@ -18,6 +14,7 @@ namespace LorePdks.API.Controllers.Hareket
     [ApiController]
     public class HareketController(ILogger<HareketController> _logger, IHareketManager _hareketManager) : ControllerBase
     {
+        //dışarıdan okuma programımız bu metodu çağıracak
         [HttpPost]
         [Route("saveHareketByHareketDto")]
         public IActionResult saveHareketByHareketDto(HareketDTO hareketDto)

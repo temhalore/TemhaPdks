@@ -2,6 +2,8 @@
 
 using LorePdks.BAL.AutoMapper;
 using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Firma;
+using LorePdks.COMMON.DTO.Hareket;
 using LorePdks.DAL.Model;
 
 public class HareketMappingProfile : MappingProfile

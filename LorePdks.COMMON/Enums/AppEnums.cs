@@ -9,6 +9,9 @@ namespace LorePdks.COMMON.Enums
         {
             FIRMA_CIHAZ_TIP = 101,
             FIRMA_KISI_TIP = 102,
+            ROL_TIP = 103,
+            HAREKET_TIP = 104,
+            HAREKET_DURUM = 105,
             KISI_TOKEN_DELETE_REASON = 901,
 
 
@@ -26,9 +29,26 @@ namespace LorePdks.COMMON.Enums
         public enum FIRMA_KISI_TIP{
             PERSONEL = 1020001,
             YETKILI = 1020002,
-        }	
+        }
 
+        public enum HAREKET_TIP
+        {
+            PDKS = 1040001,
+            QR = 1040002,
+        }
 
+        public enum HAREKET_DURUM
+        {
+            ISLEM_ICIN_BEKLIYOR = 1050001,
+            ISLENDI = 1050002,
+            ISLEMDE_HATA_ALINDI = 1050002,
+        }
+
+        public enum ROL_TIP {
+            SUPER_ADMIN = 1030001,
+            FIRMA_YETKILISI = 1030002,
+            PERSONEL = 1030003,
+        }
 
  
 

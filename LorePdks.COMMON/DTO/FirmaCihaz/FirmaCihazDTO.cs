@@ -1,11 +1,13 @@
 ﻿using LorePdks.COMMON.DTO.Base;
+using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Firma;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LorePdks.COMMON.DTO.Common
+namespace LorePdks.COMMON.DTO.FirmaCihaz
 {
 
 

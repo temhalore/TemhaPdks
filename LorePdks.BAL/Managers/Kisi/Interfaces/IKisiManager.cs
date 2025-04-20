@@ -1,7 +1,7 @@
-﻿using LorePdks.COMMON.DTO.Common;
+﻿using LorePdks.COMMON.DTO.Kisi;
 using LorePdks.DAL.Model;
 
-namespace LorePdks.BAL.Managers.Deneme.Interfaces
+namespace LorePdks.BAL.Managers.Kisi.Interfaces
 {
     public interface IKisiManager
     {

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using LorePdks.BAL.Managers.Common.Kod.Interfaces;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using Microsoft.AspNetCore.Http;
 using LorePdks.DAL.Model;
@@ -8,10 +7,11 @@ using LorePdks.DAL.Repository;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Org.BouncyCastle.Asn1;
-using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Extensions;
+using LorePdks.COMMON.DTO.Firma;
+using LorePdks.BAL.Managers.Firma.Interfaces;
 
-namespace LorePdks.BAL.Managers.Deneme
+namespace LorePdks.BAL.Managers.Firma
 {
     public class FirmaManager(
                 IHelperManager _helperManager
@@ -21,7 +21,7 @@ namespace LorePdks.BAL.Managers.Deneme
         ) : IFirmaManager
     {
 
-     
+
         private readonly GenericRepository<t_firma> _repoFirma = new GenericRepository<t_firma>();
 
 
@@ -50,7 +50,7 @@ namespace LorePdks.BAL.Managers.Deneme
         {
 
             var dbFirma = getFirmaByFirmaId(firmaId, isYoksaHataDondur: true);
-      
+
             bool isKullanilmis = false;
 
             if (isKullanilmis)
@@ -86,10 +86,10 @@ namespace LorePdks.BAL.Managers.Deneme
             return firmaDto;
         }
 
-        public List<FirmaDTO> getFirmaDtoListById( bool isYoksaHataDondur = false)
+        public List<FirmaDTO> getFirmaDtoListById(bool isYoksaHataDondur = false)
         {
             var firmaList = _repoFirma.GetList();
-            if (isYoksaHataDondur && firmaList.Count<=0)
+            if (isYoksaHataDondur && firmaList.Count <= 0)
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Firma bulunamadı");
             }
@@ -105,9 +105,9 @@ namespace LorePdks.BAL.Managers.Deneme
         /// <exception cref="AppException"></exception>
         public void checkFirmaDtoKayitEdilebilirMi(FirmaDTO firmaDto)
         {
-            if (String.IsNullOrEmpty(firmaDto.ad))
+            if (string.IsNullOrEmpty(firmaDto.ad))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"ad alanı boş olamaz");
-            if (String.IsNullOrEmpty(firmaDto.kod))
+            if (string.IsNullOrEmpty(firmaDto.kod))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"kod alanı boş olamaz");
 
             var allFirmaList = _repoFirma.GetList();
@@ -117,7 +117,7 @@ namespace LorePdks.BAL.Managers.Deneme
             //firma ad kontrolü
             foreach (var item in allFirmaList)
             {
-             
+
                 if (item.AD.ToLower().ToTurkishChars().Contains(firmaDto.ad.ToLower().ToTurkishChars()))
                 {
                     throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Kayıt etmeye çalıştığınız firma {item.AD} firma adı ile zaten kaytlı lütfen bu firmayı kullanınız");
@@ -134,7 +134,7 @@ namespace LorePdks.BAL.Managers.Deneme
                 //önce db halini bul ve ne değiştiğini tespit et buna göre ek kontrolletini yaz 
                 var dbFirma = getFirmaByFirmaId(firmaDto.id, isYoksaHataDondur: true);
 
-              
+
 
             }
 

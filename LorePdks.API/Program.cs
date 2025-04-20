@@ -32,6 +32,10 @@ using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.BAL.Managers.FirmaCihaz;
 using LorePdks.BAL.Managers.Auth.Interfaces;
 using LorePdks.BAL.Managers.Auth;
+using LorePdks.BAL.Managers.Hareket.Interfaces;
+using LorePdks.BAL.Managers.Firma.Interfaces;
+using LorePdks.BAL.Managers.Firma;
+using LorePdks.BAL.Managers.Hareket;
 
 var builder = WebApplication.CreateBuilder(args);
 

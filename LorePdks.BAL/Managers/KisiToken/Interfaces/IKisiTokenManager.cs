@@ -1,6 +1,4 @@
 using LorePdks.COMMON.DTO.Common;
-using LorePdks.DAL.Model;
-using System.Collections.Generic;
 
 namespace LorePdks.BAL.Managers.KisiToken.Interfaces
 {
@@ -45,5 +43,10 @@ namespace LorePdks.BAL.Managers.KisiToken.Interfaces
         /// Kişi ID'sine göre tüm token'ları getirir
         /// </summary>
         List<KisiTokenDTO> getKisiTokenDtoListByKisiId(int kisiId);
+        
+        /// <summary>
+        /// Kişi ID'sine göre erişebileceği menü yapısını getirir
+        /// </summary>
+   
     }
 }

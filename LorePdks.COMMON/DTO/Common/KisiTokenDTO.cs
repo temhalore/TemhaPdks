@@ -1,3 +1,4 @@
+using LorePdks.COMMON.DTO.Kisi;
 using System;
 using System.ComponentModel.DataAnnotations;
 

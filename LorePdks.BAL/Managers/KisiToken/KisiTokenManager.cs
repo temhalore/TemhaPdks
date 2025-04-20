@@ -1,6 +1,8 @@
 using AutoMapper;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
+using LorePdks.BAL.Managers.Auth.Yetki.Ekran.Interfaces;
+using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.BAL.Managers.KisiToken.Interfaces;
+using LorePdks.COMMON.DTO.Auth.Securty.Ekran;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Extensions;
@@ -20,15 +22,18 @@ namespace LorePdks.BAL.Managers.KisiToken
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GenericRepository<t_kisi_token> _repoKisiToken = new GenericRepository<t_kisi_token>();
+        private readonly IEkranManager _ekranManager;
 
         public KisiTokenManager(
             IKisiManager kisiManager,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IEkranManager ekranManager)
         {
             _kisiManager = kisiManager;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _ekranManager = ekranManager;
         }
 
         /// <summary>
@@ -147,7 +152,7 @@ namespace LorePdks.BAL.Managers.KisiToken
         }
 
         /// <summary>
-        /// Verilen token'ı geçersiz kılar (siler veya ISDELETED=1 yapar)
+        /// Verilen token'ı geçersiz kılar (siler)
         /// </summary>
         public void killToken(string token)
         {
@@ -164,10 +169,8 @@ namespace LorePdks.BAL.Managers.KisiToken
                 return;
             }
 
-            // Token'ı geçersiz kıl (silmek yerine ISDELETED=1 yap)
-            kisiToken.ISDELETED = 1;
-            kisiToken.MODIFIEDDATE = DateTime.Now;
-            _repoKisiToken.Save(kisiToken);
+            // Token'ı geçersiz kıl (Delete metodu kullanarak)
+            _repoKisiToken.Delete(kisiToken);
         }
 
         /// <summary>
@@ -186,9 +189,7 @@ namespace LorePdks.BAL.Managers.KisiToken
             foreach (var token in kisiTokenList)
             {
                 // Her bir token'ı geçersiz kıl
-                token.ISDELETED = 1;
-                token.MODIFIEDDATE = DateTime.Now;
-                _repoKisiToken.Save(token);
+                _repoKisiToken.Delete(token);
             }
         }
 
@@ -201,9 +202,7 @@ namespace LorePdks.BAL.Managers.KisiToken
             
             if (dbKisiToken != null)
             {
-                dbKisiToken.ISDELETED = 1;
-                dbKisiToken.MODIFIEDDATE = DateTime.Now;
-                _repoKisiToken.Save(dbKisiToken);
+                _repoKisiToken.Delete(dbKisiToken);
             }
         }
 
@@ -267,6 +266,20 @@ namespace LorePdks.BAL.Managers.KisiToken
             }
 
             return kisiToken;
+        }
+
+        /// <summary>
+        /// Kişi ID'sine göre erişebileceği menü yapısını getirir
+        /// </summary>
+        public List<EkranDTO> getKisiMenu(int kisiId)
+        {
+            if (kisiId <= 0)
+            {
+                return new List<EkranDTO>();
+            }
+
+            // Kişinin erişebileceği ekranları Ekran Manager üzerinden getir
+            return _ekranManager.getMenuByKisiId(kisiId);
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using LorePdks.COMMON.DTO.Common;
+﻿using LorePdks.COMMON.DTO.Pdks;
 using LorePdks.DAL.Model;
 
-namespace LorePdks.BAL.Managers.Pdks
+namespace LorePdks.BAL.Managers.Pdks.Interfaces
 {
     public interface IPdksHareketManager
     {

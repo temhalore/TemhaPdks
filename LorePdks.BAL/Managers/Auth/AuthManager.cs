@@ -1,26 +1,31 @@
 using AutoMapper;
 using LorePdks.BAL.Managers.Auth.Interfaces;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
+using LorePdks.BAL.Managers.Auth.Yetki.Rol.Interfaces;
+using LorePdks.BAL.Managers.Helper.Interfaces;
+using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.BAL.Managers.KisiToken.Interfaces;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LorePdks.BAL.Managers.Auth
 {
     public class AuthManager(
         IKisiManager _kisiManager,
-        IHttpContextAccessor _httpContextAccessor,
+        IHelperManager _HelperManager,
         IMapper _mapper,
-        IKisiTokenManager _kisiTokenManager
+        IKisiTokenManager _kisiTokenManager,
+         IRolManager _rolManager
     ) : IAuthManager
     {
         /// <summary>
         /// Kişi giriş işlemini gerçekleştirir
         /// </summary>
-        public KisiTokenDTO Login(string loginName, string sifre, string ipAdresi, string userAgent)
+        public KisiTokenDTO login(string loginName, string sifre)
         {
             try
             {
@@ -39,8 +44,8 @@ namespace LorePdks.BAL.Managers.Auth
                 if (aktifToken != null)
                 {
                     // IP adresi veya user agent değişmiş olabilir, güncelle
-                    aktifToken.ipAdresi = ipAdresi;
-                    aktifToken.userAgent = userAgent;
+                    aktifToken.ipAdresi = _HelperManager.GetIPAddress();
+                    aktifToken.userAgent = _HelperManager.GetUserAgent();
                     
                     // Token bilgilerini güncelle
                     var guncelToken = _kisiTokenManager.saveKisiToken(aktifToken);
@@ -55,15 +60,18 @@ namespace LorePdks.BAL.Managers.Auth
                     kisiId = kisiDto.id,
                     kisiDto = kisiDto,
                     loginName = loginName,
-                    ipAdresi = ipAdresi,
-                    userAgent = userAgent,
+                    ipAdresi = _HelperManager.GetIPAddress(),
+                    userAgent = _HelperManager.GetUserAgent(),
                     expDate = DateTime.Now.AddDays(1) // Token 1 gün geçerli
                 };
 
                 // Token kaydedilir
                 var resultTokenDto = _kisiTokenManager.saveKisiToken(kisiTokenDto);
                 resultTokenDto.isLogin = true;
-                
+
+                //menü için rol ve ekranlarıda dtoya ekle
+                var rolMenuDto = _rolManager.getRolDtoListByKisiId(resultTokenDto.kisiDto.id);
+
                 return resultTokenDto;
             }
             catch (AppException)
@@ -81,7 +89,7 @@ namespace LorePdks.BAL.Managers.Auth
         /// <summary>
         /// Token kontrol eder
         /// </summary>
-        public KisiTokenDTO ValidateToken(string token)
+        public KisiTokenDTO validateToken(string token)
         {
             try
             {
@@ -121,7 +129,7 @@ namespace LorePdks.BAL.Managers.Auth
         /// <summary>
         /// Çıkış yapar (token'ı geçersiz kılar)
         /// </summary>
-        public void Logout(string token)
+        public void logout(string token)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -134,7 +142,7 @@ namespace LorePdks.BAL.Managers.Auth
         /// <summary>
         /// Kişinin tüm token'larını geçersiz kılar
         /// </summary>
-        public void LogoutAll(int kisiId)
+        public void logoutAll(int kisiId)
         {
             if (kisiId <= 0)
             {
@@ -143,5 +151,7 @@ namespace LorePdks.BAL.Managers.Auth
             
             _kisiTokenManager.killAllTokensForKisi(kisiId);
         }
+
+
     }
 }

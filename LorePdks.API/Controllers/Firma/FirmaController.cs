@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using LorePdks.COMMON.Configuration;
 using LorePdks.COMMON.DTO.Base;
-using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Models.ServiceResponse;
-using LorePdks.COMMON.Enums;
-using LorePdks.BAL.Managers.Deneme;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
-using LorePdks.COMMON.Logging;
-using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Firma;
+using LorePdks.BAL.Managers.Firma.Interfaces;
 
 namespace LorePdks.API.Controllers.Firma
 {

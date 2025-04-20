@@ -1,4 +1,4 @@
-﻿using LorePdks.COMMON.DTO.Common;
+﻿using LorePdks.COMMON.DTO.FirmaCihaz;
 using LorePdks.DAL.Model;
 
 namespace LorePdks.BAL.Managers.FirmaCihaz.Interfaces

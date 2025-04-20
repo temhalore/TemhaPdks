@@ -1,7 +1,7 @@
 ﻿
 
 using LorePdks.BAL.AutoMapper;
-using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Firma;
 using LorePdks.DAL.Model;
 
 public class FirmaMapper : MappingProfile

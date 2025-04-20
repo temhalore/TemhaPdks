@@ -7,21 +7,26 @@ namespace LorePdks.BAL.Managers.Auth.Interfaces
         /// <summary>
         /// Kişi login işlemini gerçekleştirir
         /// </summary>
-        KisiTokenDTO Login(string loginName, string sifre, string ipAdresi, string userAgent);
+        KisiTokenDTO login(string loginName, string sifre);
+        
+        /// <summary>
+        /// Kişi login işlemini gerçekleştirir ve erişim menülerini de döndürür
+        /// </summary>
+
         
         /// <summary>
         /// Token kontrol eder
         /// </summary>
-        KisiTokenDTO ValidateToken(string token);
+        KisiTokenDTO validateToken(string token);
         
         /// <summary>
         /// Çıkış yapar (token'ı geçersiz kılar)
         /// </summary>
-        void Logout(string token);
+        void logout(string token);
         
         /// <summary>
         /// Kişinin tüm token'larını geçersiz kılar
         /// </summary>
-        void LogoutAll(int kisiId);
+        void logoutAll(int kisiId);
     }
 }

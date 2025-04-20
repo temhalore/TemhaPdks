@@ -1,7 +1,8 @@
 ﻿
 
 using LorePdks.BAL.AutoMapper;
-using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Hareket;
+using LorePdks.COMMON.DTO.Pdks;
 using LorePdks.DAL.Model;
 
 public class PdksHareketMapper : MappingProfile

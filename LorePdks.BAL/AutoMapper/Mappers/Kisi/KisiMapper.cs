@@ -1,5 +1,5 @@
 using LorePdks.BAL.AutoMapper;
-using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Kisi;
 using LorePdks.DAL.Model;
 
 namespace LorePdks.BAL.AutoMapper.Mappers.Kisi

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using LorePdks.BAL.Managers.Common.Kod.Interfaces;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using Microsoft.AspNetCore.Http;
 using LorePdks.DAL.Model;
@@ -8,10 +7,12 @@ using LorePdks.DAL.Repository;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Org.BouncyCastle.Asn1;
-using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Extensions;
 using System.Collections.Generic;
 using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
+using LorePdks.COMMON.DTO.Pdks;
+using LorePdks.BAL.Managers.Pdks.Interfaces;
+using LorePdks.BAL.Managers.Hareket.Interfaces;
 
 namespace LorePdks.BAL.Managers.Pdks
 {

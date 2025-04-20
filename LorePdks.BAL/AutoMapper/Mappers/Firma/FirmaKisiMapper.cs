@@ -1,8 +1,11 @@
 ﻿
 
 using LorePdks.BAL.AutoMapper;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
+using LorePdks.BAL.Managers.Firma.Interfaces;
+using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Firma;
+using LorePdks.COMMON.DTO.FirmaKisi;
 using LorePdks.COMMON.Helpers;
 using LorePdks.DAL.Model;
 using Microsoft.Extensions.DependencyInjection;

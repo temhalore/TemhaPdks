@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using LorePdks.BAL.Managers.Common.Kod.Interfaces;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using Microsoft.AspNetCore.Http;
 using LorePdks.DAL.Model;
@@ -8,10 +7,11 @@ using LorePdks.DAL.Repository;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Org.BouncyCastle.Asn1;
-using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Extensions;
+using LorePdks.COMMON.DTO.Kisi;
+using LorePdks.BAL.Managers.Kisi.Interfaces;
 
-namespace LorePdks.BAL.Managers.Deneme
+namespace LorePdks.BAL.Managers.Kisi
 {
     public class KisiManager(
                 IHelperManager _helperManager
@@ -21,7 +21,7 @@ namespace LorePdks.BAL.Managers.Deneme
         ) : IKisiManager
     {
 
-     
+
         private readonly GenericRepository<t_kisi> _repoKisi = new GenericRepository<t_kisi>();
 
 
@@ -49,7 +49,7 @@ namespace LorePdks.BAL.Managers.Deneme
         {
 
             var dbKisi = getKisiByKisiId(kisiId, isYoksaHataDondur: true);
-      
+
             bool isKullanilmis = false;
 
             if (isKullanilmis)
@@ -115,7 +115,7 @@ namespace LorePdks.BAL.Managers.Deneme
         //kişiyi sadece loginName e göre getirir ama kişi model döner
         public t_kisi getKisiByLoginName(string loginName, bool isYoksaHataDondur = false)
         {
-            var kisi = _repoKisi.GetList("LOGIN_NAME=@loginName", new { loginName = loginName }).FirstOrDefault();
+            var kisi = _repoKisi.GetList("LOGIN_NAME=@loginName", new { loginName }).FirstOrDefault();
             if (isYoksaHataDondur && kisi == null)
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"loginName ile eşleşen kisi bulunamadı");
@@ -138,7 +138,7 @@ namespace LorePdks.BAL.Managers.Deneme
         //kişiyi sadece tc ye göre getirir ama kişi model döner
         public t_kisi getKisiByTc(string tc, bool isYoksaHataDondur = false)
         {
-            var kisi = _repoKisi.GetList("TC=@tc", new { tc = tc }).FirstOrDefault();
+            var kisi = _repoKisi.GetList("TC=@tc", new { tc }).FirstOrDefault();
             if (isYoksaHataDondur && kisi == null)
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"tc ile eşleşen kisi bulunamadı");
@@ -149,7 +149,7 @@ namespace LorePdks.BAL.Managers.Deneme
         //kişiyi arama text e göre getirir
         public List<KisiDTO> getKisiDtoListByAramaText(string aramaText, bool isYoksaHataDondur = false)
         {
-           var kisiList = getKisiListByAramaText(aramaText,isYoksaHataDondur: false);
+            var kisiList = getKisiListByAramaText(aramaText, isYoksaHataDondur: false);
             List<KisiDTO> kisiDtoList = _mapper.Map<List<t_kisi>, List<KisiDTO>>(kisiList);
             return kisiDtoList;
         }
@@ -165,10 +165,10 @@ namespace LorePdks.BAL.Managers.Deneme
             return kisiList;
         }
 
-        public List<KisiDTO> getKisiDtoListById( bool isYoksaHataDondur = false)
+        public List<KisiDTO> getKisiDtoListById(bool isYoksaHataDondur = false)
         {
             var kisiList = _repoKisi.GetList();
-            if (isYoksaHataDondur && kisiList.Count<=0)
+            if (isYoksaHataDondur && kisiList.Count <= 0)
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Kisi bulunamadı");
             }
@@ -184,15 +184,15 @@ namespace LorePdks.BAL.Managers.Deneme
         /// <exception cref="AppException"></exception>
         public void checkKisiDtoKayitEdilebilirMi(KisiDTO kisiDto)
         {
-            if (String.IsNullOrEmpty(kisiDto.ad))
+            if (string.IsNullOrEmpty(kisiDto.ad))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"ad alanı boş olamaz");
-            if (String.IsNullOrEmpty(kisiDto.soyad))
+            if (string.IsNullOrEmpty(kisiDto.soyad))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"soyad alanı boş olamaz");
-            if (String.IsNullOrEmpty(kisiDto.loginName))
+            if (string.IsNullOrEmpty(kisiDto.loginName))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"loginName alanı boş olamaz");
-            if (String.IsNullOrEmpty(kisiDto.sifre))
+            if (string.IsNullOrEmpty(kisiDto.sifre))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"sifre alanı boş olamaz");
-            if (String.IsNullOrEmpty(kisiDto.tc))
+            if (string.IsNullOrEmpty(kisiDto.tc))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"tc alanı boş olamaz");
 
             var allKisiList = _repoKisi.GetList();
@@ -222,7 +222,7 @@ namespace LorePdks.BAL.Managers.Deneme
             }
 
         }
-    
-    
+
+
     }
 }

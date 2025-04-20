@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using LorePdks.BAL.Managers.Common.Kod.Interfaces;
-using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using Microsoft.AspNetCore.Http;
 using LorePdks.DAL.Model;
@@ -8,12 +7,15 @@ using LorePdks.DAL.Repository;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Org.BouncyCastle.Asn1;
-using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Extensions;
 using System.Collections.Generic;
 using System.Transactions;
+using LorePdks.COMMON.DTO.FirmaKisi;
+using LorePdks.BAL.Managers.FirmaKisi.Interfaces;
+using LorePdks.BAL.Managers.Firma.Interfaces;
+using LorePdks.BAL.Managers.Kisi.Interfaces;
 
-namespace LorePdks.BAL.Managers.Deneme
+namespace LorePdks.BAL.Managers.FirmaKisi
 {
     public class FirmaKisiManager(
                 IHelperManager _helperManager
@@ -25,7 +27,7 @@ namespace LorePdks.BAL.Managers.Deneme
         ) : IFirmaKisiManager
     {
 
-     
+
         private readonly GenericRepository<t_firma_kisi> _repoFirmaKisi = new GenericRepository<t_firma_kisi>();
 
 
@@ -40,40 +42,40 @@ namespace LorePdks.BAL.Managers.Deneme
 
             checkFirmaKisiDtoKayitEdilebilirMi(firmaKisiDto);
 
-           t_firma_kisi firmaKisi = _mapper.Map<FirmaKisiDTO, t_firma_kisi>(firmaKisiDto);
+            t_firma_kisi firmaKisi = _mapper.Map<FirmaKisiDTO, t_firma_kisi>(firmaKisiDto);
 
             //burada using transaction yapılarak önce kişi eklenir sonra firmaKisi eklenir. eğer firmaKisi eklenirken hata alınırsa kişi eklenen transaction geri alınır.
-    //        using (var transaction = new TransactionScope(
-    //TransactionScopeOption.Required,
-    //new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted },
-    //TransactionScopeAsyncFlowOption.Enabled))
-    //        {
-    //            try
-    //            {
-                    
+            //        using (var transaction = new TransactionScope(
+            //TransactionScopeOption.Required,
+            //new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted },
+            //TransactionScopeAsyncFlowOption.Enabled))
+            //        {
+            //            try
+            //            {
 
-    //                transaction.Complete();
-    //            }
-    //            catch (AppException ex)
-    //            {
-    //                transaction.Dispose();
-    //                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Hata:{ex.appMessage}");
 
-    //            }
-    _repoFirmaKisi.Save(firmaKisi); 
+            //                transaction.Complete();
+            //            }
+            //            catch (AppException ex)
+            //            {
+            //                transaction.Dispose();
+            //                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Hata:{ex.appMessage}");
+
+            //            }
+            _repoFirmaKisi.Save(firmaKisi);
 
             firmaKisiDto = _mapper.Map<t_firma_kisi, FirmaKisiDTO>(firmaKisi);
 
             return firmaKisiDto;
         }
 
-  
+
 
         public void deleteFirmaKisiByFirmaKisiId(int firmaKisiId)
         {
 
             var dbFirmaKisi = getFirmaKisiByFirmaKisiId(firmaKisiId, isYoksaHataDondur: true);
-      
+
             bool isKullanilmis = false;
 
             if (isKullanilmis)
@@ -102,10 +104,10 @@ namespace LorePdks.BAL.Managers.Deneme
         public List<t_firma_kisi> getFirmaKisiListByFirmaId(int firmaId)
         {
 
-            var modelList = _repoFirmaKisi.GetList("FIRMA_ID=@firmaId", new { firmaId = firmaId });
+            var modelList = _repoFirmaKisi.GetList("FIRMA_ID=@firmaId", new { firmaId });
 
-            
-        
+
+
             return modelList;
 
         }
@@ -115,7 +117,7 @@ namespace LorePdks.BAL.Managers.Deneme
 
             var modelList = getFirmaKisiListByFirmaId(firmaId);
 
-            var dtoList = _mapper.Map< List <t_firma_kisi> , List <FirmaKisiDTO>>(modelList);
+            var dtoList = _mapper.Map<List<t_firma_kisi>, List<FirmaKisiDTO>>(modelList);
             return dtoList;
 
         }
@@ -137,12 +139,12 @@ namespace LorePdks.BAL.Managers.Deneme
         /// <exception cref="AppException"></exception>
         public void checkFirmaKisiDtoKayitEdilebilirMi(FirmaKisiDTO firmaKisiDto)
         {
-            if (firmaKisiDto.firmaDto==null || firmaKisiDto.firmaDto.id <= 0)
+            if (firmaKisiDto.firmaDto == null || firmaKisiDto.firmaDto.id <= 0)
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"firma seçmelisiniz");
             if (firmaKisiDto.kisiDto == null || firmaKisiDto.kisiDto.id <= 0)
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"kişi seçmelisiniz");
 
-            var firma = _firmaManager.getFirmaByFirmaId(firmaKisiDto.firmaDto.id,true);
+            var firma = _firmaManager.getFirmaByFirmaId(firmaKisiDto.firmaDto.id, true);
 
             _kodManager.checkKodDTOIdInTipList(firmaKisiDto.firmaKisiTipKodDto, AppEnums.KodTipList.FIRMA_KISI_TIP, $"firmaKisiTipKodDto alanı uygun değil");
 

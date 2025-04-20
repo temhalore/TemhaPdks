@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LorePdks.COMMON.DTO.Common
+namespace LorePdks.COMMON.DTO.Kisi
 {
 
 

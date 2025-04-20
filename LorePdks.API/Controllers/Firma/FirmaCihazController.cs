@@ -6,8 +6,9 @@ using LorePdks.COMMON.Models.ServiceResponse;
 using LorePdks.COMMON.Enums;
 using LorePdks.BAL.Managers.Deneme;
 using LorePdks.COMMON.Logging;
-using LorePdks.COMMON.DTO.Common;
 using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
+using LorePdks.COMMON.DTO.FirmaCihaz;
+using LorePdks.COMMON.DTO.Firma;
 
 namespace LorePdks.API.Controllers.Firma
 {

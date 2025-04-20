@@ -2,6 +2,10 @@
 
 using LorePdks.BAL.AutoMapper;
 using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.DTO.Firma;
+using LorePdks.COMMON.DTO.FirmaCihaz;
+using LorePdks.COMMON.DTO.Kisi;
+using LorePdks.COMMON.DTO.Pdks;
 using LorePdks.DAL.Model;
 
 public class PdksMapper : MappingProfile
