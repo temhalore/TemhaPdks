@@ -1,5 +1,4 @@
-﻿
-using AspNetCoreRateLimit;
+﻿using AspNetCoreRateLimit;
 using LorePdks.API.Filters;
 using LorePdks.API;
 using LorePdks.BAL.AutoMapper;
@@ -199,6 +198,7 @@ builder.Services.AddTransient<IKodManager, KodManager>();
 builder.Services.AddTransient<IFirmaManager, FirmaManager>();
 builder.Services.AddTransient<IFirmaCihazManager, FirmaCihazManager>();
 builder.Services.AddTransient<IHareketManager, HareketManager>();
+builder.Services.AddTransient<IUserManager, UserManager>();
 
 #endregion uygulamamızda yazılan bussines servislerin managerlerin vs eklendiği bölüm
 
