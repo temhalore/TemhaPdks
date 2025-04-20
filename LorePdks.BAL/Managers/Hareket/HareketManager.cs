@@ -55,6 +55,40 @@ namespace LorePdks.BAL.Managers.Deneme
             return _mapper.Map<List<t_hareket>, List<HareketDTO>>(hareketList);
         }
 
+        public void deleteHareketById(int hareketId)
+        {
+            var dbHareket = getHareketByHareketId(hareketId, isYoksaHataDondur: true);
+
+            bool isKullanilmis = false;
+            // Eğer hareket kaydı başka bir yerde kullanılıyorsa burada kontrol edilebilir
+            // Örneğin PdksHareket tablosunda bu hareket ID'si var mı diye kontrol edilebilir
+
+            if (isKullanilmis)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Kullanılmış bir hareket kaydı silinemez.");
+            }
+
+            _repoHareket.Delete(dbHareket);
+        }
+
+        public HareketDTO getHareketDtoById(int hareketId)
+        {
+            var hareket = getHareketByHareketId(hareketId, isYoksaHataDondur: true);
+            return _mapper.Map<t_hareket, HareketDTO>(hareket);
+        }
+
+        public t_hareket getHareketByHareketId(int hareketId, bool isYoksaHataDondur = false)
+        {
+            var hareket = _repoHareket.Get(hareketId);
+
+            if (isYoksaHataDondur && hareket == null)
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"{hareketId} id'li hareket kaydı sistemde bulunamadı");
+            }
+
+            return hareket;
+        }
+
         private void checkHareketKayitEdilebilirMi(HareketDTO hareketDto)
         {
             if (hareketDto.firmaDto == null || hareketDto.firmaDto.id <= 0)
