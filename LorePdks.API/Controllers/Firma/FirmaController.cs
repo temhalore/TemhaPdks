@@ -20,7 +20,6 @@ namespace LorePdks.API.Controllers.Firma
         [Route("saveFirmaByFirmaDto")]
         public IActionResult saveFirmaByFirmaDto(FirmaDTO request)
         {
-
             var response = new ServiceResponse<FirmaDTO>();
             var dto = _firmaManager.saveFirma(request);
             response.data = dto;
@@ -28,13 +27,11 @@ namespace LorePdks.API.Controllers.Firma
         }
 
         [HttpPost]
-        [Route("deleteFirmaByFirmaDto")]
-        public IActionResult deleteFirmaByFirmaDto(EIdDTO request)
+        [Route("deleteFirmaByEIdDto")]
+        public IActionResult deleteFirmaByEIdDto(EIdDTO request)
         {
-
             var response = new ServiceResponse<FirmaDTO>();
             _firmaManager.deleteFirmaByFirmaId(request.id);
-
             return Ok(response);
         }
 
@@ -42,7 +39,6 @@ namespace LorePdks.API.Controllers.Firma
         [Route("getFirmaDtoByEIdDto")]
         public IActionResult getFirmaDtoByEIdDto(EIdDTO request)
         {
-
             var response = new ServiceResponse<FirmaDTO>();
             var dto = _firmaManager.getFirmaDtoById(request.id);
             response.data = dto;
@@ -54,12 +50,10 @@ namespace LorePdks.API.Controllers.Firma
         [Route("getAllFirmaListDto")]
         public IActionResult getAllFirmaListDto()
         {
-
             var response = new ServiceResponse<List<FirmaDTO>>();
             var dto = _firmaManager.getFirmaDtoListById();
             response.data = dto;
             return Ok(response);
         }
-
     }
 }

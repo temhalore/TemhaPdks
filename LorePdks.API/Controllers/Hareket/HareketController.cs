@@ -11,7 +11,6 @@ using LorePdks.COMMON.DTO.Common;
 
 namespace LorePdks.API.Controllers.Hareket
 {
-
     /// <summary>
     /// firmalardan toplanan tüm hareket çağrıları buraya düşecek ilk
     /// </summary>
@@ -19,22 +18,43 @@ namespace LorePdks.API.Controllers.Hareket
     [ApiController]
     public class HareketController(ILogger<HareketController> _logger, IHareketManager _hareketManager) : ControllerBase
     {
-
         [HttpPost]
-        [Route("saveFirmaByFirmaDto")]
-        public IActionResult SaveHareket(HareketDTO hareketDto)
+        [Route("saveHareketByHareketDto")]
+        public IActionResult saveHareketByHareketDto(HareketDTO hareketDto)
         {
-            var result = _hareketManager.saveHareket(hareketDto);
-            return Ok(result);
+            var response = new ServiceResponse<HareketDTO>();
+            var dto = _hareketManager.saveHareket(hareketDto);
+            response.data = dto;
+            return Ok(response);
         }
 
         [HttpPost]
-        [Route("GetHareketListByFirmaId")]
-        public IActionResult GetHareketListByFirmaDto(FirmaDTO firmaDto)
+        [Route("getHareketListByFirmaDto")]
+        public IActionResult getHareketListByFirmaDto(FirmaDTO firmaDto)
         {
-            var result = _hareketManager.getHareketListByFirmaId(firmaDto.id);
-            return Ok(result);
+            var response = new ServiceResponse<List<HareketDTO>>();
+            var dto = _hareketManager.getHareketListByFirmaId(firmaDto.id);
+            response.data = dto;
+            return Ok(response);
+        }
+        
+        [HttpPost]
+        [Route("getHareketDtoByEIdDto")]
+        public IActionResult getHareketDtoByEIdDto(EIdDTO request)
+        {
+            var response = new ServiceResponse<HareketDTO>();
+            var dto = _hareketManager.getHareketDtoById(request.id);
+            response.data = dto;
+            return Ok(response);
+        }
+        
+        [HttpPost]
+        [Route("deleteHareketByEIdDto")]
+        public IActionResult deleteHareketByEIdDto(EIdDTO request)
+        {
+            var response = new ServiceResponse<HareketDTO>();
+            _hareketManager.deleteHareketById(request.id);
+            return Ok(response);
         }
     }
-
 }

@@ -1,16 +1,15 @@
 using LorePdks.BAL.Managers.User;
+using LorePdks.COMMON.DTO.Base;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Enums;
-using LorePdks.COMMON.Models;
+using LorePdks.COMMON.Models.ServiceResponse;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace LorePdks.API.Controllers.User
 {
+    [Route("Api/User")]
     [ApiController]
-    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly IUserManager _userManager;
@@ -20,81 +19,43 @@ namespace LorePdks.API.Controllers.User
             _userManager = userManager;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult GetUserById(int id)
+        [HttpPost]
+        [Route("getUserDtoByEIdDto")]
+        public IActionResult getUserDtoByEIdDto(EIdDTO request)
         {
-            try
-            {
-                var user = _userManager.getUserDtoById(id);
-                if (user == null)
-                {
-                    return NotFound(new ResponseDTO() { IsSuccess = false, ResultCode = ((int)MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI).ToString() });
-                }
-
-                return Ok(new ResponseDTO<UserDTO>() { IsSuccess = true, Data = user });
-            }
-            catch (AppException ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message, ResultCode = ex.ResultCode });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        public ActionResult GetAllUsers()
-        {
-            try
-            {
-                var users = _userManager.getUserDtoList();
-                return Ok(new ResponseDTO<UserDTO>() { IsSuccess = true, DataList = users.ToList() });
-            }
-            catch (AppException ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message, ResultCode = ex.ResultCode });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message });
-            }
+            var response = new ServiceResponse<UserDTO>();
+            var dto = _userManager.getUserDtoById(request.id);
+            response.data = dto;
+            return Ok(response);
         }
 
         [HttpPost]
-        public ActionResult SaveUser([FromBody] UserDTO userDto)
+        [Route("getAllUserListDto")]
+        public IActionResult getAllUserListDto()
         {
-            try
-            {
-                var savedUser = _userManager.saveUser(userDto);
-                return Ok(new ResponseDTO<UserDTO>() { IsSuccess = true, Data = savedUser });
-            }
-            catch (AppException ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message, ResultCode = ex.ResultCode });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message });
-            }
+            var response = new ServiceResponse<List<UserDTO>>();
+            var dto = _userManager.getUserDtoList();
+            response.data = dto;
+            return Ok(response);
         }
 
-        [HttpDelete("{id}")]
-        public ActionResult DeleteUser(int id)
+        [HttpPost]
+        [Route("saveUserByUserDto")]
+        public IActionResult saveUserByUserDto(UserDTO request)
         {
-            try
-            {
-                _userManager.deleteUserByUserId(id);
-                return Ok(new ResponseDTO() { IsSuccess = true });
-            }
-            catch (AppException ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message, ResultCode = ex.ResultCode });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ResponseDTO() { IsSuccess = false, ResultMessage = ex.Message });
-            }
+            var response = new ServiceResponse<UserDTO>();
+            var dto = _userManager.saveUser(request);
+            response.data = dto;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("deleteUserByEidDto")]
+        public IActionResult deleteUserByEidDto(EIdDTO request)
+        {
+            var response = new ServiceResponse<UserDTO>();
+            _userManager.deleteUserByUserId(request.id);
+            return Ok(response);
         }
     }
 }

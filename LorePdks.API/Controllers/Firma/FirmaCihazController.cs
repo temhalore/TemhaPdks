@@ -15,15 +15,10 @@ namespace LorePdks.API.Controllers.Firma
     [ApiController]
     public class FirmaCihazController(ILogger<FirmaCihazController> _logger, IFirmaCihazManager _firmaCihazManager) : ControllerBase
     {
-
-
-
-
         [HttpPost]
         [Route("saveFirmaCihazByFirmaCihazDto")]
         public IActionResult saveFirmaCihazByFirmaCihazDto(FirmaCihazDTO request)
         {
-
             var response = new ServiceResponse<object>();
             var dto = _firmaCihazManager.saveFirmaCihaz(request);
             response.data = dto;
@@ -31,13 +26,11 @@ namespace LorePdks.API.Controllers.Firma
         }
 
         [HttpPost]
-        [Route("deleteFirmaCihazByEidDto")]
-        public IActionResult deleteFirmaCihazByEidDto(EIdDTO request)
+        [Route("deleteFirmaCihazByEIdDto")]
+        public IActionResult deleteFirmaCihazByEIdDto(EIdDTO request)
         {
-
             var response = new ServiceResponse<FirmaDTO>();
             _firmaCihazManager.deleteFirmaCihazByFirmaCihazId(request.id);
-
             return Ok(response);
         }
 
@@ -45,7 +38,6 @@ namespace LorePdks.API.Controllers.Firma
         [Route("getFirmaCihazDtoByEIdDto")]
         public IActionResult getFirmaCihazDtoByEIdDto(EIdDTO request)
         {
-
             var response = new ServiceResponse<object>();
             var dto = _firmaCihazManager.getFirmaCihazDtoById(request.id);
             response.data = dto;
@@ -56,12 +48,10 @@ namespace LorePdks.API.Controllers.Firma
         [Route("getFirmaCihazDtoListByFirmaDto")]
         public IActionResult getFirmaCihazDtoListByFirmaDto(FirmaDTO request)
         {
-
             var response = new ServiceResponse<object>();
             var dto = _firmaCihazManager.getFirmaCihazDtoListByFirmaId(request.id);
             response.data = dto;
             return Ok(response);
         }
-
     }
 }
