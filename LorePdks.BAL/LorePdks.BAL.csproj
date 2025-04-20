@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Managers\NewFolder\" />
-    <Folder Include="Managers\User\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

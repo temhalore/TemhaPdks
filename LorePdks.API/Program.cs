@@ -30,7 +30,6 @@ using LorePdks.COMMON.Helpers;
 using LorePdks.COMMON.Logging;
 using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.BAL.Managers.FirmaCihaz;
-using LorePdks.BAL.Managers.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -199,7 +198,6 @@ builder.Services.AddTransient<IKodManager, KodManager>();
 builder.Services.AddTransient<IFirmaManager, FirmaManager>();
 builder.Services.AddTransient<IFirmaCihazManager, FirmaCihazManager>();
 builder.Services.AddTransient<IHareketManager, HareketManager>();
-builder.Services.AddTransient<IUserManager, UserManager>();
 
 #endregion uygulamamızda yazılan bussines servislerin managerlerin vs eklendiği bölüm
 
