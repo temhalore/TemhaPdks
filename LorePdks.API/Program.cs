@@ -30,6 +30,8 @@ using LorePdks.COMMON.Helpers;
 using LorePdks.COMMON.Logging;
 using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.BAL.Managers.FirmaCihaz;
+using LorePdks.BAL.Managers.Auth.Interfaces;
+using LorePdks.BAL.Managers.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,8 +76,7 @@ builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounte
 
 
 
-//builder.Services.AddTransient<IKisiTokenManager, KisiTokenManager>();
-//builder.Services.AddTransient<IAuthManager, AuthManager>();
+
 //builder.Services.AddTransient<IMenuManager, MenuManager>();
 //builder.Services.AddTransient<IWidgetManager, WidgetManager>();
 //builder.Services.AddTransient<IPermissionManager, PermissionManager>();
@@ -198,6 +199,8 @@ builder.Services.AddTransient<IKodManager, KodManager>();
 builder.Services.AddTransient<IFirmaManager, FirmaManager>();
 builder.Services.AddTransient<IFirmaCihazManager, FirmaCihazManager>();
 builder.Services.AddTransient<IHareketManager, HareketManager>();
+builder.Services.AddTransient<LorePdks.BAL.Managers.KisiToken.Interfaces.IKisiTokenManager, LorePdks.BAL.Managers.KisiToken.KisiTokenManager>();
+builder.Services.AddTransient<IAuthManager, AuthManager>();
 
 #endregion uygulamamızda yazılan bussines servislerin managerlerin vs eklendiği bölüm
 

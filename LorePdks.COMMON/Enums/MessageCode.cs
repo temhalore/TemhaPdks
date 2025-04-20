@@ -15,6 +15,9 @@ namespace LorePdks.COMMON.Enums
         [Description("Yeniden login olunmalı")]
         ERROR_501_YENIDEN_LOGIN_OLMALI = 501,
 
+        [Description("Yeniden login olunmalı")]
+        ERROR_401_YETKISIZ_ERISIM = 401,
+
         [Description("Eksik veri gönderimi")]
         ERROR_502_EKSIK_VERI_GONDERIMI = 502,
 

@@ -1,34 +1,33 @@
-﻿//using AutoMapper;
-//using OYS.COMMON.DTO.Security.Auth;
-//using OYS.COMMON.Helpers;
-//using OYS.DAL.Model;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Reflection;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using AutoMapper;
+using LorePdks.COMMON.DTO.Common;
+using LorePdks.DAL.Model;
 
-//namespace OYS.BAL.AutoMapper.Mappers.Ogrenci
-//{
-//    public class KisiTokenMapper : MappingProfile
-//    {
-//        public KisiTokenMapper()
-//        {
-//            CreateMap<T_oys_KisiToken, UserTokenDTO>()
-//                .ForMember(x => x.loginName, y => y.MapFrom(z => z.LOGIN_NAME))
-//                .ForMember(x => x.isLogin, y => y.MapFrom(z => z.IS_YERINE_LOGIN))
-//                .ForMember(x => x.idmToken, y => y.MapFrom(z => z.IDM_TOKEN))
-//                .ForMember(x => x.oysToken, y => y.MapFrom(z => z.OYS_TOKEN))
-//                .ForMember(x => x.ip, y => y.MapFrom(z => z.IP_ADRES))
-//                .ForMember(x => x.expireDate, y => y.MapFrom(z => z.EPOSTA))
-//                .ForMember(x => x.isYerineLogin, y => y.MapFrom(z => z.IS_YERINE_LOGIN))
-//                .ForMember(x => x.yerineLoginAdminLoginName, y => y.MapFrom(z => z.YERINE_LOGIN_ADMIN_LOGIN_NAME))
-//                .ForMember(x => x.createdDate, y => y.MapFrom(z => z.CREATEDDATE))
-//                .ForMember(x => x.updatedate, y => y.MapFrom(z => z.MODIFIEDDATE))
-//                .ForMember(x => x.userAgent, y => y.MapFrom(z => z.USER_AGENT))
-//                .ForMember(x => x.deleteReason, y => y.MapFrom(z => z.DELETE_REASON));
+namespace LorePdks.BAL.AutoMapper.Mappers.KisiToken
+{
+    public class KisiTokenMapper : MappingProfile
+    {
+        public KisiTokenMapper()
+        {
+            // Entity'den DTO'ya dönüşüm
+            CreateMap<t_kisi_token, KisiTokenDTO>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.ID))
+                .ForMember(dest => dest.kisiId, opt => opt.MapFrom(src => src.KISI_ID))
+                .ForMember(dest => dest.loginName, opt => opt.MapFrom(src => src.LOGIN_NAME))
+                .ForMember(dest => dest.token, opt => opt.MapFrom(src => src.TOKEN))
+                .ForMember(dest => dest.ipAdresi, opt => opt.MapFrom(src => src.IP_ADRESI))
+                .ForMember(dest => dest.userAgent, opt => opt.MapFrom(src => src.USER_AGENT))
+                .ForMember(dest => dest.expDate, opt => opt.MapFrom(src => src.EXP_DATE));
 
-//        }
-//    }
-//}
+            // DTO'dan Entity'ye dönüşüm
+            CreateMap<KisiTokenDTO, t_kisi_token>()
+                .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.id))
+                .ForMember(dest => dest.KISI_ID, opt => opt.MapFrom(src => src.kisiId))
+                .ForMember(dest => dest.LOGIN_NAME, opt => opt.MapFrom(src => src.loginName))
+                .ForMember(dest => dest.TOKEN, opt => opt.MapFrom(src => src.token))
+                .ForMember(dest => dest.IP_ADRESI, opt => opt.MapFrom(src => src.ipAdresi))
+                .ForMember(dest => dest.USER_AGENT, opt => opt.MapFrom(src => src.userAgent))
+                .ForMember(dest => dest.EXP_DATE, opt => opt.MapFrom(src => src.expDate))
+                .ForMember(dest => dest.ISDELETED, opt => opt.MapFrom(src => 0)); // Yeni oluşturulan veya güncellenen tokenlar aktif olmalı
+        }
+    }
+}

@@ -2,6 +2,7 @@
 using LorePdks.BAL.Managers.Common.Kod.Interfaces;
 using LorePdks.BAL.Managers.Deneme.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
+using LorePdks.BAL.Managers.Kisi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using LorePdks.DAL.Model;
 using LorePdks.DAL.Repository;
@@ -17,7 +18,8 @@ namespace LorePdks.BAL.Managers.Deneme
 {
     public class HareketManager(
         IMapper _mapper,
-        IKodManager _kodManager
+        IKodManager _kodManager,
+        IKisiManager _kisiManager
     ) : IHareketManager
     {
         private readonly GenericRepository<t_hareket> _repoHareket = new GenericRepository<t_hareket>();
@@ -38,6 +40,12 @@ namespace LorePdks.BAL.Managers.Deneme
                 hareketDto.hareketDurumKodDto = _kodManager.GetKodDtoByKodId(hareketDto.hareketDurumKodDto.id);
             }
 
+            // Hareket için kişi bilgisi varsa kontrol et
+            //if (hareketDto.kisiDto != null && hareketDto.kisiDto.id > 0)
+            //{
+            //    hareketDto.kisiDto = _kisiManager.getKisiDtoById(hareketDto.kisiDto.id);
+            //}
+
             // DTO'dan Entity'ye dönüşüm
             t_hareket hareket = _mapper.Map<HareketDTO, t_hareket>(hareketDto);
 
@@ -52,6 +60,12 @@ namespace LorePdks.BAL.Managers.Deneme
         public List<HareketDTO> getHareketListByFirmaId(int firmaId)
         {
             var hareketList = _repoHareket.GetList("FIRMA_ID=@firmaId", new { firmaId });
+            return _mapper.Map<List<t_hareket>, List<HareketDTO>>(hareketList);
+        }
+
+        public List<HareketDTO> getHareketListByKisiId(int kisiId)
+        {
+            var hareketList = _repoHareket.GetList("KISI_ID=@kisiId", new { kisiId });
             return _mapper.Map<List<t_hareket>, List<HareketDTO>>(hareketList);
         }
 
@@ -112,5 +126,4 @@ namespace LorePdks.BAL.Managers.Deneme
             }
         }
     }
-
 }
