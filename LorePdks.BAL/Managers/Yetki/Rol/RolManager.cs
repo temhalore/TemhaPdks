@@ -11,6 +11,7 @@ using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.COMMON.DTO.Yetki.Ekran;
 using LorePdks.COMMON.DTO.Yetki.Rol;
 using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
+using LorePdks.COMMON.DTO.Yetki;
 
 namespace LorePdks.BAL.Managers.Yetki.Rol
 {
@@ -24,6 +25,7 @@ namespace LorePdks.BAL.Managers.Yetki.Rol
         private readonly GenericRepository<t_rol_ekran> _repoRolEkran = new GenericRepository<t_rol_ekran>();
         private readonly GenericRepository<t_kisi_rol> _repoKisiRol = new GenericRepository<t_kisi_rol>();
         private readonly GenericRepository<t_ekran> _repoEkran = new GenericRepository<t_ekran>();
+        private readonly GenericRepository<t_rol_controller_method> _repoRolControllerMethod = new GenericRepository<t_rol_controller_method>();
 
 
 
@@ -243,6 +245,103 @@ namespace LorePdks.BAL.Managers.Yetki.Rol
             }
         }
 
+        public List<RolControllerMethodDTO> getRolControllerMethodDtoListByRolId(int rolId, bool isYoksaHataDondur = false)
+        {
+            var rolControllerMethods = _repoRolControllerMethod.GetList("ROL_ID=@rolId", new { rolId });
 
+            if (isYoksaHataDondur && (rolControllerMethods == null || !rolControllerMethods.Any()))
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"{rolId} id'li role ait controller ve method bulunamadı");
+            }
+
+            return _mapper.Map<List<RolControllerMethodDTO>>(rolControllerMethods);
+        }
+
+        public bool addControllerMethodToRol(int rolId, string controllerName, string methodName)
+        {
+            // Rol'ün var olduğunu kontrol et
+            var rol = getRolByRolId(rolId, isYoksaHataDondur: true);
+
+            var rolControllerMethod = _repoRolControllerMethod.GetList(
+                "ROL_ID=@rolId AND CONTROLLER_NAME=@controllerName AND METHOD_NAME=@methodName", 
+                new { rolId, controllerName, methodName }
+            ).FirstOrDefault();
+
+            if (rolControllerMethod != null)
+            {
+                return true;
+            }
+
+            rolControllerMethod = new t_rol_controller_method
+            {
+                ROL_ID = rolId,
+                CONTROLLER_NAME = controllerName,
+                METHOD_NAME = methodName
+            };
+
+            _repoRolControllerMethod.Save(rolControllerMethod);
+            return true;
+        }
+
+        public bool removeControllerMethodFromRol(int rolId, string controllerName, string methodName)
+        {
+            var rolControllerMethod = _repoRolControllerMethod.GetList(
+                "ROL_ID=@rolId AND CONTROLLER_NAME=@controllerName AND METHOD_NAME=@methodName", 
+                new { rolId, controllerName, methodName }
+            ).FirstOrDefault();
+
+            if (rolControllerMethod == null)
+                return false;
+
+            _repoRolControllerMethod.Delete(rolControllerMethod);
+            return true;
+        }
+
+        public bool saveRolControllerMethods(int rolId, List<ControllerAndMethodsDTO> controllerMethods)
+        {
+            // Rol'ün var olduğunu kontrol et
+            var rol = getRolByRolId(rolId, isYoksaHataDondur: true);
+
+            // İşlem transaction içinde yapılacak
+            using (var transaction = new System.Transactions.TransactionScope(
+                System.Transactions.TransactionScopeOption.Required,
+                new System.Transactions.TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted },
+                System.Transactions.TransactionScopeAsyncFlowOption.Enabled))
+            {
+                try
+                {
+                    // Önce bu role ait tüm controller-method ilişkilerini sil
+                    var existingMethods = _repoRolControllerMethod.GetList("ROL_ID=@rolId", new { rolId });
+                    foreach (var method in existingMethods)
+                    {
+                        _repoRolControllerMethod.Delete(method);
+                    }
+
+                    // Seçilen controller ve methodları ekle
+                    foreach (var controller in controllerMethods)
+                    {
+                        foreach (var method in controller.methods)
+                        {
+                            var rolControllerMethod = new t_rol_controller_method
+                            {
+                                ROL_ID = rolId,
+                                CONTROLLER_NAME = controller.controllerName,
+                                METHOD_NAME = method
+                            };
+
+                            _repoRolControllerMethod.Save(rolControllerMethod);
+                        }
+                    }
+
+                    transaction.Complete();
+                    return true;
+                }
+                catch
+                {
+                    // Transaction başarısız olursa otomatik olarak rollback yapılacak
+                    return false;
+                }
+            }
+        }
     }
 }
