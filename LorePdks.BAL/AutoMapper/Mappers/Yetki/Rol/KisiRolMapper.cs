@@ -1,5 +1,5 @@
 using AutoMapper;
-using LorePdks.COMMON.DTO.Auth.Securty.Rol;
+using LorePdks.COMMON.DTO.Yetki.Rol;
 using LorePdks.DAL.Model;
 
 namespace LorePdks.BAL.AutoMapper.Mappers.Yetki.Rol

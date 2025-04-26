@@ -1,7 +1,7 @@
-using LorePdks.COMMON.DTO.Auth.Securty.Ekran;
+using LorePdks.COMMON.DTO.Yetki.Ekran;
 using System.Collections.Generic;
 
-namespace LorePdks.BAL.Managers.Auth.Yetki.Ekran.Interfaces
+namespace LorePdks.BAL.Managers.Yetki.Ekran.Interfaces
 {
     public interface IEkranManager
     {

@@ -7,12 +7,12 @@ using AutoMapper;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using System.Threading.Tasks;
-using LorePdks.COMMON.DTO.Auth.Securty.Ekran;
-using LorePdks.COMMON.DTO.Auth.Securty.Rol;
-using LorePdks.BAL.Managers.Auth.Yetki.Rol.Interfaces;
 using LorePdks.BAL.Managers.Kisi.Interfaces;
+using LorePdks.COMMON.DTO.Yetki.Ekran;
+using LorePdks.COMMON.DTO.Yetki.Rol;
+using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
 
-namespace LorePdks.BAL.Managers.Auth.Yetki.Rol
+namespace LorePdks.BAL.Managers.Yetki.Rol
 {
     public class RolManager(
         IMapper _mapper,

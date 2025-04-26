@@ -2,7 +2,7 @@ using LorePdks.COMMON.DTO.Base;
 using System;
 using System.Collections.Generic;
 
-namespace LorePdks.COMMON.DTO.Auth.Securty.Ekran
+namespace LorePdks.COMMON.DTO.Yetki.Ekran
 {
     public class EkranDTO : BaseDTO
     {

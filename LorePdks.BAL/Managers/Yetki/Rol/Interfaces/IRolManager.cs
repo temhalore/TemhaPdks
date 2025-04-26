@@ -1,6 +1,6 @@
-using LorePdks.COMMON.DTO.Auth.Securty.Rol;
+using LorePdks.COMMON.DTO.Yetki.Rol;
 
-namespace LorePdks.BAL.Managers.Auth.Yetki.Rol.Interfaces
+namespace LorePdks.BAL.Managers.Yetki.Rol.Interfaces
 {
     public interface IRolManager
     {

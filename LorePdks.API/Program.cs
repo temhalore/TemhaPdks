@@ -38,10 +38,10 @@ using LorePdks.BAL.Managers.Firma;
 using LorePdks.BAL.Managers.Hareket;
 using LorePdks.BAL.Managers.KisiToken;
 using LorePdks.BAL.Managers.KisiToken.Interfaces;
-using LorePdks.BAL.Managers.Auth.Yetki.Rol.Interfaces;
-using LorePdks.BAL.Managers.Auth.Yetki.Rol;
-using LorePdks.BAL.Managers.Auth.Yetki.Ekran.Interfaces;
-using LorePdks.BAL.Managers.Auth.Yetki.Ekran;
+using LorePdks.BAL.Managers.Yetki.Ekran;
+using LorePdks.BAL.Managers.Yetki.Rol;
+using LorePdks.BAL.Managers.Yetki.Ekran.Interfaces;
+using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

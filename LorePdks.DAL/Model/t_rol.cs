@@ -26,6 +26,8 @@ namespace LorePdks.DAL.Model
         public int ID { get; set; }
         public string ROL_ADI { get; set; }
         public string ACIKLAMA { get; set; }
+        public string CONTROLLER_NAME { get; set; }
+        public string CONTROLLER_METHOD_NAME { get; set; }
         [Required]
         public int ISDELETED { get; set; }
         public int? CREATEDUSER { get; set; }
@@ -38,6 +40,8 @@ namespace LorePdks.DAL.Model
         ID,
         ROL_ADI,
         ACIKLAMA,
+        CONTROLLER_NAME,
+        CONTROLLER_METHOD_NAME,
         ISDELETED,
         CREATEDUSER,
         CREATEDDATE,

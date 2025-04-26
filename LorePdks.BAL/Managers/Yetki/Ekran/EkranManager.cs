@@ -6,10 +6,10 @@ using System.Linq;
 using AutoMapper;
 using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Enums;
-using LorePdks.COMMON.DTO.Auth.Securty.Ekran;
-using LorePdks.BAL.Managers.Auth.Yetki.Ekran.Interfaces;
+using LorePdks.COMMON.DTO.Yetki.Ekran;
+using LorePdks.BAL.Managers.Yetki.Ekran.Interfaces;
 
-namespace LorePdks.BAL.Managers.Auth.Yetki.Ekran
+namespace LorePdks.BAL.Managers.Yetki.Ekran
 {
     public class EkranManager : IEkranManager
     {

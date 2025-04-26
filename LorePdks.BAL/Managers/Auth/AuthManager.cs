@@ -1,9 +1,9 @@
 using AutoMapper;
 using LorePdks.BAL.Managers.Auth.Interfaces;
-using LorePdks.BAL.Managers.Auth.Yetki.Rol.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.BAL.Managers.KisiToken.Interfaces;
+using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;

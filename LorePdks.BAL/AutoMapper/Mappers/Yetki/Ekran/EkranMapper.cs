@@ -1,5 +1,5 @@
 using AutoMapper;
-using LorePdks.COMMON.DTO.Auth.Securty.Ekran;
+using LorePdks.COMMON.DTO.Yetki.Ekran;
 using LorePdks.DAL.Model;
 
 namespace LorePdks.BAL.AutoMapper.Mappers.Yetki.Ekran
