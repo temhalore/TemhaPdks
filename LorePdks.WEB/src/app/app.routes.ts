@@ -13,7 +13,7 @@ export const routes: Routes = [
   // Auth modülü (login sayfası)
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+    loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule)
   },
   
   // Ana layout ve korumalı sayfalar (path boş yerine özel bir path kullanıyoruz)
@@ -29,7 +29,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadChildren: () => import('./modules/dashboard/dashboard.module').then(m => m.DashboardModule)
       }
       // Diğer korumalı sayfalar buraya eklenebilir
     ]

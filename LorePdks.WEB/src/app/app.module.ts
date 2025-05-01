@@ -12,7 +12,7 @@ import { LayoutsModule } from './layouts/layouts.module';
 // Auth service initialize fonksiyonu
 function appInitializer(authService: AuthService) {
   return () => {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       authService.getUserFromLocalStorage().subscribe({
         next: () => {
           resolve();
