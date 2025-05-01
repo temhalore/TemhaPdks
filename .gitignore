@@ -26,6 +26,8 @@ bin/
 obj/
 .vs/
 TestResults/
+OrnekWebProjesi/
+/OrnekWebProjesi/
 ###################
 # Web publish log #
 ###################
