@@ -72,10 +72,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "lore-pdks-web:build:production"
+              "buildTarget": "lore-pdks-web:build:production"
             },
             "development": {
-              "browserTarget": "lore-pdks-web:build:development"
+              "buildTarget": "lore-pdks-web:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "lore-pdks-web:build"
+            "buildTarget": "lore-pdks-web:build"
           }
         },
         "test": {
