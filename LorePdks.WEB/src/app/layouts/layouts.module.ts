@@ -8,15 +8,13 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
-  declarations: [
+  imports: [
+    CommonModule,
+    RouterModule,
     MainLayoutComponent,
     HeaderComponent,
     SidebarComponent,
     FooterComponent
-  ],
-  imports: [
-    CommonModule,
-    RouterModule
   ],
   exports: [
     MainLayoutComponent

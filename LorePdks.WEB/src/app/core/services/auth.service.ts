@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
 import { ApiService } from './api.service';
 import { KisiToken } from '../models/user.model';
 import { LoginRequest } from '../models/login-request.model';
@@ -98,5 +98,20 @@ export class AuthService {
    */
   isLoggedIn(): boolean {
     return !!this.currentUserValue;
+  }
+
+  /**
+   * Local Storage'dan kullanıcı bilgilerini alır ve Observable olarak döndürür
+   * @returns Observable<KisiToken | null>
+   */
+  getUserFromLocalStorage(): Observable<KisiToken | null> {
+    const storedUser = localStorage.getItem('kisiToken');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    
+    if (user) {
+      this.currentUserSubject.next(user);
+    }
+    
+    return of(user);
   }
 }

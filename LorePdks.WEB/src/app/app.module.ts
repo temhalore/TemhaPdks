@@ -13,16 +13,19 @@ import { LayoutsModule } from './layouts/layouts.module';
 function appInitializer(authService: AuthService) {
   return () => {
     return new Promise((resolve) => {
-      authService.getUserFromLocalStorage().subscribe().add(resolve);
+      authService.getUserFromLocalStorage().subscribe({
+        next: () => {
+          resolve();
+        },
+        error: () => {
+          resolve();
+        }
+      });
     });
   };
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    // Diğer global bileşenler buraya eklenebilir
-  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -30,8 +33,8 @@ function appInitializer(authService: AuthService) {
     AppRoutingModule,
     CoreModule,
     SharedModule,
-    LayoutsModule
-    // Diğer modüller burada import edilebilir
+    LayoutsModule,
+    AppComponent
   ],
   providers: [
     {
