@@ -3,15 +3,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { ServiceResponse } from '../../../core/models/service-response.model';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],
-  standalone: true,
-  imports: [CommonModule, RouterModule]
+  styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
   menuItems: any[] = [];

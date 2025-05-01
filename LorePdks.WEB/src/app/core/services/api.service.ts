@@ -37,31 +37,8 @@ export class ApiService {
     
     return this.http.post<ServiceResponse<T>>(url, body, { headers });
   }
+
   
-  /**
-   * PUT isteği göndermek için kullanılır
-   * @param endpoint API endpoint'i
-   * @param body İstek gövdesi
-   * @returns Observable<ServiceResponse<T>>
-   */
-  put<T>(endpoint: string, body: any): Observable<ServiceResponse<T>> {
-    const url = `${this.apiUrl}/${endpoint}`;
-    const headers = this.getHeaders();
-    
-    return this.http.put<ServiceResponse<T>>(url, body, { headers });
-  }
-  
-  /**
-   * DELETE isteği göndermek için kullanılır
-   * @param endpoint API endpoint'i
-   * @returns Observable<ServiceResponse<T>>
-   */
-  delete<T>(endpoint: string): Observable<ServiceResponse<T>> {
-    const url = `${this.apiUrl}/${endpoint}`;
-    const headers = this.getHeaders();
-    
-    return this.http.delete<ServiceResponse<T>>(url, { headers });
-  }
   
   /**
    * HTTP istekleri için gerekli başlıkları oluşturur
