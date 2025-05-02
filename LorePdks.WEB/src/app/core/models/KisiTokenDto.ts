@@ -1,5 +1,5 @@
 import { baseDto } from "./baseDto";
-import { KisiDto } from "./kisiDto";
+import { KisiDto } from "./KisiDto";
 import { RolDto } from "./RolDto";
 
 /**
