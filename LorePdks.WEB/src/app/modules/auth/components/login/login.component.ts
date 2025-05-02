@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { loginReqDto } from '../../../../core/models/loginReqDto';
 import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +23,8 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastr: ToastrService
   ) {
     // Eğer kullanıcı zaten giriş yapmışsa, dashboard'a yönlendir
     if (this.authService.isLoggedIn()) {
@@ -63,20 +64,12 @@ export class LoginComponent implements OnInit {
     this.authService.login(loginRequest)
       .subscribe({
         next: () => {
-          // Başarılı giriş sonrası SweetAlert göster
-          Swal.fire({
-            icon: 'success',
-            title: 'Başarılı!',
-            text: 'Giriş işlemi başarıyla gerçekleştirildi.',
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            // Başarılı giriş sonrası return url'e yönlendir
-            this.router.navigate([this.returnUrl]);
-          });
+          // Başarılı giriş sonrası
+          this.toastr.success('Giriş işlemi başarıyla gerçekleştirildi.', 'Başarılı!');
+          this.router.navigate([this.returnUrl]);
         },
-        error: (error: unknown) => {
-          console.error('Login error:', error);
+        error: () => {
+          // Hata interceptor tarafından yönetilecek
           this.loading = false;
         }
       });
