@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
-import Swal from 'sweetalert2';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { KisiTokenDto } from '../../../core/models/KisiTokenDto';
 import { loginReqDto } from '../../../core/models/loginReqDto';
 import { ApiService } from '../../../core/services/api.service';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -40,24 +40,11 @@ export class AuthService {
   login(loginRequest: loginReqDto): Observable<KisiTokenDto> {
     return this.apiService.post<KisiTokenDto>('Auth/login', loginRequest)
       .pipe(
-        map(response => {
-          // API yanıtı başarılı ve data varsa
-          if (response.isSuccess && response.data) {
-            // LocalStorage'a kullanıcı bilgisini kaydet
-            localStorage.setItem('kisiToken', JSON.stringify(response.data));
-            // BehaviorSubject'i güncelle
-            this.currentUserSubject.next(response.data);
-            return response.data;
-          } else {
-            // Hata durumunda SweetAlert ile mesaj göster
-            Swal.fire({
-              title: 'Hata!',
-              text: response.message || 'Giriş sırasında bir hata oluştu.',
-              icon: 'error',
-              confirmButtonText: 'Tamam'
-            });
-            throw new Error(response.message || 'Giriş sırasında bir hata oluştu.');
-          }
+        tap(userData => {
+          // LocalStorage'a kullanıcı bilgisini kaydet
+          localStorage.setItem('kisiToken', JSON.stringify(userData));
+          // BehaviorSubject'i güncelle
+          this.currentUserSubject.next(userData);
         })
       );
   }

@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ServiceResponse } from '../models/ServiceResponse';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -16,29 +17,47 @@ export class ApiService {
    * GET isteği göndermek için kullanılır
    * @param endpoint API endpoint'i
    * @param params Query parametreleri
-   * @returns Observable<ServiceResponse<T>>
+   * @returns Observable<T>
    */
-  get<T>(endpoint: string, params?: any): Observable<ServiceResponse<T>> {
+  get<T>(endpoint: string, params?: any): Observable<T> {
     const url = `${this.apiUrl}/${endpoint}`;
     const headers = this.getHeaders();
     
-    return this.http.get<ServiceResponse<T>>(url, { headers, params });
+    return this.http.get<ServiceResponse<T>>(url, { headers, params })
+      .pipe(
+        map(response => this.handleResponse<T>(response)),
+        catchError(error => throwError(() => error))
+      );
   }
   
   /**
    * POST isteği göndermek için kullanılır
    * @param endpoint API endpoint'i
    * @param body İstek gövdesi
-   * @returns Observable<ServiceResponse<T>>
+   * @returns Observable<T>
    */
-  post<T>(endpoint: string, body: any): Observable<ServiceResponse<T>> {
+  post<T>(endpoint: string, body: any): Observable<T> {
     const url = `${this.apiUrl}/${endpoint}`;
     const headers = this.getHeaders();
     
-    return this.http.post<ServiceResponse<T>>(url, body, { headers });
+    return this.http.post<ServiceResponse<T>>(url, body, { headers })
+      .pipe(
+        map(response => this.handleResponse<T>(response)),
+        catchError(error => throwError(() => error))
+      );
   }
 
-  
+  /**
+   * API yanıtını işler ve başarısız yanıtlarda hata fırlatır
+   * @param response API yanıtı
+   * @returns T - API yanıtının data özelliği
+   */
+  private handleResponse<T>(response: ServiceResponse<T>): T {
+    if (!response.IsSuccess || !response.data) {
+      throw new Error(response.message || 'API isteği başarısız oldu.');
+    }
+    return response.data;
+  }
   
   /**
    * HTTP istekleri için gerekli başlıkları oluşturur
