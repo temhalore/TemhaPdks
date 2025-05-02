@@ -6,7 +6,6 @@
         //UserTokenDTO GetKisiTokenDto();
         string GetIPAddress();
         string GetUserAgent();
-
         string GetToken();
 
 

@@ -87,7 +87,7 @@ namespace LorePdks.BAL.Managers.Kisi
         //verilen login name ve kişiyi var olan diğer metodlardan bulur ve şifre kontrolü yapar
         public KisiDTO getKisiDtoByLoginNameAndSifre(string loginName, string sifre, bool isYoksaHataDondur = false)
         {
-            var kisi = getKisiByLoginName(loginName, isYoksaHataDondur: false);
+            var kisi = getKisiByLoginName(loginName, isYoksaHataDondur: true);
             if (isYoksaHataDondur && kisi == null)
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"loginName ile eşleşen kisi bulunamadı");

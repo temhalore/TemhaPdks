@@ -1,5 +1,10 @@
 ﻿using LorePdks.BAL.Managers.Helper.Interfaces;
 using LorePdks.COMMON.Configuration;
+using LorePdks.COMMON.DTO.Common;
+using LorePdks.COMMON.Enums;
+using LorePdks.COMMON.Models;
+using LorePdks.DAL.Model;
+using LorePdks.DAL.Repository;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 
@@ -71,30 +76,37 @@ namespace LorePdks.BAL.Managers.Helper
 
         //////}
 
-        //////public UserTokenDTO GetKisiTokenDtoByToken(string token)
-        //////{
+       public KisiTokenDTO GetKisiTokenDtoByToken(string token)
+       {
 
-        //////    var repoKisiToken = new GenericRepository<T_oys_KisiToken>();
-        //////    var repoKisiTokenClob = new GenericRepository<T_oys_KisiTokenClob>();
+           var repoKisiToken = new GenericRepository<t_kisi_token>();
+           //var repoKisiTokenClob = new GenericRepository<T_oys_KisiTokenClob>();
 
-        //////    var kisiToken = repoKisiToken.Get("OYS_TOKEN =@token", new { token });
+           var kisiToken = repoKisiToken.Get("OYS_TOKEN =@token", new { token });
 
-        //////    if (kisiToken == null || kisiToken.ID == 0)
-        //////    {
-        //////        throw new OYSException(MessageCode.ERROR_501, "login bilgilerinizde problem tespit edildi lütfen yeniden login olunuz.");
-        //////    }
+            KisiTokenDTO kisiTokenDto = new KisiTokenDTO()
+            {
+                token = kisiToken.TOKEN,
+                kisiId = kisiToken.KISI_ID,
+                loginName = kisiToken.LOGIN_NAME,
+                ipAdresi = kisiToken.IP_ADRESI,
+                userAgent = kisiToken.USER_AGENT,
+                expDate = kisiToken.EXP_DATE,
 
-        //////    var tokenClobData = kisiToken == null ? null : repoKisiTokenClob.Get((long)kisiToken.LOGIN_DTO_JSON_CLOB_ID);
+            };
+            //if (kisiToken == null || kisiToken.ID == 0)
+            //{
+            //    throw new OYSException(MessageCode.ERROR_501, "login bilgilerinizde problem tespit edildi lütfen yeniden login olunuz.");
+            //}
 
-        //////    UserTokenDTO userTokenDto = JsonConvert.DeserializeObject<UserTokenDTO>(tokenClobData.LOGIN_DTO_JSON);
+            //var tokenClobData = kisiToken == null ? null : repoKisiTokenClob.Get((long)kisiToken.LOGIN_DTO_JSON_CLOB_ID);
 
-        //////    if (userTokenDto == null || userTokenDto.id == 0)
-        //////    {
-        //////        throw new OYSException(MessageCode.ERROR_501, "login bilgilerinizde problem tespit edildi lütfen yeniden login olnuz.");
-        //////    }
+            //KisiTokenDTO kisiTokenDto = JsonConvert.DeserializeObject<UserTokenDTO>(tokenClobData.LOGIN_DTO_JSON);
 
-        //////    return userTokenDto;
-        //////}
+
+
+           return kisiTokenDto;
+       }
 
         public string GetToken()
         {

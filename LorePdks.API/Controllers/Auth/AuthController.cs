@@ -34,19 +34,6 @@ namespace LorePdks.API.Controllers.Auth
     
         }
 
-        [HttpPost("getRolDtoListByKisiId")]
-        public IActionResult getRolDtoListByKisiId()
-        {
-            var response = new ServiceResponse<object>();
-            //menü için rol ve ekranlarıda dtoya ekle
-            var rolMenuDto = _rolManager.getRolDtoListByKisiId(resultTokenDto.kisiDto.id);
-
-            response.data = _authManager.login(request.loginName, request.sifre); ;
-            return Ok(response);
-
-        }
-
-        
 
 
         /// <summary>
