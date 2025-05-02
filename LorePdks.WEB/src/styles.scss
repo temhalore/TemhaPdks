@@ -137,3 +137,28 @@ html, body {
     padding-right: 15px;
   }
 }
+
+/* ngx-toastr için stil import */
+@import 'ngx-toastr/toastr';
+
+/* Toastr özelleştirmeleri */
+.toast-container .ngx-toastr {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.toast-success {
+  background-color: var(--success-color);
+}
+
+.toast-error {
+  background-color: var(--danger-color);
+}
+
+.toast-info {
+  background-color: var(--info-color);
+}
+
+.toast-warning {
+  background-color: var(--warning-color);
+}

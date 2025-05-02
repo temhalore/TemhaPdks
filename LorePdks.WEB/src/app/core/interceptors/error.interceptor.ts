@@ -8,12 +8,15 @@ import {
 } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
@@ -54,12 +57,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         // Hata mesajını göster (401 hariç - zaten yönlendirme yapılıyor)
         if (error.status !== 401) {
-          Swal.fire({
-            title: 'Hata!',
-            text: errorMessage,
-            icon: 'error',
-            confirmButtonText: 'Tamam'
-          });
+          this.toastr.error(errorMessage, 'Hata!');
         }
         
         return throwError(() => new Error(errorMessage));

@@ -8,6 +8,7 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { LayoutsModule } from './layouts/layouts.module';
 import { AuthService } from './modules/auth/services/auth.service';
+import { ToastrModule } from 'ngx-toastr';
 
 // Auth service initialize fonksiyonu
 function appInitializer(authService: AuthService) {
@@ -34,6 +35,12 @@ function appInitializer(authService: AuthService) {
     CoreModule,
     SharedModule,
     LayoutsModule,
+    ToastrModule.forRoot({
+      timeOut: 5000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      closeButton: true
+    }),
     AppComponent
   ],
   providers: [
