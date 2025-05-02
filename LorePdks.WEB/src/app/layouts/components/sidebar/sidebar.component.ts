@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { ApiService } from '../../../core/services/api.service';
-import { ServiceResponse } from '../../../core/models/ServiceResponse';
 import { CommonModule } from '@angular/common';
 import { EkranDTO } from '../../../core/models/EkranDTO';
+import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../modules/auth/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',

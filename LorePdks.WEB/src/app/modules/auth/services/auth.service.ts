@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
-import { ApiService } from './api.service';
 import Swal from 'sweetalert2';
-import { KisiTokenDto } from '../models/kisiTokenDto';
-import { loginReqDto } from '../models/loginReqDto';
+import { KisiTokenDto } from '../../../core/models/KisiTokenDto';
+import { loginReqDto } from '../../../core/models/loginReqDto';
+import { ApiService } from '../../../core/services/api.service';
 
 @Injectable({
   providedIn: 'root'

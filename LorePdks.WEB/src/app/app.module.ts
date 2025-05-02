@@ -6,8 +6,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
-import { AuthService } from './core/services/auth.service';
 import { LayoutsModule } from './layouts/layouts.module';
+import { AuthService } from './modules/auth/services/auth.service';
 
 // Auth service initialize fonksiyonu
 function appInitializer(authService: AuthService) {
