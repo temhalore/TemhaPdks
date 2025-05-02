@@ -68,10 +68,7 @@ namespace LorePdks.BAL.Managers.Auth
                 // Token kaydedilir
                 var resultTokenDto = _kisiTokenManager.saveKisiToken(kisiTokenDto);
                 resultTokenDto.isLogin = true;
-
-                //menü için rol ve ekranlarıda dtoya ekle
-                var rolMenuDto = _rolManager.getRolDtoListByKisiId(resultTokenDto.kisiDto.id);
-
+                resultTokenDto.rolDtoList = _rolManager.getRolDtoListByKisiId(resultTokenDto.kisiDto.id);
                 return resultTokenDto;
             }
             catch (AppException)

@@ -1,7 +1,7 @@
 /**
  * Login isteği için kullanılan model
  */
-export interface LoginRequest {
+export interface loginReqDto {
   loginName: string;
   sifre: string;
 }

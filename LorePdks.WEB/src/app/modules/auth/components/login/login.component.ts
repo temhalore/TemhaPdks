@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
-import { LoginRequest } from '../../../../core/models/login-request.model';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
+import { loginReqDto } from '../../../../core/models/loginReqDto';
 
 @Component({
   selector: 'app-login',
@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
 
     this.loading = true;
     
-    const loginRequest: LoginRequest = {
+    const loginRequest: loginReqDto = {
       loginName: this.f['loginName'].value,
       sifre: this.f['sifre'].value
     };

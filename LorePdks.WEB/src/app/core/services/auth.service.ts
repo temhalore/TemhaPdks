@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
 import { ApiService } from './api.service';
-import { KisiToken } from '../models/user.model';
-import { LoginRequest } from '../models/login-request.model';
 import Swal from 'sweetalert2';
+import { KisiTokenDto } from '../models/kisiTokenDto';
+import { loginReqDto } from '../models/loginReqDto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject: BehaviorSubject<KisiToken | null>;
-  public currentUser: Observable<KisiToken | null>;
+  private currentUserSubject: BehaviorSubject<KisiTokenDto | null>;
+  public currentUser: Observable<KisiTokenDto | null>;
 
   constructor(
     private apiService: ApiService,
@@ -19,7 +19,7 @@ export class AuthService {
   ) {
     // LocalStorage'dan mevcut kullanıcı bilgisini çek
     const storedUser = localStorage.getItem('kisiToken');
-    this.currentUserSubject = new BehaviorSubject<KisiToken | null>(
+    this.currentUserSubject = new BehaviorSubject<KisiTokenDto | null>(
       storedUser ? JSON.parse(storedUser) : null
     );
     this.currentUser = this.currentUserSubject.asObservable();
@@ -28,7 +28,7 @@ export class AuthService {
   /**
    * Mevcut kullanıcıyı döndürür
    */
-  public get currentUserValue(): KisiToken | null {
+  public get currentUserValue(): KisiTokenDto | null {
     return this.currentUserSubject.value;
   }
 
@@ -37,8 +37,8 @@ export class AuthService {
    * @param loginRequest Giriş bilgileri
    * @returns Observable<KisiToken>
    */
-  login(loginRequest: LoginRequest): Observable<KisiToken> {
-    return this.apiService.post<KisiToken>('Auth/login', loginRequest)
+  login(loginRequest: loginReqDto): Observable<KisiTokenDto> {
+    return this.apiService.post<KisiTokenDto>('Auth/login', loginRequest)
       .pipe(
         map(response => {
           // API yanıtı başarılı ve data varsa
@@ -104,7 +104,7 @@ export class AuthService {
    * Local Storage'dan kullanıcı bilgilerini alır ve Observable olarak döndürür
    * @returns Observable<KisiToken | null>
    */
-  getUserFromLocalStorage(): Observable<KisiToken | null> {
+  getUserFromLocalStorage(): Observable<KisiTokenDto | null> {
     const storedUser = localStorage.getItem('kisiToken');
     const user = storedUser ? JSON.parse(storedUser) : null;
     

@@ -1,4 +1,5 @@
 using LorePdks.COMMON.DTO.Kisi;
+using LorePdks.COMMON.DTO.Yetki.Rol;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,5 +16,9 @@ namespace LorePdks.COMMON.DTO.Common
         public DateTime? expDate { get; set; }
         public bool isLogin { get; set; }
         public KisiDTO kisiDto { get; set; }
+
+        public List<RolDTO> rolDtoList  { get; set; }
+
+
     }
 }

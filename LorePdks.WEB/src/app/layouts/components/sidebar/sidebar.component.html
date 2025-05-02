@@ -19,13 +19,13 @@
         
         <!-- Alt menüye sahip menü öğesi -->
         <li class="nav-item has-submenu" *ngIf="menuItem.altEkranlar && menuItem.altEkranlar.length > 0">
-          <a class="nav-link" href="javascript:void(0)" data-bs-toggle="collapse" [attr.data-bs-target]="'#submenu-' + menuItem.id" routerLinkActive="active">
+          <a class="nav-link" href="javascript:void(0)" data-bs-toggle="collapse" [attr.data-bs-target]="'#submenu-' + menuItem.eid" routerLinkActive="active">
             <i class="fa" [ngClass]="menuItem.ikon || 'fa-circle'"></i>
             <span class="menu-text">{{ menuItem.ekranAdi }}</span>
             <i class="fa fa-chevron-down submenu-icon"></i>
           </a>
           
-          <div class="collapse submenu" [id]="'submenu-' + menuItem.id">
+          <div class="collapse submenu" [id]="'submenu-' + menuItem.eid">
             <ul class="nav flex-column">
               <li class="nav-item" *ngFor="let subItem of menuItem.altEkranlar">
                 <a class="nav-link" [routerLink]="[subItem.ekranYolu]" routerLinkActive="active">
