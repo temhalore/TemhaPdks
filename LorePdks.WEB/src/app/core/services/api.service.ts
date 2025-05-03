@@ -6,6 +6,8 @@ import { ServiceResponse } from '../models/ServiceResponse';
 import { catchError, map } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
+import { ApiErrorCodes } from '../constants/api-error-codes';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,8 @@ export class ApiService {
   
   constructor(
     private http: HttpClient,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) { }
   
   /**
@@ -59,19 +62,73 @@ export class ApiService {
   }
 
   /**
-   * API yanıtını işler ve başarısız yanıtlarda hata fırlatır
+   * API yanıtını işler ve başarısız yanıtlarda hata kodlarına göre işlem yapar
    * @param response API yanıtı
    * @returns T - API yanıtının data özelliği
    */
   private handleResponse<T>(response: ServiceResponse<T>): T {
     if (!response.IsSuccess || !response.data) {
-      // API hatasını burada toastr kullanarak göster
-      this.toastr.error(response.message || 'API isteği başarısız oldu.', 'Hata!');
+      // API hata koduna göre özel işlemler yap
+      this.handleApiError(response.errorCode, response.message);
       
       // Hatayı fırlat (subscribe eden komponentte yakalanabilir)
       throw new Error(response.message || 'API isteği başarısız oldu.');
     }
     return response.data;
+  }
+
+  /**
+   * API hata kodlarına göre özel işlemler yapar
+   * @param errorCode Hata kodu
+   * @param message Hata mesajı
+   */
+  private handleApiError(errorCode?: number, message?: string): void {
+    const defaultErrorMessage = message || 'API isteği başarısız oldu.';
+    
+    // Hata kodu yoksa veya bilinmeyen bir hata ise
+    if (!errorCode) {
+      this.toastr.error(defaultErrorMessage, 'Hata!');
+      return;
+    }
+    
+    // Hata koduna göre işlem yap
+    switch (errorCode) {
+      case ApiErrorCodes.ERROR_401_YETKISIZ_ERISIM:
+        this.toastr.error(message, 'Yetkisiz Erişim!');
+        break;
+        
+      case ApiErrorCodes.ERROR_501_YENIDEN_LOGIN_OLMALI:
+        this.toastr.warning(message, 'Oturum Sonlandı!');
+        // LocalStorage'dan token'ı temizle
+        localStorage.removeItem('kisiToken');
+        // Login sayfasına yönlendir
+        this.router.navigate(['/auth/login']);
+        break;
+        
+      case ApiErrorCodes.ERROR_500_BIR_HATA_OLUSTU:
+        this.toastr.error(message ,'Uygulamada bir hata oluştu.');
+        break;
+        
+      case ApiErrorCodes.ERROR_502_EKSIK_VERI_GONDERIMI:
+        this.toastr.error(message ,'Eksik veri gönderimi yapıldı.');
+        break;
+        
+      case ApiErrorCodes.ERROR_503_GECERSIZ_VERI_GONDERIMI:
+        this.toastr.error(message , 'Geçersiz veri gönderimi yapıldı.');
+        break;
+        
+      case ApiErrorCodes.ERROR_BIR_HATA_OLUSTU_YONLENDIR:
+        this.toastr.error('Uygulamada bir hata oluştu. Lütfen yönlendirmeyi bekleyiniz..', 'Sistem Hatası!');
+        // 3 saniye sonra ana sayfaya yönlendir
+        setTimeout(() => {
+          this.router.navigate(['/secure/dashboard']);
+        }, 3000);
+        break;
+        
+      default:
+        // Bilinmeyen hata kodları için genel mesaj göster
+        this.toastr.error(defaultErrorMessage, 'Hata!');
+    }
   }
   
   /**
