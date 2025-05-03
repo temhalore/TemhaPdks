@@ -10,6 +10,10 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
+//burası http isteklerin http status kodu olan ok 200 bad request 400 gibi durumları yakalamak için kullanılır
+// ve hata mesajlarını kullanıcıya göstermek için kullanılır
+//apinin mantıksal herşeyi ok dönüp ISucces kımındaki hata fırlatma durumları buradan yakalanamaz.Çünkü hepsi ok ani 200 dür.
+
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 

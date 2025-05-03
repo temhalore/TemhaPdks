@@ -33,6 +33,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // this.toastr.error("aaaaaaaaaaaaaaaaaaaaaa", 'Hata!');
+
     // Login formu oluştur
     this.loginForm = this.formBuilder.group({
       loginName: ['', [Validators.required]],

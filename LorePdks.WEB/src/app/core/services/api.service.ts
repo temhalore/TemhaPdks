@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ServiceResponse } from '../models/ServiceResponse';
 import { catchError, map } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +13,10 @@ import { catchError, map } from 'rxjs/operators';
 export class ApiService {
   private apiUrl = environment.apiUrl;
   
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private toastr: ToastrService
+  ) { }
   
   /**
    * GET isteği göndermek için kullanılır
@@ -26,7 +31,10 @@ export class ApiService {
     return this.http.get<ServiceResponse<T>>(url, { headers, params })
       .pipe(
         map(response => this.handleResponse<T>(response)),
-        catchError(error => throwError(() => error))
+        catchError(error => {
+          // HTTP hatalarını burada işle (interceptor tarafından yakalanacak)
+          return throwError(() => error);
+        })
       );
   }
   
@@ -43,7 +51,10 @@ export class ApiService {
     return this.http.post<ServiceResponse<T>>(url, body, { headers })
       .pipe(
         map(response => this.handleResponse<T>(response)),
-        catchError(error => throwError(() => error))
+        catchError(error => {
+          // HTTP hatalarını burada işle (interceptor tarafından yakalanacak)
+          return throwError(() => error);
+        })
       );
   }
 
@@ -54,6 +65,10 @@ export class ApiService {
    */
   private handleResponse<T>(response: ServiceResponse<T>): T {
     if (!response.IsSuccess || !response.data) {
+      // API hatasını burada toastr kullanarak göster
+      this.toastr.error(response.message || 'API isteği başarısız oldu.', 'Hata!');
+      
+      // Hatayı fırlat (subscribe eden komponentte yakalanabilir)
       throw new Error(response.message || 'API isteği başarısız oldu.');
     }
     return response.data;
