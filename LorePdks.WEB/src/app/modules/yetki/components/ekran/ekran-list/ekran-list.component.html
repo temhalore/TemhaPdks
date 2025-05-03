@@ -1,0 +1,64 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2>Ekran Yönetimi</h2>
+      <button pButton pRipple type="button" label="Yeni Ekran Ekle" icon="pi pi-plus" 
+              class="p-button-success" (click)="openNewEkranModal()"></button>
+    </div>
+    <div class="card-body">
+      <!-- Ekran TreeTable -->
+      <p-treeTable [value]="ekranlarTree" [paginator]="true" [rows]="10"
+                  [rowHover]="true" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Ekran Adı</th>
+            <th>Ekran Yolu</th>
+            <th>Ekran Kodu</th>
+            <th>Açıklama</th>
+            <th>Sıra No</th>
+            <th>Aktif</th>
+            <th style="width: 120px">İşlemler</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+          <tr>
+            <td>
+              <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+              <span>
+                <i [class]="rowData.ikon" style="margin-right: 8px;"></i>
+                {{rowData.ekranAdi}}
+              </span>
+            </td>
+            <td>{{rowData.ekranYolu}}</td>
+            <td>{{rowData.ekranKodu}}</td>
+            <td>{{rowData.aciklama}}</td>
+            <td>{{rowData.siraNo}}</td>
+            <td>
+              <i [ngClass]="rowData.aktif ? 'pi pi-check-circle text-success' : 'pi pi-times-circle text-danger'"></i>
+            </td>
+            <td>
+              <button pButton pRipple type="button" icon="pi pi-pencil" 
+                      class="p-button-rounded p-button-warning p-button-sm mr-2"
+                      pTooltip="Düzenle" tooltipPosition="top"
+                      (click)="openEditEkranModal(rowData)"></button>
+              <button pButton pRipple type="button" icon="pi pi-trash" 
+                      class="p-button-rounded p-button-danger p-button-sm"
+                      pTooltip="Sil" tooltipPosition="top"
+                      (click)="deleteEkran(rowData)"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-treeTable>
+    </div>
+  </div>
+</div>
+
+<!-- Ekran Ekleme/Düzenleme Modalı -->
+<app-ekran-modal 
+  *ngIf="displayModal"
+  [isNew]="isNewEkran"
+  [ekran]="selectedEkran"
+  [ekranlar]="ekranlar"
+  (modalClose)="onModalClose()"
+  (ekranSaved)="onEkranSaved()">
+</app-ekran-modal>

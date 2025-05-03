@@ -1,0 +1,27 @@
+.form-control {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.required-field {
+  color: red;
+  margin-left: 2px;
+}
+
+.p-error {
+  color: red;
+  font-size: 12px;
+}
+
+.mb-3 {
+  margin-bottom: 16px;
+}
+
+.ml-2 {
+  margin-left: 8px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}

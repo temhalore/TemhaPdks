@@ -1,0 +1,139 @@
+<p-dialog 
+  [(visible)]="displayModal" 
+  [modal]="true" 
+  [style]="{width: '500px'}" 
+  [draggable]="false" 
+  [resizable]="false"
+  header="{{isNew ? 'Yeni Ekran Ekle' : 'Ekran Düzenle'}}"
+  (onHide)="closeModal()">
+  
+  <form [formGroup]="ekranForm" (ngSubmit)="onSubmit()">
+    <!-- Ekran adı -->
+    <div class="p-field mb-3">
+      <label for="ekranAdi">Ekran Adı <span class="required-field">*</span></label>
+      <input 
+        id="ekranAdi" 
+        type="text" 
+        pInputText 
+        formControlName="ekranAdi" 
+        class="form-control"
+        [ngClass]="{'ng-invalid ng-dirty': ekranForm.get('ekranAdi')?.invalid && ekranForm.get('ekranAdi')?.touched}">
+      <small 
+        *ngIf="ekranForm.get('ekranAdi')?.invalid && ekranForm.get('ekranAdi')?.touched" 
+        class="p-error">Ekran adı zorunludur</small>
+    </div>
+    
+    <!-- Ekran Yolu -->
+    <div class="p-field mb-3">
+      <label for="ekranYolu">Ekran Yolu <span class="required-field">*</span></label>
+      <input 
+        id="ekranYolu" 
+        type="text" 
+        pInputText 
+        formControlName="ekranYolu" 
+        class="form-control"
+        [ngClass]="{'ng-invalid ng-dirty': ekranForm.get('ekranYolu')?.invalid && ekranForm.get('ekranYolu')?.touched}">
+      <small 
+        *ngIf="ekranForm.get('ekranYolu')?.invalid && ekranForm.get('ekranYolu')?.touched" 
+        class="p-error">Ekran yolu zorunludur</small>
+    </div>
+    
+    <!-- Ekran Kodu -->
+    <div class="p-field mb-3">
+      <label for="ekranKodu">Ekran Kodu <span class="required-field">*</span></label>
+      <input 
+        id="ekranKodu" 
+        type="text" 
+        pInputText 
+        formControlName="ekranKodu" 
+        class="form-control"
+        [ngClass]="{'ng-invalid ng-dirty': ekranForm.get('ekranKodu')?.invalid && ekranForm.get('ekranKodu')?.touched}">
+      <small 
+        *ngIf="ekranForm.get('ekranKodu')?.invalid && ekranForm.get('ekranKodu')?.touched" 
+        class="p-error">Ekran kodu zorunludur</small>
+    </div>
+    
+    <!-- Açıklama -->
+    <div class="p-field mb-3">
+      <label for="aciklama">Açıklama</label>
+      <textarea 
+        id="aciklama" 
+        pInputTextarea 
+        formControlName="aciklama" 
+        class="form-control">
+      </textarea>
+    </div>
+    
+    <!-- Üst Ekran -->
+    <div class="p-field mb-3">
+      <label for="ustEkranId">Üst Ekran</label>
+      <p-dropdown 
+        id="ustEkranId"
+        formControlName="ustEkranId"
+        [options]="ustEkranlar" 
+        optionLabel="ekranAdi" 
+        optionValue="id"
+        [showClear]="true" 
+        placeholder="Üst ekran seç" 
+        class="form-control">
+      </p-dropdown>
+    </div>
+    
+    <!-- Sıra No -->
+    <div class="p-field mb-3">
+      <label for="siraNo">Sıra No <span class="required-field">*</span></label>
+      <input 
+        id="siraNo" 
+        type="number" 
+        pInputText 
+        formControlName="siraNo" 
+        class="form-control"
+        [ngClass]="{'ng-invalid ng-dirty': ekranForm.get('siraNo')?.invalid && ekranForm.get('siraNo')?.touched}">
+      <small 
+        *ngIf="ekranForm.get('siraNo')?.invalid && ekranForm.get('siraNo')?.touched" 
+        class="p-error">Sıra no zorunludur ve 0'dan büyük olmalıdır</small>
+    </div>
+    
+    <!-- İkon -->
+    <div class="p-field mb-3">
+      <label for="ikon">İkon</label>
+      <p-dropdown 
+        id="ikon"
+        formControlName="ikon"
+        [options]="ikonlar" 
+        optionLabel="label" 
+        optionValue="value"
+        [showClear]="false" 
+        class="form-control">
+        <ng-template pTemplate="selectedItem">
+          <div *ngIf="ekranForm.get('ikon')?.value">
+            <i [class]="ekranForm.get('ikon')?.value" style="margin-right: 8px;"></i>
+            {{ikonlar.find(i => i.value === ekranForm.get('ikon')?.value)?.label}}
+          </div>
+        </ng-template>
+        <ng-template let-ikon pTemplate="item">
+          <div>
+            <i [class]="ikon.value" style="margin-right: 8px;"></i>
+            {{ikon.label}}
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+    
+    <!-- Aktif -->
+    <div class="p-field mb-3">
+      <p-checkbox 
+        id="aktif" 
+        formControlName="aktif" 
+        [binary]="true" 
+        label="Aktif">
+      </p-checkbox>
+      <label for="aktif" class="ml-2">Aktif</label>
+    </div>
+  </form>
+  
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="İptal" icon="pi pi-times" class="p-button-text" (click)="closeModal()"></button>
+    <button pButton pRipple label="Kaydet" icon="pi pi-check" class="p-button-text" (click)="onSubmit()"></button>
+  </ng-template>
+</p-dialog>
