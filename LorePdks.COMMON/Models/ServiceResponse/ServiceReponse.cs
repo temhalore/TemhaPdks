@@ -14,7 +14,7 @@ namespace LorePdks.COMMON.Models.ServiceResponse
         int _code;
         string _messageHeader;
         string _message;
-        public bool IsSuccess { get; set; } = true;
+        public bool isSuccess { get; set; } = true;
 
         AppExceptionModel _AppException;
         //Data
@@ -45,7 +45,7 @@ namespace LorePdks.COMMON.Models.ServiceResponse
             _messageHeader = appEx.messageHeader;
             _messageTypeCode = Convert.ToString(appEx.errorCode);
             _code = Convert.ToInt16(appEx.code);
-            this.IsSuccess = false;
+            this.isSuccess = false;
             _AppException = new AppExceptionModel()
             {
                 code = appEx.code,
@@ -102,7 +102,7 @@ namespace LorePdks.COMMON.Models.ServiceResponse
                 }
                 if (messageType == ServiceResponseMessageType.Error)
                 {
-                    this.IsSuccess = false;
+                    this.isSuccess = false;
                     _messageHeader = "Hatalı İşlem";
                 }
                 if (messageType == ServiceResponseMessageType.Warning)

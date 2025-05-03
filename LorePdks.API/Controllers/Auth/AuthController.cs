@@ -46,7 +46,7 @@ namespace LorePdks.API.Controllers.Auth
 
             var response = new ServiceResponse<object>();
             response.message = "Başarıyla çıkış yapıldı";
-            response.IsSuccess = true;
+            response.isSuccess = true;
             return Ok(response);
 
         }

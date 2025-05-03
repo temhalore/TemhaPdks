@@ -69,7 +69,7 @@ export class ApiService {
    */
   private handleResponse<T>(response: ServiceResponse<T>): T {
     // Başarısız yanıt kontrolü
-    if (!response.IsSuccess || !response.data) {
+    if (!response.isSuccess ) {
       // API hata koduna göre özel işlemler yap
       this.handleApiError(response.errorCode, response.message, response.messageType);
       
