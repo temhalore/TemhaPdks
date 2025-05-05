@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { EkranDTO } from '../../../core/models/EkranDTO';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../modules/auth/services/auth.service';
+import { EkranDto } from '../../../core/models/EkranDto';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,7 +13,7 @@ import { AuthService } from '../../../modules/auth/services/auth.service';
   imports: [CommonModule, RouterModule]
 })
 export class SidebarComponent implements OnInit {
-  menuItems: EkranDTO[] = [];
+  menuItems: EkranDto[] = [];
   isCollapsed = false;
 
   constructor(
