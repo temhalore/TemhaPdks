@@ -11,4 +11,5 @@ export interface KisiDto extends baseDto{
   cepTel?: string;
   email?: string;
   loginName: string;
+  sifre?: string;
 }
