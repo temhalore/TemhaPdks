@@ -6,7 +6,7 @@ namespace LorePdks.COMMON.DTO.Yetki.Rol
 {
     public class RolControllerMethodDTO : BaseDTO
     {
-        public int rolId { get; set; }
+        public EIdDTO rolEidDto { get; set; }
         public string controllerName { get; set; }
         public string methodName { get; set; }
     }

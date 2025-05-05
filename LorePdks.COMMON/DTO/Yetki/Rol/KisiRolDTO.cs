@@ -8,9 +8,9 @@ namespace LorePdks.COMMON.DTO.Yetki.Rol
     {
 
 
-        public int kisiId { get; set; }
+        public EIdDTO kisiEidDto { get; set; }
 
-        public int rolId { get; set; }
+        public EIdDTO rolEidDto { get; set; }
         public string rolAdi { get; set; }
     }
 }

@@ -119,7 +119,7 @@ namespace LorePdks.API.Controllers.Yetki
         public IActionResult saveRolControllerMethodsByRolIdAndControllerMethods(RolControllerMethodsRequestDTO request)
         {
             var response = new ServiceResponse<bool>();
-            var success = _rolManager.saveRolControllerMethods(request.rolId, request.controllerMethods);
+            var success = _rolManager.saveRolControllerMethods(request.rolEidDto.id, request.controllerMethods);
             response.data = success;
             return Ok(response);
         }
@@ -153,7 +153,7 @@ namespace LorePdks.API.Controllers.Yetki
         public IActionResult addEkranToRolByRolEkranDto(RolEkranDTO request)
         {
             var response = new ServiceResponse<bool>();
-            var success = _rolManager.addEkranToRol(request.rolId, request.ekranId);
+            var success = _rolManager.addEkranToRol(request.rolEidDto.id, request.ekranEidDto.id);
             response.data = success;
             return Ok(response);
         }
@@ -163,7 +163,7 @@ namespace LorePdks.API.Controllers.Yetki
         public IActionResult removeEkranFromRolByRolEkranDto(RolEkranDTO request)
         {
             var response = new ServiceResponse<bool>();
-            var success = _rolManager.removeEkranFromRol(request.rolId, request.ekranId);
+            var success = _rolManager.removeEkranFromRol(request.rolEidDto.id, request.ekranEidDto.id);
             response.data = success;
             return Ok(response);
         }

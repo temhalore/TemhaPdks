@@ -1,11 +1,12 @@
 using LorePdks.COMMON.DTO.Base;
+using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.DTO.Yetki;
 
 namespace LorePdks.COMMON.DTO.Yetki.Rol
 {
     public class RolEkranDTO:BaseDTO
     {
-        public int rolId { get; set; }
-        public int ekranId { get; set; }
+        public EIdDTO rolEidDto { get; set; }
+        public EIdDTO ekranEidDto { get; set; }
     }
 }

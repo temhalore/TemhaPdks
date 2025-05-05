@@ -175,13 +175,13 @@ namespace LorePdks.BAL.Managers.Yetki.Ekran
             var ekranlar = getEkranDtoListByKisiId(kisiId);
 
             // Ana menü öğelerini al (üst ekranı null olanlar)
-            var menuItems = ekranlar.Where(x => x.ustEkranId == null || x.ustEkranId <= 0).OrderBy(x => x.siraNo).ToList();
+            var menuItems = ekranlar.Where(x => x.ustEkranEidDto == null || x.ustEkranEidDto.id <= 0).OrderBy(x => x.siraNo).ToList();
 
             // Her ana menü öğesi için alt menüleri bul ve ekle
             foreach (var menuItem in menuItems)
             {
                 menuItem.altEkranlar = ekranlar
-                    .Where(x => x.ustEkranId == menuItem.id)
+                    .Where(x => x.ustEkranEidDto.id == menuItem.id)
                     .OrderBy(x => x.siraNo)
                     .ToList();
             }
@@ -221,9 +221,9 @@ namespace LorePdks.BAL.Managers.Yetki.Ekran
             }
 
             // Üst ekran ID kontrolü
-            if (ekranDTO.ustEkranId.HasValue && ekranDTO.ustEkranId > 0)
+            if (ekranDTO.ustEkranEidDto!=null && ekranDTO.ustEkranEidDto.id> 0)
             {
-                var ustEkran = _repoEkran.Get(ekranDTO.ustEkranId.Value);
+                var ustEkran = _repoEkran.Get(ekranDTO.ustEkranEidDto.id);
                 if (ustEkran == null)
                 {
                     throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"Belirtilen üst ekran bulunamadı");

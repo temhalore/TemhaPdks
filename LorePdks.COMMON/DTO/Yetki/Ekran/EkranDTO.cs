@@ -10,7 +10,7 @@ namespace LorePdks.COMMON.DTO.Yetki.Ekran
         public string ekranYolu { get; set; }
         public string ekranKodu { get; set; }
         public string aciklama { get; set; }
-        public int? ustEkranId { get; set; }
+        public EIdDTO ustEkranEidDto { get; set; }
         public int siraNo { get; set; }
         public string ikon { get; set; }
         public bool aktif { get; set; }
