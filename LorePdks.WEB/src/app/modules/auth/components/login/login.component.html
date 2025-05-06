@@ -7,23 +7,17 @@
       </div>
     </ng-template>
     
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <form [formGroup]="loginForm" class="login-form">
       <!-- Kullanıcı Adı -->
       <div class="form-group mb-3">
-        <label for="loginName" class="mb-2">Kullanıcı Adı</label>
-        <div class="p-inputgroup">
-          <span class="p-inputgroup-addon">
-            <i class="pi pi-user"></i>
-          </span>
-          <input 
-            pInputText
-            type="text" 
-            formControlName="loginName" 
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && f['loginName'].errors }"
-            id="loginName" 
-            placeholder="Kullanıcı adınızı giriniz"
-          >
-        </div>
+        <app-text-input
+          title="Kullanıcı Adı"
+          placeholder="Kullanıcı adınızı giriniz"
+          [isRequired]="true"
+          [isLoading$]="loadingState$"
+          type="text"
+          [(value)]="loginModel.loginName"
+        ></app-text-input>
         <small *ngIf="submitted && f['loginName'].errors" class="p-error">
           <div *ngIf="f['loginName'].errors['required']">Kullanıcı adı gereklidir</div>
         </small>
@@ -31,21 +25,14 @@
       
       <!-- Şifre -->
       <div class="form-group mb-4">
-        <label for="sifre" class="mb-2">Şifre</label>
-        <div class="p-inputgroup">
-          <span class="p-inputgroup-addon">
-            <i class="pi pi-lock"></i>
-          </span>
-          <p-password 
-            id="sifre"
-            formControlName="sifre"
-            [feedback]="false"
-            [toggleMask]="true"
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && f['sifre'].errors }"
-            placeholder="Şifrenizi giriniz"
-            [style]="{'width':'100%'}"
-          ></p-password>
-        </div>
+        <app-text-input
+          title="Şifre"
+          placeholder="Şifrenizi giriniz"
+          [isRequired]="true"
+          [isLoading$]="loadingState$"
+          type="password"
+          [(value)]="loginModel.sifre"
+        ></app-text-input>
         <small *ngIf="submitted && f['sifre'].errors" class="p-error">
           <div *ngIf="f['sifre'].errors['required']">Şifre gereklidir</div>
         </small>
@@ -53,15 +40,14 @@
       
       <!-- Giriş Butonu -->
       <div class="d-grid">
-        <p-button 
-          [disabled]="loading" 
-          type="submit" 
-          label="Giriş Yap" 
-          icon="pi pi-sign-in" 
-          styleClass="w-100"
-          
-          [loading]="loading"
-        ></p-button>
+        <app-button
+          name="Giriş Yap"
+          [isLoading$]="loadingState$"
+          [isDisabled]="loading"
+          icon="pi pi-sign-in"
+          class="p-button-primary w-100"
+          (onClick)="onLoginClick()"
+        ></app-button>
       </div>
     </form>
     

@@ -24,7 +24,19 @@ export class TextInputComponent implements OnInit {
   @Input() isRequired: boolean = false;
   @Input() isDisabled: boolean = false;
   @Input() isLoading$: Observable<boolean> = of(false);
-  @Input() value: string = '';
+  
+  // İki yönlü veri bağlaması için set/get kullanımı
+  private _value: string = '';
+  
+  @Input()
+  get value(): string {
+    return this._value;
+  }
+  
+  set value(val: string) {
+    this._value = val;
+    this.valueChange.emit(this._value);
+  }
   
   @Output() valueChange = new EventEmitter<string>();
 
@@ -38,6 +50,6 @@ export class TextInputComponent implements OnInit {
   }
 
   onChange(event: any): void {
-    this.valueChange.emit(event.target.value);
+    this.value = event.target.value;
   }
 }

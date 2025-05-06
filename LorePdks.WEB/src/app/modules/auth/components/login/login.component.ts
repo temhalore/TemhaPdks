@@ -5,16 +5,20 @@ import { CommonModule } from '@angular/common';
 import { loginReqDto } from '../../../../core/models/loginReqDto';
 import { AuthService } from '../../../../core/services/modules/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { BehaviorSubject } from 'rxjs';
 
 // PrimeNG imports
 import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
 
 // NGX-Spinner import
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+
+// Özel bileşen importları
+import { ButtonComponent } from '../../../../core/components/button/button.component';
+import { TextInputComponent } from '../../../../core/components/text-input/text-input.component';
 
 @Component({
   selector: 'app-login',
@@ -25,18 +29,29 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
     CommonModule, 
     ReactiveFormsModule, 
     InputTextModule, 
-    ButtonModule, 
     CardModule, 
     PasswordModule,
     DividerModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    ButtonComponent,
+    TextInputComponent
   ]
 })
 export class LoginComponent implements OnInit {
+  // Form geçerliliğini kontrol etmek için formGroup
   loginForm!: FormGroup;
   loading = false;
   submitted = false;
   returnUrl: string = '/secure/dashboard';
+  
+  // Yükleme durumu için observable
+  loadingState$ = new BehaviorSubject<boolean>(false);
+  
+  // Form verilerini tutacak model - doğrudan loginReqDto kullanıyoruz
+  loginModel: loginReqDto = {
+    loginName: '',
+    sifre: ''
+  };
   
   constructor(
     private formBuilder: FormBuilder,
@@ -53,10 +68,10 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Login formu oluştur
+    // Login formunu model üzerinden oluştur
     this.loginForm = this.formBuilder.group({
-      loginName: ['', [Validators.required]],
-      sifre: ['', [Validators.required]]
+      loginName: [this.loginModel.loginName, [Validators.required]],
+      sifre: [this.loginModel.sifre, [Validators.required]]
     });
 
     // return url'i al (eğer query param olarak gelmişse)
@@ -65,35 +80,47 @@ export class LoginComponent implements OnInit {
 
   // Form kontrollerine kolay erişim için bir getter
   get f() { return this.loginForm.controls; }
-
-  onSubmit(): void {
+  
+  // Form değerlerini doğrulamak için helper metot
+  validateForm(): boolean {
     this.submitted = true;
+    
+    // Modeldeki değerleri form'a aktar
+    this.loginForm.patchValue({
+      loginName: this.loginModel.loginName,
+      sifre: this.loginModel.sifre
+    });
+    
+    return this.loginForm.valid;
+  }
 
-    // Form geçersizse işlemi durdur
-    if (this.loginForm.invalid) {
+  // Özel buton bileşeni için click handler
+  onLoginClick(): void {
+    // Form geçerliliğini kontrol et
+    if (!this.validateForm()) {
       return;
     }
 
     this.loading = true;
+    this.loadingState$.next(true);
+    
     // Spinner'ı göster
     this.spinner.show();
-    
-    const loginRequest: loginReqDto = {
-      loginName: this.f['loginName'].value,
-      sifre: this.f['sifre'].value
-    };
 
-    this.authService.login(loginRequest)
+    // Doğrudan loginModel'i service'e gönder
+    this.authService.login(this.loginModel)
       .subscribe({
         next: () => {
           // Başarılı giriş sonrası
           this.spinner.hide();
+          this.loadingState$.next(false);
           this.toastr.success('Giriş işlemi başarıyla gerçekleştirildi.', 'Başarılı!');
           this.router.navigate([this.returnUrl]);
         },
         error: () => {
           // Hata durumunda spinner'ı gizle
           this.spinner.hide();
+          this.loadingState$.next(false);
           this.loading = false;
         }
       });
