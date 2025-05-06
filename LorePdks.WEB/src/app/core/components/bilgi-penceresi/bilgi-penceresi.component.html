@@ -1,0 +1,8 @@
+<div class="bilgi-penceresi-container">
+  <div *ngIf="baslik && baslik.length > 0" class="bilgi-penceresi-baslik">
+    <h3>{{ baslik }}</h3>
+  </div>
+  <div class="bilgi-penceresi-icerik">
+    <div [innerHTML]="htmlIcerik"></div>
+  </div>
+</div>

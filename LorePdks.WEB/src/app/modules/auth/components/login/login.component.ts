@@ -19,6 +19,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 // Özel bileşen importları
 import { ButtonComponent } from '../../../../core/components/button/button.component';
 import { TextInputComponent } from '../../../../core/components/text-input/text-input.component';
+import { BilgiPenceresiComponent } from '../../../../core/components/bilgi-penceresi/bilgi-penceresi.component';
 
 @Component({
   selector: 'app-login',
@@ -34,7 +35,8 @@ import { TextInputComponent } from '../../../../core/components/text-input/text-
     DividerModule,
     NgxSpinnerModule,
     ButtonComponent,
-    TextInputComponent
+    TextInputComponent,
+    BilgiPenceresiComponent
   ]
 })
 export class LoginComponent implements OnInit {
@@ -46,6 +48,22 @@ export class LoginComponent implements OnInit {
   
   // Yükleme durumu için observable
   loadingState$ = new BehaviorSubject<boolean>(false);
+  
+  // Bilgi penceresi için içerik
+  bilgiBaslik: string = 'Lore PDKS Sistem Bilgileri';
+  bilgiIcerik: string = `
+    <div>
+      <p><strong>Lore PDKS Sistemine Hoş Geldiniz</strong></p>
+      <p>Bu sistem ile personel giriş-çıkış kayıtlarınızı kolayca yönetebilirsiniz.</p>
+      <ul>
+        <li>Çalışma saatlerinizi takip edin</li>
+        <li>İzin ve tatil durumlarını görüntüleyin</li>
+        <li>Günlük, haftalık ve aylık raporlar alın</li>
+        <li>Mobil cihazlardan da erişim sağlayın</li>
+      </ul>
+      <p>Sorun yaşamanız durumunda sistem yöneticinizle iletişime geçebilirsiniz.</p>
+    </div>
+  `;
   
   // Form verilerini tutacak model - doğrudan loginReqDto kullanıyoruz
   loginModel: loginReqDto = {

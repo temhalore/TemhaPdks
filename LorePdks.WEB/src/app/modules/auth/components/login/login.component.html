@@ -1,62 +1,73 @@
 <div class="login-container">
-  <p-card styleClass="login-card">
-    <ng-template pTemplate="header">
+  <div class="login-panel">
+    <!-- Sol taraf - Login Kısmı -->
+    <div class="login-left-panel">
       <div class="login-header">
-        <h1 class="text-center">Lore PDKS</h1>
-        <p class="text-center">Personel Devam Kontrol Sistemi</p>
-      </div>
-    </ng-template>
-    
-    <form [formGroup]="loginForm" class="login-form">
-      <!-- Kullanıcı Adı -->
-      <div class="form-group mb-3">
-        <app-text-input
-          title="Kullanıcı Adı"
-          placeholder="Kullanıcı adınızı giriniz"
-          [isRequired]="true"
-          [isLoading$]="loadingState$"
-          type="text"
-          [(value)]="loginModel.loginName"
-        ></app-text-input>
-        <small *ngIf="submitted && f['loginName'].errors" class="p-error">
-          <div *ngIf="f['loginName'].errors['required']">Kullanıcı adı gereklidir</div>
-        </small>
+        <div class="logo-container">
+          <img src="/logo.png" alt="Logo" class="logo-image">
+          <h2>Lore PDKS</h2>
+        </div>
       </div>
       
-      <!-- Şifre -->
-      <div class="form-group mb-4">
-        <app-text-input
-          title="Şifre"
-          placeholder="Şifrenizi giriniz"
-          [isRequired]="true"
-          [isLoading$]="loadingState$"
-          type="password"
-          [(value)]="loginModel.sifre"
-        ></app-text-input>
-        <small *ngIf="submitted && f['sifre'].errors" class="p-error">
-          <div *ngIf="f['sifre'].errors['required']">Şifre gereklidir</div>
-        </small>
+      <div class="login-form-container">
+        <form [formGroup]="loginForm" class="login-form">
+          <!-- Kullanıcı Adı -->
+          <div class="form-group mb-3">
+            <app-text-input
+              title="Kullanıcı Adı"
+              placeholder="Kullanıcı adınızı giriniz"
+              [isRequired]="true"
+              [isLoading$]="loadingState$"
+              type="text"
+              [(value)]="loginModel.loginName"
+            ></app-text-input>
+            <small *ngIf="submitted && f['loginName'].errors" class="p-error">
+              <div *ngIf="f['loginName'].errors['required']">Kullanıcı adı gereklidir</div>
+            </small>
+          </div>
+          
+          <!-- Şifre -->
+          <div class="form-group mb-4">
+            <app-text-input
+              title="Şifre"
+              placeholder="Şifrenizi giriniz"
+              [isRequired]="true"
+              [isLoading$]="loadingState$"
+              type="password"
+              [(value)]="loginModel.sifre"
+            ></app-text-input>
+            <small *ngIf="submitted && f['sifre'].errors" class="p-error">
+              <div *ngIf="f['sifre'].errors['required']">Şifre gereklidir</div>
+            </small>
+          </div>
+          
+          <!-- Giriş Butonu -->
+          <div class="d-grid">
+            <app-button
+              name="Giriş Yap"
+              [isLoading$]="loadingState$"
+              [isDisabled]="loading"
+              icon="pi pi-sign-in"
+              class="p-button-primary w-100"
+              (onClick)="onLoginClick()"
+            ></app-button>
+          </div>
+        </form>
+        
+        <div class="login-footer">
+          <p>© {{ 2025 }} Lore PDKS. Tüm Hakları Saklıdır.</p>
+        </div>
       </div>
-      
-      <!-- Giriş Butonu -->
-      <div class="d-grid">
-        <app-button
-          name="Giriş Yap"
-          [isLoading$]="loadingState$"
-          [isDisabled]="loading"
-          icon="pi pi-sign-in"
-          class="p-button-primary w-100"
-          (onClick)="onLoginClick()"
-        ></app-button>
-      </div>
-    </form>
+    </div>
     
-    <ng-template pTemplate="footer">
-      <div class="login-footer">
-        <p class="text-center">© {{ 2025 }} Lore PDKS. Tüm Hakları Saklıdır.</p>
-      </div>
-    </ng-template>
-  </p-card>
+    <!-- Sağ taraf - Bilgi Penceresi -->
+    <div class="login-right-panel">
+      <app-bilgi-penceresi
+        [baslik]="bilgiBaslik"
+        [htmlIcerik]="bilgiIcerik"
+      ></app-bilgi-penceresi>
+    </div>
+  </div>
   
   <ngx-spinner 
     bdColor="rgba(0, 0, 0, 0.8)" 
