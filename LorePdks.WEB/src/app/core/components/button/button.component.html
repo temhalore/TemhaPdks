@@ -1,0 +1,18 @@
+<ng-container *ngIf="!(isLoading$ | async) && !(_isLoading$ | async); else loadingTemplate">
+  <p-button 
+    [label]="name" 
+    [disabled]="isDisabled" 
+    [icon]="icon" 
+    [styleClass]="class" 
+    (onClick)="clickHandler($event)">
+  </p-button>
+</ng-container>
+
+<ng-template #loadingTemplate>
+  <p-button 
+    [label]="name" 
+    [disabled]="true" 
+    [styleClass]="class" 
+    [loading]="true">
+  </p-button>
+</ng-template>

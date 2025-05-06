@@ -1,0 +1,43 @@
+<ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
+  <ng-container *ngIf="!multiple">
+    <p-dropdown 
+      [options]="itemListDto$ | async" 
+      [placeholder]="placeholder"
+      [disabled]="isDisabled"
+      [required]="isRequired"
+      [styleClass]="'w-100 ' + class"
+      [(ngModel)]="selectedValue"
+      optionLabel="value"
+      optionValue="key"
+      (onChange)="onSelectionChange($event)"
+      [showClear]="!isRequired"
+      appendTo="body">
+    </p-dropdown>
+  </ng-container>
+
+  <ng-container *ngIf="multiple">
+    <p-multiSelect 
+      [options]="itemListDto$ | async" 
+      [placeholder]="placeholder"
+      [disabled]="isDisabled"
+      [required]="isRequired"
+      [styleClass]="'w-100 ' + class"
+      [(ngModel)]="selectedValue"
+      optionLabel="value"
+      optionValue="key"
+      (onChange)="onSelectionChange($event)"
+      appendTo="body"
+      [showToggleAll]="true"
+      [showHeader]="true">
+    </p-multiSelect>
+  </ng-container>
+</ng-container>
+
+<ng-template #loadingTemplate>
+  <div class="select-loading">
+    <div class="d-flex align-items-center">
+      <i class="pi pi-spin pi-spinner mr-2"></i>
+      <span>Yükleniyor...</span>
+    </div>
+  </div>
+</ng-template>

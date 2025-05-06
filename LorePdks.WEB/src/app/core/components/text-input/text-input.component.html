@@ -1,0 +1,31 @@
+<div class="form-group">
+  <label *ngIf="title" [for]="'input-' + title" class="mb-2">
+    {{ title }}
+    <span *ngIf="isRequired" class="text-danger">*</span>
+  </label>
+
+  <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
+    <div class="p-inputgroup">
+      <input 
+        [type]="type"
+        pInputText 
+        [id]="'input-' + title"
+        [placeholder]="placeholder"
+        [required]="isRequired"
+        [disabled]="isDisabled"
+        [ngClass]="class"
+        [value]="value"
+        (input)="onChange($event)"
+        class="w-100">
+    </div>
+  </ng-container>
+
+  <ng-template #loadingTemplate>
+    <div class="input-loading">
+      <div class="d-flex align-items-center">
+        <i class="pi pi-spin pi-spinner mr-2"></i>
+        <span>Yükleniyor...</span>
+      </div>
+    </div>
+  </ng-template>
+</div>
