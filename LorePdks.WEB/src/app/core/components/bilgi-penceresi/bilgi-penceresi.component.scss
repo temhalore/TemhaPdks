@@ -3,22 +3,23 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #4267B2 0%, #3B5998 50%, #2C4374 100%); /* Parlement mavisi gradient */
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .bilgi-penceresi-baslik {
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 
   h3 {
     margin: 0;
     font-size: 1.3rem;
     font-weight: 600;
-    color: #333;
+    color: #ffffff; /* Beyaz renk yazı */
+    text-align: center;
   }
 }
 
@@ -26,27 +27,46 @@
   padding: 20px;
   flex: 1;
   overflow-y: auto;
-  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* Arka planı şeffaf yapma */
   
-  p {
-    margin-bottom: 16px;
-    line-height: 1.6;
-    color: #333;
+  div {
+    max-width: 90%;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Beyaz bordür */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Gölge efekti */
+    color: #ffffff; /* Tüm iç içerik için varsayılan beyaz renk */
+  }
+  
+  p, span, a, h1, h2, h3, h4, h5, h6, div, td, th, label, small {
+    color: #ffffff !important; /* Tüm metin öğeleri için beyaz renk */
   }
   
   ul, ol {
     margin-left: 20px;
     margin-bottom: 16px;
+    color: #ffffff; /* Beyaz renk liste */
     
     li {
       margin-bottom: 8px;
       line-height: 1.5;
+      color: #ffffff; /* Beyaz renk liste öğeleri */
     }
   }
   
-  strong, b {
+  strong, b, em, i {
     font-weight: 600;
-    color: #2c3e50;
+    color: #ffffff; /* Beyaz renk yazı */
+  }
+  
+  a {
+    text-decoration: underline;
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 }
 
@@ -61,5 +81,9 @@
   
   .bilgi-penceresi-icerik {
     padding: 15px;
+    
+    div {
+      padding: 12px;
+    }
   }
 }
