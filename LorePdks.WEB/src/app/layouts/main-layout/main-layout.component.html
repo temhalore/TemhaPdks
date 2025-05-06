@@ -1,10 +1,10 @@
-<div class="main-layout">
+<div class="main-layout" [class.sidebar-collapsed]="isSidebarCollapsed">
   <!-- Header -->
   <app-header></app-header>
 
   <div class="main-container">
     <!-- Sidebar -->
-    <app-sidebar></app-sidebar>
+    <app-sidebar (sidebarToggled)="onSidebarToggle($event)"></app-sidebar>
 
     <!-- Content Area -->
     <div class="content-area">

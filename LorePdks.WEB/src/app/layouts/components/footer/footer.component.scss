@@ -1,30 +1,53 @@
+// Footer değişkenleri
+$footer-background: #1a1e2d;
+$footer-text-color: rgba(255, 255, 255, 0.7);
+$footer-border-color: rgba(255, 255, 255, 0.1);
+$primary-color: #4158d0;
+$secondary-color: #c850c0;
+
 .footer {
-  background-color: #f8f9fa;
-  padding: 15px 0;
-  border-top: 1px solid #e9ecef;
-  z-index: 10;
+  background-color: $footer-background;
+  color: $footer-text-color;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.footer-container {
+  padding: 0 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .footer-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.875rem;
-  color: #6c757d;
-}
-
-.copyright {
-  margin-right: 15px;
-}
-
-@media (max-width: 576px) {
-  .footer-content {
-    flex-direction: column;
-    text-align: center;
-  }
+  font-size: 0.85rem;
   
   .copyright {
-    margin-right: 0;
-    margin-bottom: 5px;
+    opacity: 0.8;
+  }
+  
+  .version {
+    opacity: 0.8;
+    
+    strong {
+      opacity: 1;
+      color: #ffffff;
+    }
+  }
+}
+
+// Responsive tasarım
+@media (max-width: 576px) {
+  .footer-container {
+    padding: 0 1rem;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
   }
 }

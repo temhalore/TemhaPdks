@@ -13,8 +13,16 @@ import { AuthService } from '../../core/services/modules/auth.service';
   imports: [RouterOutlet, HeaderComponent, SidebarComponent, FooterComponent]
 })
 export class MainLayoutComponent {
+  isSidebarCollapsed = false;
   
   constructor(private authService: AuthService) { }
+  
+  /**
+   * Sidebar durumu değiştiğinde bu metod çağrılır
+   */
+  onSidebarToggle(collapsed: boolean): void {
+    this.isSidebarCollapsed = collapsed;
+  }
   
   /**
    * Kullanıcı oturumunu kapatır

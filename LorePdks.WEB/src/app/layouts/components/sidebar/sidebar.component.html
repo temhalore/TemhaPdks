@@ -1,9 +1,48 @@
-<div class="sidebar" [class.collapsed]="isCollapsed">
+<div class="sidebar" [class.collapsed]="isCollapsed" [class.hover-expanded]="isHoverExpanded" (mouseleave)="onMouseLeave()">
   <div class="sidebar-header">
-    <p-button icon="pi pi-bars" styleClass="p-button-rounded p-button-text toggle-btn" (click)="toggleSidebar()"></p-button>
+    <div class="logo-container" *ngIf="!isCollapsed">
+      <span class="app-logo">PDKS</span>
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <i class="pi pi-bars"></i>
+    </button>
   </div>
   
   <div class="sidebar-content">
-    <p-panelMenu [model]="panelMenuItems" [style]="{'width':'100%'}" [multiple]="false"></p-panelMenu>
+    <nav class="sidebar-menu">
+      <!-- Ana menü öğeleri -->
+      <div class="menu-group" *ngFor="let item of menuItems">
+        <!-- Ana menü başlığı -->
+        <div class="menu-item" 
+             [class.active]="isMenuItemActive(item)"
+             [class.has-submenu]="item.children && item.children.length > 0"
+             (click)="navigateToLink(item)">
+          <div class="menu-item-content">
+            <i class="menu-icon" [class]="item.icon"></i>
+            <span class="menu-text">{{ item.label }}</span>
+          </div>
+          <i class="submenu-icon pi pi-chevron-down" *ngIf="item.children && item.children.length > 0 && !isCollapsed"></i>
+        </div>
+        
+        <!-- Alt menü öğeleri -->
+        <div class="submenu" *ngIf="item.expanded && item.children && item.children.length > 0 && !isCollapsed">
+          <div class="menu-item submenu-item" 
+               *ngFor="let subItem of item.children"
+               [class.active]="isMenuItemActive(subItem)"
+               (click)="navigateToLink(subItem); $event.stopPropagation()">
+            <div class="menu-item-content">
+              <i class="menu-icon" [class]="subItem.icon"></i>
+              <span class="menu-text">{{ subItem.label }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <div class="version-info">v1.0.0</div>
   </div>
 </div>
+
+<div class="sidebar-overlay" *ngIf="isMobileView && !isCollapsed" (click)="toggleSidebar()"></div>
