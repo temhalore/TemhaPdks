@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../modules/auth/services/auth.service';
+import { AuthService } from '../../../core/services/modules/auth.service';
 
 // PrimeNG imports
 import { MenuModule } from 'primeng/menu';

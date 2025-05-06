@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../core/services/api.service';
-import { AuthService } from '../../../modules/auth/services/auth.service';
+import { AuthService } from '../../../core/services/modules/auth.service';
 import { EkranDto } from '../../../core/models/EkranDto';
 
 // PrimeNG imports

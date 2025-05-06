@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { KisiTokenDto } from '../../../core/models/KisiTokenDto';
-import { loginReqDto } from '../../../core/models/loginReqDto';
-import { ApiService } from '../../../core/services/api.service';
+import { KisiTokenDto } from '../../models/KisiTokenDto';
+import { loginReqDto } from '../../models/loginReqDto';
+import { ApiService } from '../api.service';
 import { tap } from 'rxjs/operators';
 
 @Injectable({

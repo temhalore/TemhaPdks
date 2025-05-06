@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { LayoutsModule } from './layouts/layouts.module';
-import { AuthService } from './modules/auth/services/auth.service';
+import { AuthService } from './core/services/modules/auth.service';
 import { ToastrModule } from 'ngx-toastr';
 
 // Auth service initialize fonksiyonu

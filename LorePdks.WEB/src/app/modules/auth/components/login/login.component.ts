@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { loginReqDto } from '../../../../core/models/loginReqDto';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../../core/services/modules/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
 // PrimeNG imports
