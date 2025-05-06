@@ -6,12 +6,31 @@ import { loginReqDto } from '../../../../core/models/loginReqDto';
 import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
+// PrimeNG imports
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { PasswordModule } from 'primeng/password';
+import { DividerModule } from 'primeng/divider';
+
+// NGX-Spinner import
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    InputTextModule, 
+    ButtonModule, 
+    CardModule, 
+    PasswordModule,
+    DividerModule,
+    NgxSpinnerModule
+  ]
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -24,7 +43,8 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) {
     // Eğer kullanıcı zaten giriş yapmışsa, dashboard'a yönlendir
     if (this.authService.isLoggedIn()) {
@@ -33,8 +53,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.toastr.error("aaaaaaaaaaaaaaaaaaaaaa", 'Hata!');
-
     // Login formu oluştur
     this.loginForm = this.formBuilder.group({
       loginName: ['', [Validators.required]],
@@ -57,6 +75,8 @@ export class LoginComponent implements OnInit {
     }
 
     this.loading = true;
+    // Spinner'ı göster
+    this.spinner.show();
     
     const loginRequest: loginReqDto = {
       loginName: this.f['loginName'].value,
@@ -67,11 +87,13 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: () => {
           // Başarılı giriş sonrası
+          this.spinner.hide();
           this.toastr.success('Giriş işlemi başarıyla gerçekleştirildi.', 'Başarılı!');
           this.router.navigate([this.returnUrl]);
         },
         error: () => {
-          // Hata interceptor tarafından yönetilecek
+          // Hata durumunda spinner'ı gizle
+          this.spinner.hide();
           this.loading = false;
         }
       });

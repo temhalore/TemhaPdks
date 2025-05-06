@@ -1,42 +1,9 @@
 <div class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
-    <button class="btn toggle-btn" (click)="toggleSidebar()">
-      <i class="fa" [class.fa-bars]="isCollapsed" [class.fa-times]="!isCollapsed"></i>
-    </button>
+    <p-button icon="pi pi-bars" styleClass="p-button-rounded p-button-text toggle-btn" (click)="toggleSidebar()"></p-button>
   </div>
   
   <div class="sidebar-content">
-    <ul class="nav flex-column">
-      <!-- Menü öğeleri -->
-      <ng-container *ngFor="let menuItem of menuItems">
-        <!-- Ana menü öğesi -->
-        <li class="nav-item" *ngIf="!menuItem.altEkranlar || menuItem.altEkranlar.length === 0">
-          <a class="nav-link" [routerLink]="[menuItem.ekranYolu]" routerLinkActive="active">
-            <i class="fa" [ngClass]="menuItem.ikon || 'fa-circle'"></i>
-            <span class="menu-text">{{ menuItem.ekranAdi }}</span>
-          </a>
-        </li>
-        
-        <!-- Alt menüye sahip menü öğesi -->
-        <li class="nav-item has-submenu" *ngIf="menuItem.altEkranlar && menuItem.altEkranlar.length > 0">
-          <a class="nav-link" href="javascript:void(0)" data-bs-toggle="collapse" [attr.data-bs-target]="'#submenu-' + menuItem.eid" routerLinkActive="active">
-            <i class="fa" [ngClass]="menuItem.ikon || 'fa-circle'"></i>
-            <span class="menu-text">{{ menuItem.ekranAdi }}</span>
-            <i class="fa fa-chevron-down submenu-icon"></i>
-          </a>
-          
-          <div class="collapse submenu" [id]="'submenu-' + menuItem.eid">
-            <ul class="nav flex-column">
-              <li class="nav-item" *ngFor="let subItem of menuItem.altEkranlar">
-                <a class="nav-link" [routerLink]="[subItem.ekranYolu]" routerLinkActive="active">
-                  <i class="fa" [ngClass]="subItem.ikon || 'fa-circle'"></i>
-                  <span class="menu-text">{{ subItem.ekranAdi }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ng-container>
-    </ul>
+    <p-panelMenu [model]="panelMenuItems" [style]="{'width':'100%'}" [multiple]="false"></p-panelMenu>
   </div>
 </div>

@@ -9,16 +9,10 @@
   <div class="header-right">
     <div class="user-info" *ngIf="authService.currentUserValue">
       <span class="user-name">{{ authService.currentUserValue.kisiDto?.ad }} {{ authService.currentUserValue.kisiDto?.soyad }}</span>
-      <div class="dropdown">
-        <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fa fa-user-circle"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-user"></i> Profil</a></li>
-          <li><a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-cog"></i> Ayarlar</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="javascript:void(0)" (click)="logout()"><i class="fa fa-sign-out"></i> Çıkış</a></li>
-        </ul>
+      
+      <div class="user-menu-container">
+        <p-avatar icon="pi pi-user" shape="circle" [style]="{ 'cursor': 'pointer' }" (click)="userMenu.toggle($event)"></p-avatar>
+        <p-menu #userMenu [model]="userMenuItems" [popup]="true"></p-menu>
       </div>
     </div>
   </div>

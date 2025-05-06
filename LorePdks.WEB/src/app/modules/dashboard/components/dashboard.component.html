@@ -1,15 +1,181 @@
-<div class="container mt-4">
+<div class="dashboard-container p-3">
+  <!-- Spinner -->
+  <ngx-spinner 
+    bdColor="rgba(0, 0, 0, 0.8)" 
+    size="medium" 
+    color="#fff" 
+    type="ball-scale-multiple" 
+    [fullScreen]="false"
+  >
+    <p style="color: white">Veriler yükleniyor...</p>
+  </ngx-spinner>
+
+  <!-- Dashboard Başlığı -->
+  <div class="dashboard-header mb-4">
+    <h2>Gösterge Paneli</h2>
+    <p class="text-muted">Lore PDKS sisteminde bugünkü genel durum özeti</p>
+  </div>
+
+  <!-- Özet Kartları Satırı -->
+  <div class="row mb-4">
+    <!-- Toplam Personel Kartı -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <p-card styleClass="dashboard-summary-card">
+        <div class="summary-card-content">
+          <div class="summary-icon bg-primary-subtle">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="summary-details">
+            <h3 *ngIf="!loading">{{ ozet.toplamPersonel }}</h3>
+            <p-skeleton *ngIf="loading" width="3rem" height="2rem"></p-skeleton>
+            <span>Toplam Personel</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Mesaide Personel Kartı -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <p-card styleClass="dashboard-summary-card">
+        <div class="summary-card-content">
+          <div class="summary-icon bg-success-subtle">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          <div class="summary-details">
+            <h3 *ngIf="!loading">{{ ozet.bugunMesaide }}</h3>
+            <p-skeleton *ngIf="loading" width="3rem" height="2rem"></p-skeleton>
+            <span>Mesaide</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- İzinli Personel Kartı -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <p-card styleClass="dashboard-summary-card">
+        <div class="summary-card-content">
+          <div class="summary-icon bg-info-subtle">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <div class="summary-details">
+            <h3 *ngIf="!loading">{{ ozet.bugunIzinli }}</h3>
+            <p-skeleton *ngIf="loading" width="3rem" height="2rem"></p-skeleton>
+            <span>İzinde</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Geç Giriş Yapan Personel Kartı -->
+    <div class="col-md-3 col-sm-6 mb-3">
+      <p-card styleClass="dashboard-summary-card">
+        <div class="summary-card-content">
+          <div class="summary-icon bg-warning-subtle">
+            <i class="pi pi-exclamation-circle"></i>
+          </div>
+          <div class="summary-details">
+            <h3 *ngIf="!loading">{{ ozet.gecGiris }}</h3>
+            <p-skeleton *ngIf="loading" width="3rem" height="2rem"></p-skeleton>
+            <span>Geç Giriş</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Grafikler Satırı -->
+  <div class="row mb-4">
+    <!-- Personel Durum Grafiği -->
+    <div class="col-md-4 mb-3">
+      <p-card header="Personel Durumu" styleClass="chart-card h-100">
+        <div *ngIf="!loading" class="chart-container">
+          <ngx-charts-pie-chart
+            [results]="personelDurumData"
+            [legend]="true"
+            [labels]="true"
+            [doughnut]="true"
+            [arcWidth]="0.3"
+            [scheme]="'vivid'"
+          ></ngx-charts-pie-chart>
+        </div>
+        <div *ngIf="loading" class="skeleton-chart">
+          <p-skeleton height="250px" styleClass="mb-2"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- İzin Dağılımı Grafiği -->
+    <div class="col-md-4 mb-3">
+      <p-card header="İzin Dağılımı" styleClass="chart-card h-100">
+        <div *ngIf="!loading" class="chart-container">
+          <ngx-charts-advanced-pie-chart
+            [results]="izinDurumData"
+            [scheme]="'cool'"
+            [gradient]="true"
+          ></ngx-charts-advanced-pie-chart>
+        </div>
+        <div *ngIf="loading" class="skeleton-chart">
+          <p-skeleton height="250px" styleClass="mb-2"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Haftalık Giriş Grafiği -->
+    <div class="col-md-4 mb-3">
+      <p-card header="Haftalık Giriş Sayıları" styleClass="chart-card h-100">
+        <div *ngIf="!loading" class="chart-container">
+          <p-chart type="bar" [data]="girisDataChart" [options]="girisOptionsChart"></p-chart>
+        </div>
+        <div *ngIf="loading" class="skeleton-chart">
+          <p-skeleton height="250px" styleClass="mb-2"></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Son Giriş Yapan Personel Tablosu -->
   <div class="row">
     <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">Dashboard</h4>
+      <p-card header="Bugünkü Son Giriş Kayıtları" styleClass="table-card">
+        <p-table 
+          *ngIf="!loading"
+          [value]="sonGirisKayitlari" 
+          [paginator]="true" 
+          [rows]="5" 
+          styleClass="p-datatable-gridlines"
+          [tableStyle]="{ 'min-width': '50rem' }"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Ad Soyad</th>
+              <th>Sicil No</th>
+              <th>Giriş Saati</th>
+              <th>Çıkış Saati</th>
+              <th>Durumu</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-kayit>
+            <tr>
+              <td>{{ kayit.adSoyad }}</td>
+              <td>{{ kayit.sicilNo }}</td>
+              <td>{{ kayit.girisTarihi | date:'HH:mm:ss' }}</td>
+              <td>{{ kayit.cikisTarihi ? (kayit.cikisTarihi | date:'HH:mm:ss') : '-' }}</td>
+              <td>
+                <!-- <p-tag [value]="kayit.durumu" [severity]="getDurumSeverity(kayit.durumu)"></p-tag> -->
+                <p-tag [value]="kayit.durumu" [severity]="getDurumSeverity(kayit.durumu)"></p-tag>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        
+        <div *ngIf="loading">
+          <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
         </div>
-        <div class="card-body">
-          <p>Lore PDKS sistemine hoş geldiniz!</p>
-          <p>Bu bölümden sistemdeki özet bilgileri takip edebilirsiniz.</p>
-        </div>
-      </div>
+      </p-card>
     </div>
   </div>
 </div>

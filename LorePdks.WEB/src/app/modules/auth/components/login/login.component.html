@@ -1,64 +1,83 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h1 class="text-center">Lore PDKS</h1>
-      <p class="text-center">Personel Devam Kontrol Sistemi</p>
-    </div>
+  <p-card styleClass="login-card">
+    <ng-template pTemplate="header">
+      <div class="login-header">
+        <h1 class="text-center">Lore PDKS</h1>
+        <p class="text-center">Personel Devam Kontrol Sistemi</p>
+      </div>
+    </ng-template>
     
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Kullanıcı Adı -->
       <div class="form-group mb-3">
-        <label for="loginName">Kullanıcı Adı</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="fa fa-user"></i>
+        <label for="loginName" class="mb-2">Kullanıcı Adı</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
           </span>
           <input 
+            pInputText
             type="text" 
             formControlName="loginName" 
-            class="form-control" 
-            [ngClass]="{ 'is-invalid': submitted && f['loginName'].errors }"
+            [ngClass]="{ 'ng-invalid ng-dirty': submitted && f['loginName'].errors }"
             id="loginName" 
             placeholder="Kullanıcı adınızı giriniz"
           >
         </div>
-        <div *ngIf="submitted && f['loginName'].errors" class="invalid-feedback d-block">
+        <small *ngIf="submitted && f['loginName'].errors" class="p-error">
           <div *ngIf="f['loginName'].errors['required']">Kullanıcı adı gereklidir</div>
-        </div>
+        </small>
       </div>
       
       <!-- Şifre -->
       <div class="form-group mb-4">
-        <label for="sifre">Şifre</label>
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="fa fa-lock"></i>
+        <label for="sifre" class="mb-2">Şifre</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-lock"></i>
           </span>
-          <input 
-            type="password" 
-            formControlName="sifre" 
-            class="form-control" 
-            [ngClass]="{ 'is-invalid': submitted && f['sifre'].errors }"
-            id="sifre" 
+          <p-password 
+            id="sifre"
+            formControlName="sifre"
+            [feedback]="false"
+            [toggleMask]="true"
+            [ngClass]="{ 'ng-invalid ng-dirty': submitted && f['sifre'].errors }"
             placeholder="Şifrenizi giriniz"
-          >
+            [style]="{'width':'100%'}"
+          ></p-password>
         </div>
-        <div *ngIf="submitted && f['sifre'].errors" class="invalid-feedback d-block">
+        <small *ngIf="submitted && f['sifre'].errors" class="p-error">
           <div *ngIf="f['sifre'].errors['required']">Şifre gereklidir</div>
-        </div>
+        </small>
       </div>
       
       <!-- Giriş Butonu -->
       <div class="d-grid">
-        <button [disabled]="loading" type="submit" class="btn btn-primary btn-block">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
-          Giriş Yap
-        </button>
+        <p-button 
+          [disabled]="loading" 
+          type="submit" 
+          label="Giriş Yap" 
+          icon="pi pi-sign-in" 
+          styleClass="w-100"
+          [loading]="loading"
+        ></p-button>
       </div>
     </form>
     
-    <div class="login-footer mt-4">
-      <p class="text-center">© {{ 2025 }} Lore PDKS. Tüm Hakları Saklıdır.</p>
-    </div>
-  </div>
+    <ng-template pTemplate="footer">
+      <div class="login-footer">
+        <p class="text-center">© {{ 2025 }} Lore PDKS. Tüm Hakları Saklıdır.</p>
+      </div>
+    </ng-template>
+  </p-card>
+  
+  <ngx-spinner 
+    bdColor="rgba(0, 0, 0, 0.8)" 
+    size="medium" 
+    color="#fff" 
+    type="ball-pulse" 
+    [fullScreen]="true"
+  >
+    <p style="color: white">Giriş yapılıyor...</p>
+  </ngx-spinner>
 </div>
