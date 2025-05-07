@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/modules/auth.service';
 import { EkranDto } from '../../../core/models/EkranDto';
+import { KisiTokenDto } from '../../../core/models/KisiTokenDto';
 import { filter } from 'rxjs/operators';
 
 // PrimeNG imports
@@ -61,7 +62,10 @@ export class SidebarComponent implements OnInit {
     
     // Kullanıcı giriş yapmışsa menü öğelerini getir
     if (this.authService.isLoggedIn()) {
-      this.loadMenuItems();
+      this.loadMenuDummyItems();
+      
+      // Gerçek veri kullanımı için yorum satırı olarak ekleyelim
+      // this.loadMenuItems();
     }
   }
 
@@ -98,29 +102,84 @@ export class SidebarComponent implements OnInit {
   /**
    * Menü öğeleri yüklenir
    */
-  loadMenuItems(): void {
-    // Gerçek bir API bağlantısı için:
-    // const kisiId = this.authService.currentUserValue?.eid;
-    // if (kisiId) {
-    //   this.apiService.post<any[]>('Yetki/getMenuByKisiId', { id: kisiId })
-    //     .subscribe({
-    //       next: (response) => {
-    //         if (response.isSuccess && response.data) {
-    //           this.menuItems = this.convertToMenuItems(response.data);
-    //           this.updateMenuActiveState();
-    //         }
-    //       },
-    //       error: (error) => console.error('Menü yüklenirken hata oluştu:', error)
-    //     });
-    // }
-    
-    // Geçici menü öğeleri
+  loadMenuDummyItems(): void {
     this.createDummyMenuItems();
     this.updateMenuActiveState();
   }
   
   /**
-   * Geçici menü öğeleri oluşturur
+   * Gerçek veri kullanarak menü öğeleri yüklenir
+   * Not: Bu metot şu an aktif değil, EkranDto yapısını kullanan gerçek veri için
+   */
+  loadMenuItems(): void {
+    this.authService.getUserFromLocalStorage().subscribe({
+      next: (userData: KisiTokenDto | null) => {
+        if (userData && userData.ekranDtoList && userData.ekranDtoList.length > 0) {
+          // EkranDto listesini MenuItemModel listesine dönüştür
+          this.menuItems = this.convertEkranDtoToMenuItems(userData.ekranDtoList);
+          this.updateMenuActiveState();
+        }
+        // else {
+        //   // Kullanıcının ekran listesi bulunamadıysa dummy data kullan
+        //   this.createDummyMenuItems();
+        //   this.updateMenuActiveState();
+        // }
+      },
+      error: (error) => {
+        console.error('Kullanıcı bilgileri alınırken hata oluştu:', error);
+        this.createDummyMenuItems();
+        this.updateMenuActiveState();
+      }
+    });
+  }
+  
+  /**
+   * EkranDto listesini MenuItemModel listesine dönüştürür
+   * @param ekranList EkranDto listesi
+   * @returns MenuItemModel listesi
+   */
+  convertEkranDtoToMenuItems(ekranList: EkranDto[]): MenuItemModel[] {
+    // Üst seviye ekranları filtrele
+    const topLevelItems = ekranList.filter(ekran => !ekran.ustEkranEidDto || !ekran.ustEkranEidDto.eid);
+    
+    // Sıra numarasına göre sırala
+    topLevelItems.sort((a, b) => (a.siraNo || 0) - (b.siraNo || 0));
+    
+    // MenuItemModel listesine dönüştür
+    return topLevelItems.map(ekran => this.convertEkranToMenuItem(ekran, ekranList));
+  }
+  
+  /**
+   * Tek bir EkranDto'yu MenuItemModel'e dönüştürür ve alt ekranları (varsa) ekler
+   * @param ekran EkranDto
+   * @param ekranList Tüm ekranların listesi
+   * @returns MenuItemModel
+   */
+  convertEkranToMenuItem(ekran: EkranDto, ekranList: EkranDto[]): MenuItemModel {
+    // Alt ekranları bul ve sırala
+    let children: MenuItemModel[] = [];
+    
+    if (ekran.altEkranlar && ekran.altEkranlar.length > 0) {
+      // Alt ekranları sırala
+      ekran.altEkranlar.sort((a, b) => (a.siraNo || 0) - (b.siraNo || 0));
+      
+      // Alt ekranları dönüştür
+      children = ekran.altEkranlar.map(altEkran => this.convertEkranToMenuItem(altEkran, ekranList));
+    }
+    
+    // MenuItemModel oluştur
+    return {
+      label: ekran.ekranAdi,
+      icon: ekran.ikon || 'pi pi-circle', // İkon boşsa varsayılan ikon
+      route: ekran.ekranYolu,
+      routerLink: ekran.ekranYolu ? [ekran.ekranYolu] : undefined,
+      children: children.length > 0 ? children : undefined,
+      expanded: false
+    };
+  }
+  
+  /**
+   * Geçici menü öğeleri oluşturur (EkranDto yapısını taklit eder)
    */
   createDummyMenuItems(): void {
     this.menuItems = [
