@@ -124,6 +124,8 @@ namespace LorePdks.API.Controllers.Yetki
             return Ok(response);
         }
 
+  
+
         #endregion
 
         #region Ekran-Rol İlişkilendirme
@@ -147,6 +149,29 @@ namespace LorePdks.API.Controllers.Yetki
             response.data = dto;
             return Ok(response);
         }
+
+        [HttpPost]
+        [Route("saveEkranByEkranDto")]
+        public IActionResult saveEkranByEkranDto(EkranDTO request)
+        {
+            var response = new ServiceResponse<EkranDTO>();
+            var dto = _ekranManager.saveEkran(request);
+            response.data = dto;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("deleteEkranByEkranDto")]
+        public IActionResult deleteEkranByEkranDto(EkranDTO request)
+        {
+            var response = new ServiceResponse<EkranDTO>();
+            _ekranManager.deleteEkranByEkranId(request.id);
+            response.messageType = ServiceResponseMessageType.Success;
+            response.message ="Silme İşlemi Başarılı";
+            return Ok(response);
+        }
+
+        
 
         [HttpPost]
         [Route("addEkranToRolByRolEkranDto")]
