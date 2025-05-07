@@ -1,4 +1,5 @@
 import { baseDto } from "./baseDto";
+import { EkranDto } from "./EkranDto";
 import { KisiDto } from "./KisiDto";
 import { RolDto } from "./RolDto";
 
@@ -15,6 +16,6 @@ export interface KisiTokenDto extends baseDto {
   expDate?: Date;
   isLogin: boolean;
   kisiDto?: KisiDto;
-  rolDtoList?: RolDto;
+  ekranDtoList?: EkranDto[];
 }
 

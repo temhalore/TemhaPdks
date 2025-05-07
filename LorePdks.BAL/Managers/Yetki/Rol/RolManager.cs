@@ -88,7 +88,7 @@ namespace LorePdks.BAL.Managers.Yetki.Rol
             var rolEkranlar = _repoRolEkran.GetList("ROL_ID=@rolId", new { rolId });
             if (rolEkranlar != null && rolEkranlar.Any())
             {
-                var ekranIdler = rolEkranlar.Select(x => x.EKRAN_ID).ToList();
+                var ekranIdler = rolEkranlar.Select(x => x.EKRAN_ID).Distinct().ToList();
 
                 // IN sorgusu için string oluşturma
                 string ekranIdParams = string.Join(",", ekranIdler);
@@ -131,6 +131,8 @@ namespace LorePdks.BAL.Managers.Yetki.Rol
 
             return aa;
         }
+
+
 
         public bool addEkranToRol(int rolId, int ekranId)
         {

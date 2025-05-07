@@ -3,6 +3,7 @@ using LorePdks.BAL.Managers.Auth.Interfaces;
 using LorePdks.BAL.Managers.Helper.Interfaces;
 using LorePdks.BAL.Managers.Kisi.Interfaces;
 using LorePdks.BAL.Managers.KisiToken.Interfaces;
+using LorePdks.BAL.Managers.Yetki.Ekran.Interfaces;
 using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
 using LorePdks.COMMON.DTO.Common;
 using LorePdks.COMMON.Enums;
@@ -19,7 +20,7 @@ namespace LorePdks.BAL.Managers.Auth
         IHelperManager _HelperManager,
         IMapper _mapper,
         IKisiTokenManager _kisiTokenManager,
-         IRolManager _rolManager
+         IEkranManager _ekranManager
     ) : IAuthManager
     {
         /// <summary>
@@ -68,7 +69,7 @@ namespace LorePdks.BAL.Managers.Auth
                 // Token kaydedilir
                 var resultTokenDto = _kisiTokenManager.saveKisiToken(kisiTokenDto);
                 resultTokenDto.isLogin = true;
-                resultTokenDto.rolDtoList = _rolManager.getRolDtoListByKisiId(resultTokenDto.kisiDto.id);
+                resultTokenDto.ekranDtoList = _ekranManager.getMenuByKisiId(resultTokenDto.kisiDto.id);
                 return resultTokenDto;
             }
             catch (AppException)

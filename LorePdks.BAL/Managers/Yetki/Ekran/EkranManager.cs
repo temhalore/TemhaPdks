@@ -128,7 +128,7 @@ namespace LorePdks.BAL.Managers.Yetki.Ekran
             if (rolEkranlar == null || !rolEkranlar.Any())
                 return new List<EkranDTO>();
 
-            var ekranIdList = rolEkranlar.Select(x => x.EKRAN_ID).ToList();
+            var ekranIdList = rolEkranlar.Select(x => x.EKRAN_ID).Distinct().ToList();
 
             // SQL injection riskini önlemek için parametre kullanımı
             var ekranlar = _repoEkran.GetList("ID IN @ekranIdParams", new { ekranIdParams = ekranIdList });
