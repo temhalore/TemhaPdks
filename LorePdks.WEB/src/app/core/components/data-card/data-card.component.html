@@ -9,13 +9,11 @@
          (click)="onCardSelect(item)">
       <p-card styleClass="card-custom">
         <ng-template pTemplate="header">
-          <div class="card-header-content">
-            <h3>{{ formatField(columns[0]?.field, item) }}</h3>
-          </div>
+          <!-- Kart başlığı artık boş, tüm alanlar içerikte gösterilecek -->
         </ng-template>
         
         <div class="card-body-content">
-          <div *ngFor="let col of columns | slice:1" class="card-field">
+          <div *ngFor="let col of columns" class="card-field">
             <span class="field-label">{{ col.header }}:</span>
             <span class="field-value">
               <ng-container *ngIf="!col.template">
