@@ -1,6 +1,6 @@
-import { ControllerAndMethodsModel } from "./ControllerAndMethodsModel";
+// import { ControllerAndMethodsModel } from "./ControllerAndMethodsModel";
 
-export class RolControllerMethodsRequestModel {
-  rolEid: string = '';
-  controllerMethods: ControllerAndMethodsModel[] = [];
-}
+// export class RolControllerMethodsRequestModel {
+//   rolEid: string = '';
+//   controllerMethods: ControllerAndMethodsModel[] = [];
+// }

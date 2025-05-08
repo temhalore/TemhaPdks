@@ -1,20 +1,39 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
 import { TreeNode } from 'primeng/api';
 import { finalize } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TreeModule } from 'primeng/tree';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
-
-
+import { DataGridComponent } from '../../../core/components/data-grid/data-grid.component';
+import { ModalComponent } from '../../../core/components/modal/modal.component';
+import { ControllerAndMethodsDTO } from '../../../core/models/ControllerAndMethodsDTO';
 import { YetkiService } from '../../../core/services/modules/yetki.service';
 import { RolDto } from '../../../core/models/RolDto';
 import { EkranDto } from '../../../core/models/EkranDto';
-import { ControllerAndMethodsDTO } from '../../../core/models/ControllerAndMethodsDTO';
 import { RolControllerMethodsRequestDto } from '../../../core/models/RolControllerMethodsRequestDto';
 
 @Component({
   selector: 'app-rol',
   templateUrl: './rol.component.html',
-  styleUrls: ['./rol.component.scss']
+  styleUrls: ['./rol.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonModule,
+    InputTextModule,
+    InputTextareaModule,
+    TreeModule,
+    CheckboxModule,
+    DataGridComponent,
+    ModalComponent,
+    ConfirmDialogComponent
+  ]
 })
 export class RolComponent implements OnInit {
   // Rol listesi
@@ -220,8 +239,8 @@ export class RolComponent implements OnInit {
     const result: TreeNode[] = [];
     
     const children = ekranlar.filter(e => 
-      (!parentId && !e.ustEkranEidDto.eid) || 
-      (e.ustEkranEidDto.eid === parentId)
+      (!parentId && !e.ustEkranEidDto?.eid) || 
+      (e.ustEkranEidDto?.eid === parentId)
     );
     
     children.forEach(child => {
@@ -479,7 +498,7 @@ export class RolComponent implements OnInit {
     if (!this.selectedRol) return;
     
     const request: RolControllerMethodsRequestDto = {
-      rolEidDto: { eid: this.selectedRol.eid },//s.selectedRol,
+      rolEidDto: {eid: this.selectedRol.eid},
       controllerMethods: this.selectedControllerMethods
     };
     

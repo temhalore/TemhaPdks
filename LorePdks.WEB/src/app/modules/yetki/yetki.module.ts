@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { YetkiRoutingModule } from './yetki-routing.module';
-import { YetkiComponent } from './yetki.component';
 import { RolComponent } from './rol/rol.component';
 
 // PrimeNG Modülleri
@@ -19,15 +17,11 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DataGridComponent } from '../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../core/components/modal/modal.component';
 import { ConfirmDialogComponent } from '../../core/components/confirm-dialog/confirm-dialog.component';
+import { YetkiRoutingModule } from './yetki-routing.module';
+import { YetkiComponent } from './yetki.component';
 
 @NgModule({
-  declarations: [
-    YetkiComponent,
-    RolComponent,
-    DataGridComponent,
-    ModalComponent,
-    ConfirmDialogComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     FormsModule,
@@ -38,7 +32,9 @@ import { ConfirmDialogComponent } from '../../core/components/confirm-dialog/con
     TableModule,
     TooltipModule,
     TreeModule,
-    CheckboxModule
+    CheckboxModule,
+    YetkiComponent,
+    RolComponent
   ]
 })
 export class YetkiModule { }

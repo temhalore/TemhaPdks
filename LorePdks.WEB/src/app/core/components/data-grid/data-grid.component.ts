@@ -8,7 +8,7 @@ import { TooltipModule } from 'primeng/tooltip';
   selector: 'app-data-grid',
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.scss'],
-  standalone: false,
+  standalone: true,
   imports: [CommonModule, TableModule, ButtonModule, TooltipModule]
 })
 export class DataGridComponent {

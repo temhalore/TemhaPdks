@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
   selector: 'app-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
-  standalone: false,
+  standalone: true,
   imports: [CommonModule, DialogModule, ButtonModule]
 })
 export class ModalComponent {

@@ -7,7 +7,7 @@ import { ConfirmationService } from 'primeng/api';
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styleUrls: ['./confirm-dialog.component.scss'],
-  standalone: false,
+  standalone: true,
   imports: [CommonModule, ConfirmDialogModule],
   providers: [ConfirmationService]
 })

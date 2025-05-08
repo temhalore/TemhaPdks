@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { YetkiComponent } from './yetki.component';
 import { RolComponent } from './rol/rol.component';
+import { YetkiComponent } from './yetki.component';
 
 const routes: Routes = [
   {
