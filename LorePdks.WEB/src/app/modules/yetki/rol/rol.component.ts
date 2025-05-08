@@ -535,4 +535,13 @@ export class RolComponent implements OnInit {
         break;
     }
   }
+
+  /**
+   * Özel action butonları için işlemleri yönetir
+   * @param action Aksiyon adı
+   * @param rol Rol verisi
+   */
+  onAction(action: string, rol: RolDto): void {
+    this.onRowAction({action, data: rol});
+  }
 }

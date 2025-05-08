@@ -26,7 +26,7 @@
           class="p-button-rounded p-button-text p-button-info p-button-sm" 
           pTooltip="Ekran Ekle/Çıkar" 
           tooltipPosition="top"
-          (click)="openEkranModal(rol)">
+          (click)="onAction('ekran', rol)">
         </button>
         <button 
           pButton 
@@ -35,7 +35,7 @@
           class="p-button-rounded p-button-text p-button-info p-button-sm" 
           pTooltip="Controller-Method Ekle/Çıkar" 
           tooltipPosition="top"
-          (click)="openControllerModal(rol)">
+          (click)="onAction('controller', rol)">
         </button>
       </ng-template>
     </app-data-grid>

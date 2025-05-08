@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -20,6 +20,8 @@ export class DataGridComponent {
   @Input() rows: number = 10;
   @Input() rowsPerPageOptions: number[] = [5, 10, 20, 50];
   @Input() headerTitle: string = '';
+  
+  @ContentChild('customActions') customActionsTemplate!: TemplateRef<any>;
 
   @Output() rowSelect = new EventEmitter<any>();
   @Output() rowUnselect = new EventEmitter<any>();

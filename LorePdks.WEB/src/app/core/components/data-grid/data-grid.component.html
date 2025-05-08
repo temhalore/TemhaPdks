@@ -58,7 +58,10 @@
               tooltipPosition="top"
               (click)="onAction('delete', rowData)">
             </button>
-            <ng-content select="[customActions]"></ng-content>
+            <!-- Özel butonlar için ng-container kullanımını düzeltiyoruz -->
+            <ng-container *ngIf="customActionsTemplate">
+              <ng-container *ngTemplateOutlet="customActionsTemplate; context: {$implicit: rowData}"></ng-container>
+            </ng-container>
           </div>
         </td>
       </tr>
