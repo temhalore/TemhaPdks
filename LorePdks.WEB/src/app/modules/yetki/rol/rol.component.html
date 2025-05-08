@@ -48,7 +48,8 @@
     [(visible)]="rolModalVisible"
     [title]="rolModel.eid ? 'Rol Düzenle' : 'Yeni Rol'"
     [width]="'500px'"
-    (save)="saveRol()">
+    (save)="saveRol()"
+    (visibleChange)="!rolModalVisible && onRolModalClosed()">
     <div class="rol-form">
       <div class="form-group">
         <label for="rolAdi">Rol Adı</label>
@@ -82,7 +83,8 @@
     [title]="selectedRol?.rolAdi + ' - Ekran Yönetimi'"
     [width]="'700px'"
     [height]="'500px'"
-    (save)="saveEkranlar()">
+    (save)="saveEkranlar()"
+    (visibleChange)="!ekranModalVisible && onEkranModalClosed()">
     <div class="ekran-form">
       <p-tree 
         [value]="ekranTree" 
@@ -100,7 +102,8 @@
     [title]="selectedRol?.rolAdi + ' - Controller ve Method Yönetimi'"
     [width]="'800px'"
     [height]="'600px'"
-    (save)="saveControllerMethods()">
+    (save)="saveControllerMethods()"
+    (visibleChange)="!controllerModalVisible && onControllerModalClosed()">
     <div class="controller-form" *ngIf="!loadingControllers">
       <div class="controller-list">
         <div class="controller-item" *ngFor="let controller of controllerMethods">

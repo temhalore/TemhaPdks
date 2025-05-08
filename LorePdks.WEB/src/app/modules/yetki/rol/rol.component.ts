@@ -152,12 +152,20 @@ export class RolComponent implements OnInit {
       .subscribe({
         next: () => {
           this.rolModalVisible = false;
+          this.selectedRol = null; // Modal kapandığında seçili rol temizleniyor
           this.loadRolList();
         },
         error: (err) => {
           console.error('Rol kaydedilirken hata oluştu:', err);
         }
       });
+  }
+  
+  /**
+   * Modal kapatıldığında seçili rolü temizler
+   */
+  onRolModalClosed(): void {
+    this.selectedRol = null;
   }
   
   /**
@@ -327,6 +335,7 @@ export class RolComponent implements OnInit {
           Promise.all(promises)
             .then(() => {
               this.ekranModalVisible = false;
+              this.selectedRol = null; // Modal kapandığında seçili rol temizleniyor
             })
             .catch(err => {
               console.error('Ekranlar kaydedilirken hata oluştu:', err);
@@ -336,6 +345,13 @@ export class RolComponent implements OnInit {
           console.error('Rol ekranları yüklenirken hata oluştu:', err);
         }
       });
+  }
+  
+  /**
+   * Ekran modalı kapatıldığında seçili rolü temizler
+   */
+  onEkranModalClosed(): void {
+    this.selectedRol = null;
   }
   
   /**
@@ -508,11 +524,19 @@ export class RolComponent implements OnInit {
       .subscribe({
         next: () => {
           this.controllerModalVisible = false;
+          this.selectedRol = null; // Modal kapandığında seçili rol temizleniyor
         },
         error: (err) => {
           console.error('Controller-Method yetkileri kaydedilirken hata oluştu:', err);
         }
       });
+  }
+  
+  /**
+   * Controller modalı kapatıldığında seçili rolü temizler
+   */
+  onControllerModalClosed(): void {
+    this.selectedRol = null;
   }
   
   /**
