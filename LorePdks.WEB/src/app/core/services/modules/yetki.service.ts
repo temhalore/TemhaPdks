@@ -29,8 +29,8 @@ export class YetkiService {
    * @param id Rolün encrypt edilmiş ID'si
    * @returns Observable<RolModel>
    */
-  getRolById(id: string): Observable<RolDto> {
-    return this.apiService.post<RolDto>(`${this.endpoint}/getRolDtoByEIdDto`, { id });
+  getRolById(eid: string): Observable<RolDto> {
+    return this.apiService.post<RolDto>(`${this.endpoint}/getRolDtoByEIdDto`, { eid });
   }
 
   /**
@@ -47,8 +47,8 @@ export class YetkiService {
    * @param id Rolün encrypt edilmiş ID'si
    * @returns Observable<boolean>
    */
-  deleteRol(id: string): Observable<boolean> {
-    return this.apiService.post<boolean>(`${this.endpoint}/deleteRolByEIdDto`, { id });
+  deleteRol(eid: string): Observable<boolean> {
+    return this.apiService.post<boolean>(`${this.endpoint}/deleteRolByEIdDto`, { eid });
   }
 
   /**

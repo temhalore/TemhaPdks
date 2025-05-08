@@ -105,17 +105,10 @@ export class RolComponent implements OnInit {
    * @param rol Düzenlenecek rol
    */
   openEditRolModal(rol: RolDto): void {
+    // Rol verisini doğrudan kullan, tekrar API çağrısı yapma
     this.selectedRol = rol;
-    this.yetkiService.getRolById(rol.eid)
-      .subscribe({
-        next: (data) => {
-          this.rolModel = { ...data };
-          this.rolModalVisible = true;
-        },
-        error: (err) => {
-          console.error('Rol bilgisi yüklenirken hata oluştu:', err);
-        }
-      });
+    this.rolModel = { ...rol }; // Rol bilgilerini doğrudan kopyala
+    this.rolModalVisible = true;
   }
   
   /**
@@ -150,6 +143,11 @@ export class RolComponent implements OnInit {
    * Rol kaydetme/güncelleme işlemini gerçekleştirir
    */
   saveRol(): void {
+    // Güncelleme kontrolü için eid bilgisini doğru şekilde ayarla
+    if (this.selectedRol && this.selectedRol.eid) {
+      this.rolModel.eid = this.selectedRol.eid;
+    }
+    
     this.yetkiService.saveRol(this.rolModel)
       .subscribe({
         next: () => {
