@@ -31,6 +31,10 @@ const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () => import('./modules/dashboard/dashboard.module').then(m => m.DashboardModule)
+      },
+      {
+        path: 'yetki',
+        loadChildren: () => import('./modules/yetki/yetki.module').then(m => m.YetkiModule)
       }
       // Diğer korumalı sayfalar buraya eklenebilir
     ]

@@ -1,0 +1,30 @@
+::ng-deep .app-modal {
+  .p-dialog-header {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    
+    .p-dialog-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #333;
+    }
+  }
+  
+  .p-dialog-content {
+    padding: 1.5rem;
+    min-height: 120px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .modal-content {
+    width: 100%;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}

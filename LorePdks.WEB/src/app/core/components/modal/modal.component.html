@@ -1,0 +1,42 @@
+<p-dialog 
+  [(visible)]="visible" 
+  [header]="title"
+  [style]="{width: width, height: height}" 
+  [baseZIndex]="10000"
+  [draggable]="true" 
+  [resizable]="false"
+  [modal]="true"
+  [showHeader]="true"
+  [closeOnEscape]="closeOnEscape"
+  [dismissableMask]="false"
+  [maximizable]="maximizable"
+  [showCloseIcon]="showCloseIcon"
+  [position]="position"
+  (onHide)="onVisibleChange(false)"
+  styleClass="app-modal">
+  
+  <div class="modal-content">
+    <ng-content></ng-content>
+  </div>
+  
+  <ng-template pTemplate="footer" *ngIf="showFooter">
+    <div class="modal-footer">
+      <button 
+        pButton 
+        type="button" 
+        [label]="cancelLabel" 
+        class="p-button-text p-button-sm" 
+        (click)="onCancel()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        [label]="saveLabel" 
+        class="p-button-sm" 
+        [disabled]="saveBtnDisabled"
+        [loading]="saveBtnLoading" 
+        (click)="onSave()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

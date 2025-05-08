@@ -226,6 +226,18 @@ export class SidebarComponent implements OnInit {
         ]
       },
       {
+        label: 'Yetki Yönetimi',
+        icon: 'pi pi-shield',
+        children: [
+          {
+            label: 'Rol Yönetimi',
+            icon: 'pi pi-users',
+            route: '/secure/yetki/rol',
+            routerLink: ['/secure/yetki/rol']
+          }
+        ]
+      },
+      {
         label: 'Raporlar',
         icon: 'pi pi-chart-bar',
         children: [

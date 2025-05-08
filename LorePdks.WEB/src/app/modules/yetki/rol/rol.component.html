@@ -1,0 +1,136 @@
+<div class="rol-container">
+  <div class="rol-header">
+    <h1>Rol Yönetimi</h1>
+    <button 
+      pButton 
+      type="button" 
+      label="Yeni Rol" 
+      icon="pi pi-plus" 
+      class="p-button-sm" 
+      (click)="openAddRolModal()">
+    </button>
+  </div>
+  
+  <div class="rol-content">
+    <app-data-grid
+      [data]="rolList"
+      [columns]="columns"
+      [loading]="loading"
+      headerTitle="Rol Listesi"
+      (rowAction)="onRowAction($event)">
+      <ng-template #customActions let-rol>
+        <button 
+          pButton 
+          pRipple 
+          icon="pi pi-list" 
+          class="p-button-rounded p-button-text p-button-info p-button-sm" 
+          pTooltip="Ekran Ekle/Çıkar" 
+          tooltipPosition="top"
+          (click)="openEkranModal(rol)">
+        </button>
+        <button 
+          pButton 
+          pRipple 
+          icon="pi pi-cog" 
+          class="p-button-rounded p-button-text p-button-info p-button-sm" 
+          pTooltip="Controller-Method Ekle/Çıkar" 
+          tooltipPosition="top"
+          (click)="openControllerModal(rol)">
+        </button>
+      </ng-template>
+    </app-data-grid>
+  </div>
+  
+  <!-- Rol Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="rolModalVisible"
+    [title]="rolModel.eid ? 'Rol Düzenle' : 'Yeni Rol'"
+    [width]="'500px'"
+    (save)="saveRol()">
+    <div class="rol-form">
+      <div class="form-group">
+        <label for="rolAdi">Rol Adı</label>
+        <input 
+          id="rolAdi" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="rolModel.rolAdi" 
+          class="form-control" 
+          placeholder="Rol adını giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="aciklama">Açıklama</label>
+        <textarea 
+          id="aciklama" 
+          pInputTextarea 
+          [(ngModel)]="rolModel.aciklama" 
+          class="form-control" 
+          placeholder="Açıklama giriniz" 
+          rows="3">
+        </textarea>
+      </div>
+    </div>
+  </app-modal>
+  
+  <!-- Ekran Ekleme/Çıkarma Modalı -->
+  <app-modal
+    [(visible)]="ekranModalVisible"
+    [title]="selectedRol?.rolAdi + ' - Ekran Yönetimi'"
+    [width]="'700px'"
+    [height]="'500px'"
+    (save)="saveEkranlar()">
+    <div class="ekran-form">
+      <p-tree 
+        [value]="ekranTree" 
+        selectionMode="checkbox" 
+        [(selection)]="selectedEkranNodes"
+        styleClass="w-full" 
+        [loading]="loadingEkranlar">
+      </p-tree>
+    </div>
+  </app-modal>
+  
+  <!-- Controller-Method Ekleme/Çıkarma Modalı -->
+  <app-modal
+    [(visible)]="controllerModalVisible"
+    [title]="selectedRol?.rolAdi + ' - Controller ve Method Yönetimi'"
+    [width]="'800px'"
+    [height]="'600px'"
+    (save)="saveControllerMethods()">
+    <div class="controller-form" *ngIf="!loadingControllers">
+      <div class="controller-list">
+        <div class="controller-item" *ngFor="let controller of controllerMethods">
+          <div class="controller-header">
+            <p-checkbox 
+              [binary]="true" 
+              [ngModel]="isControllerSelected(controller.controllerName)" 
+              (onChange)="onControllerSelectionChange(controller, $event)">
+            </p-checkbox>
+            <h3>{{ controller.controllerName }}</h3>
+          </div>
+          
+          <div class="method-list">
+            <div class="method-item" *ngFor="let method of controller.methods">
+              <p-checkbox 
+                [binary]="true" 
+                [ngModel]="isMethodSelected(controller.controllerName, method)" 
+                (onChange)="onMethodSelectionChange(controller.controllerName, method, $event)">
+              </p-checkbox>
+              <span>{{ method }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-container" *ngIf="loadingControllers">
+      <p>Controller ve methodlar yükleniyor...</p>
+    </div>
+  </app-modal>
+  
+  <!-- Silme Onay Dialogu -->
+  <app-confirm-dialog
+    (confirmed)="deleteRol()">
+  </app-confirm-dialog>
+</div>
