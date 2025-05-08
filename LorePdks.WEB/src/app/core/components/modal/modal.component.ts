@@ -23,7 +23,7 @@ export class ModalComponent {
   @Input() cancelLabel: string = 'İptal';
   @Input() saveBtnDisabled: boolean = false;
   @Input() saveBtnLoading: boolean = false;
-  @Input() position: string = 'center';
+  @Input() position: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright' = 'center';
   
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<void>();

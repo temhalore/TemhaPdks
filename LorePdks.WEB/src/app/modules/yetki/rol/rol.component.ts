@@ -441,9 +441,11 @@ export class RolComponent implements OnInit {
   /**
    * Controller seçim durumunu değiştirir
    * @param controller Controller
-   * @param checked Seçili mi
+   * @param event Checkbox olayı
    */
-  onControllerSelectionChange(controller: ControllerAndMethodsDTO, checked: boolean): void {
+  onControllerSelectionChange(controller: ControllerAndMethodsDTO, event: any): void {
+    const checked = event.checked !== undefined ? event.checked : event;
+    
     if (checked) {
       // Controller ve tüm metotlarını ekle
       this.selectedControllerMethods = this.selectedControllerMethods.filter(c => c.controllerName !== controller.controllerName);
@@ -458,9 +460,11 @@ export class RolComponent implements OnInit {
    * Metot seçim durumunu değiştirir
    * @param controller Controller adı
    * @param method Metot adı
-   * @param checked Seçili mi
+   * @param event Checkbox olayı
    */
-  onMethodSelectionChange(controller: string, method: string, checked: boolean): void {
+  onMethodSelectionChange(controller: string, method: string, event: any): void {
+    const checked = event.checked !== undefined ? event.checked : event;
+    
     const controllerObj = this.controllerMethods.find(c => c.controllerName === controller);
     
     if (!controllerObj) return;
