@@ -1,17 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
+import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef, HostListener, OnInit } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { DataCardComponent } from '../data-card/data-card.component';
+
+enum ViewMode {
+  LIST = 'list',
+  CARD = 'card'
+}
 
 @Component({
   selector: 'app-data-grid',
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.scss'],
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TooltipModule]
+  imports: [CommonModule, TableModule, ButtonModule, TooltipModule, DataCardComponent]
 })
-export class DataGridComponent {
+export class DataGridComponent implements OnInit {
   @Input() data: any[] = [];
   @Input() columns: any[] = [];
   @Input() loading: boolean = false;
@@ -29,6 +35,41 @@ export class DataGridComponent {
   @Output() rowAction = new EventEmitter<{action: string, data: any}>();
 
   selectedRow: any;
+  viewMode: ViewMode = ViewMode.LIST;
+  isMobile: boolean = false;
+  readonly ViewMode = ViewMode;
+
+  constructor() {
+    this.checkScreenSize();
+  }
+
+  ngOnInit(): void {
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any): void {
+    this.checkScreenSize();
+  }
+
+  /**
+   * Ekran boyutunu kontrol ederek mobil cihaz olup olmadığını belirler
+   * Mobil cihazlarda otomatik olarak kart görünümüne geçer
+   */
+  private checkScreenSize(): void {
+    this.isMobile = window.innerWidth < 768;
+    if (this.isMobile) {
+      this.viewMode = ViewMode.CARD;
+    }
+  }
+
+  /**
+   * Görünüm modunu değiştirir
+   * @param mode Görünüm modu (liste veya kart)
+   */
+  changeViewMode(mode: ViewMode): void {
+    this.viewMode = mode;
+  }
 
   /**
    * Satır seçildiğinde tetiklenir

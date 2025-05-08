@@ -1,0 +1,65 @@
+<div class="data-card-container">
+  <div class="data-card-header" *ngIf="headerTitle">
+    <h2>{{ headerTitle }}</h2>
+  </div>
+  
+  <div class="cards-grid" [class.loading]="loading">
+    <div *ngFor="let item of data" class="card-item" 
+         [class.selected]="selectedRow === item"
+         (click)="onCardSelect(item)">
+      <p-card styleClass="card-custom">
+        <ng-template pTemplate="header">
+          <div class="card-header-content">
+            <h3>{{ formatField(columns[0]?.field, item) }}</h3>
+          </div>
+        </ng-template>
+        
+        <div class="card-body-content">
+          <div *ngFor="let col of columns | slice:1" class="card-field">
+            <span class="field-label">{{ col.header }}:</span>
+            <span class="field-value">
+              <ng-container *ngIf="!col.template">
+                {{ formatField(col.field, item) }}
+              </ng-container>
+              <ng-container *ngIf="col.template">
+                <ng-container *ngTemplateOutlet="col.template; context: {$implicit: item, field: col.field}"></ng-container>
+              </ng-container>
+            </span>
+          </div>
+        </div>
+        
+        <ng-template pTemplate="footer">
+          <div class="action-buttons">
+            <button 
+              pButton 
+              pRipple 
+              icon="pi pi-pencil" 
+              class="p-button-rounded p-button-text p-button-sm" 
+              pTooltip="Düzenle" 
+              tooltipPosition="top"
+              (click)="onAction('edit', item); $event.stopPropagation();">
+            </button>
+            <button 
+              pButton 
+              pRipple 
+              icon="pi pi-trash" 
+              class="p-button-rounded p-button-text p-button-danger p-button-sm" 
+              pTooltip="Sil" 
+              tooltipPosition="top"
+              (click)="onAction('delete', item); $event.stopPropagation();">
+            </button>
+            <!-- Özel butonlar için ng-container kullanımı -->
+            <ng-container *ngIf="customActionsTemplate">
+              <ng-container *ngTemplateOutlet="customActionsTemplate; context: {$implicit: item}"></ng-container>
+            </ng-container>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+    
+    <!-- Boş veri durumu -->
+    <div *ngIf="data.length === 0 && !loading" class="empty-state">
+      Kayıt bulunamadı
+    </div>
+  </div>
+</div>

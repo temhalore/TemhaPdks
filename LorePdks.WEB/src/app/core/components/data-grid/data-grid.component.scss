@@ -8,13 +8,35 @@
   .data-grid-header {
     padding: 1rem;
     border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     
-    h2 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: #333;
+    .header-left {
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #333;
+      }
     }
+    
+    .header-right {
+      .view-mode-buttons {
+        display: flex;
+        gap: 0.5rem;
+        
+        button.p-button-outlined {
+          background-color: rgba(33, 150, 243, 0.1);
+          border-color: #2196F3;
+          color: #2196F3;
+        }
+      }
+    }
+  }
+  
+  .data-grid-list-view, .data-grid-card-view {
+    width: 100%;
   }
   
   ::ng-deep {
