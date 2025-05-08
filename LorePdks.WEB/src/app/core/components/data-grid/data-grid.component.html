@@ -16,28 +16,20 @@
     (onRowSelect)="onRowSelect($event)"
     (onRowUnselect)="onRowUnselect($event)"
     styleClass="p-datatable-sm"
-    [tableStyle]="{'min-width': '50rem'}">
+    [tableStyle]="tableStyle || {'min-width': '50rem'}">
     
     <ng-template pTemplate="header" let-columns>
       <tr>
+        <th style="width: 150px;">İşlemler</th>
         <th *ngFor="let col of columns" [pSortableColumn]="col.field">
           {{col.header}}
           <p-sortIcon [field]="col.field"></p-sortIcon>
         </th>
-        <th *ngIf="columns.length > 0">İşlemler</th>
       </tr>
     </ng-template>
     
     <ng-template pTemplate="body" let-rowData let-columns="columns">
       <tr [pSelectableRow]="rowData">
-        <td *ngFor="let col of columns">
-          <ng-container *ngIf="!col.template">
-            {{ col.format ? col.format(rowData[col.field], rowData) : rowData[col.field] }}
-          </ng-container>
-          <ng-container *ngIf="col.template">
-            <ng-container *ngTemplateOutlet="col.template; context: {$implicit: rowData, field: col.field}"></ng-container>
-          </ng-container>
-        </td>
         <td>
           <div class="action-buttons">
             <button 
@@ -63,6 +55,14 @@
               <ng-container *ngTemplateOutlet="customActionsTemplate; context: {$implicit: rowData}"></ng-container>
             </ng-container>
           </div>
+        </td>
+        <td *ngFor="let col of columns">
+          <ng-container *ngIf="!col.template">
+            {{ col.format ? col.format(rowData[col.field], rowData) : rowData[col.field] }}
+          </ng-container>
+          <ng-container *ngIf="col.template">
+            <ng-container *ngTemplateOutlet="col.template; context: {$implicit: rowData, field: col.field}"></ng-container>
+          </ng-container>
         </td>
       </tr>
     </ng-template>

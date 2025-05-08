@@ -11,12 +11,14 @@
     </button>
   </div>
   
-  <div class="rol-content">
+  <div class="rol-content" style="width: 100%;">
     <app-data-grid
       [data]="rolList"
       [columns]="columns"
       [loading]="loading"
       headerTitle="Rol Listesi"
+      [responsive]="true"
+      [tableStyle]="{'width': '100%', 'min-width': '800px'}"
       (rowAction)="onRowAction($event)">
       <ng-template #customActions let-rol>
         <button 

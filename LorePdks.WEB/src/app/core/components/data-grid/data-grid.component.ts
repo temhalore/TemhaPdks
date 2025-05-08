@@ -20,6 +20,7 @@ export class DataGridComponent {
   @Input() rows: number = 10;
   @Input() rowsPerPageOptions: number[] = [5, 10, 20, 50];
   @Input() headerTitle: string = '';
+  @Input() tableStyle: any;
   
   @ContentChild('customActions') customActionsTemplate!: TemplateRef<any>;
 
