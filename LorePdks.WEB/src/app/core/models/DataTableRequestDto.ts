@@ -1,7 +1,7 @@
 /**
  * DataTable kolon bilgilerini temsil eden model
  */
-export interface DataTableColumns {
+export class DataTableColumns {
   data: string;
   name: string;
   orderable: boolean;
@@ -11,7 +11,7 @@ export interface DataTableColumns {
 /**
  * DataTable sıralama bilgilerini temsil eden model
  */
-export interface DataTableOrder {
+export class DataTableOrder {
   column: number;
   dir: string;
 }
@@ -19,7 +19,7 @@ export interface DataTableOrder {
 /**
  * DataTable arama bilgilerini temsil eden model
  */
-export interface DataTableSearch {
+export class DataTableSearch {
   regex: boolean;
   value: string;
 }
@@ -27,7 +27,7 @@ export interface DataTableSearch {
 /**
  * DataTable istek bilgilerini temsil eden model
  */
-export interface DataTableRequestDto<T> {
+export class DataTableRequestDto<T> {
   columns: DataTableColumns[];
   start: number;
   length: number;

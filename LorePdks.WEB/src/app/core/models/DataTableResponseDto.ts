@@ -1,7 +1,7 @@
 /**
  * DataTable yanıt bilgilerini temsil eden model
  */
-export interface DataTableResponseDto<T> {
+export class DataTableResponseDto<T> {
   data: T[];
   draw: number;
   recordsFiltered: number;
@@ -11,7 +11,7 @@ export interface DataTableResponseDto<T> {
 /**
  * DataTable genel yanıt bilgilerini temsil eden model
  */
-export interface DataTableResponse {
+export class DataTableResponse {
   data: any[];
   recordsTotal: number;
 }

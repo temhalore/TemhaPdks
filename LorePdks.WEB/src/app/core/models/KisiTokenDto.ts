@@ -6,9 +6,7 @@ import { RolDto } from "./RolDto";
 /**
  * Kullanıcı token bilgisini temsil eden model
  */
-export interface KisiTokenDto extends baseDto {
-
-  
+export class KisiTokenDto extends baseDto {
   loginName: string;
   token: string;
   ipAdresi: string;

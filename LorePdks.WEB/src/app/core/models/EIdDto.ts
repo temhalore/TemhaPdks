@@ -1,5 +1,5 @@
 import { baseDto } from "./baseDto";
 
-export interface EIdDto extends baseDto {
+export class EIdDto extends baseDto {
 
-  }
+}

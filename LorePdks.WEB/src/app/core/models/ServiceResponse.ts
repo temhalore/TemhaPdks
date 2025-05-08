@@ -1,7 +1,7 @@
 /**
  * API'den gelen yanıtları temsil eden model sınıfı
  */
-export interface ServiceResponse<T> {
+export class ServiceResponse<T> {
   isSuccess: boolean;
   message: string;
   messageType?: string;

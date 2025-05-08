@@ -1,7 +1,7 @@
 /**
  * Kullanıcı token bilgisini temsil eden model
  */
-export interface baseDto {
+export abstract class baseDto {
   eid: string;
 }
 

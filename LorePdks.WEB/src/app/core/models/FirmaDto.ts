@@ -3,7 +3,7 @@ import { baseDto } from "./baseDto";
 /**
  * Firma bilgisini temsil eden model
  */
-export interface FirmaDto extends baseDto {
+export class FirmaDto extends baseDto {
   ad: string;
   kod: string;
   aciklama: string;

@@ -3,7 +3,7 @@ import { baseDto } from './baseDto';
 /**
  * Ekran bilgilerini temsil eden model
  */
-export interface EkranDto extends baseDto {
+export class EkranDto extends baseDto {
   ekranAdi: string;
   ekranYolu: string;
   ekranKodu: string;

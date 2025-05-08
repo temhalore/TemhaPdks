@@ -1,19 +1,22 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
-    "strict": true,
+	"forceConsistentCasingInFileNames": true,  // ae ekledim yoktu
+   // "strict": true, //ae kapadım 
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
+	"strictPropertyInitialization": false, // ae ekledim yoktu
+    "noImplicitReturns": false,//true, ae yaptım
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
+	 "sourceMap": true, // ae ekledim yoktu
     "esModuleInterop": true,
+	"declaration": false, // ae ekledim yoktu
+	 "downlevelIteration": true, // ae ekledim yoktu
     "experimentalDecorators": true,
-    "moduleResolution": "bundler",
+    "moduleResolution":  "node", //"bundler", ae yaptım
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022"
@@ -25,3 +28,32 @@
     "strictTemplates": true
   }
 }
+
+
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+// {
+//   "compileOnSave": false,
+//   "compilerOptions": {
+//     "outDir": "./dist/out-tsc",
+//     "strict": true,
+//     "noImplicitOverride": true,
+//     "noPropertyAccessFromIndexSignature": true,
+//     "noImplicitReturns": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "skipLibCheck": true,
+//     "isolatedModules": true,
+//     "esModuleInterop": true,
+//     "experimentalDecorators": true,
+//     "moduleResolution": "bundler",
+//     "importHelpers": true,
+//     "target": "ES2022",
+//     "module": "ES2022"
+//   },
+//   "angularCompilerOptions": {
+//     "enableI18nLegacyMessageIdFormat": false,
+//     "strictInjectionParameters": true,
+//     "strictInputAccessModifiers": true,
+//     "strictTemplates": true
+//   }
+// }

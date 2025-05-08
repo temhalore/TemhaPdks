@@ -5,7 +5,7 @@ import { PdksDto } from "./PdksDto";
 /**
  * Pdks hareket bilgisini temsil eden model
  */
-export interface PdksHareketDto extends baseDto {
+export class PdksHareketDto extends baseDto {
   pdksDto: PdksDto;
   hareketDto: HareketDto;
 }

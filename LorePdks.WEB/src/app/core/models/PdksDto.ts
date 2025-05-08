@@ -6,7 +6,7 @@ import { KisiDto } from "./KisiDto";
 /**
  * Pdks bilgisini temsil eden model
  */
-export interface PdksDto extends baseDto {
+export class PdksDto extends baseDto {
   firmaDto: FirmaDto;
   kisiDto: KisiDto;
   firmaCihazDto: FirmaCihazDto;

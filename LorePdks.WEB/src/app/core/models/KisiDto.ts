@@ -3,8 +3,7 @@ import { baseDto } from "./baseDto";
 /**
  * Kullanıcı bilgisini temsil eden model
  */
-export interface KisiDto extends baseDto{
-
+export class KisiDto extends baseDto {
   ad: string;
   soyad: string;
   tc?: string;

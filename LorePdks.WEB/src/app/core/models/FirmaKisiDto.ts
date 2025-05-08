@@ -6,7 +6,7 @@ import { KodDto } from "./KodDto";
 /**
  * Firma kişi bilgisini temsil eden model
  */
-export interface FirmaKisiDto extends baseDto {
+export class FirmaKisiDto extends baseDto {
   firmaDto: FirmaDto;
   kisiDto: KisiDto;
   firmaKisiTipKodDto: KodDto;

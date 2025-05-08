@@ -5,7 +5,7 @@ import { KodDto } from "./KodDto";
 /**
  * Hareket bilgisini temsil eden model
  */
-export interface HareketDto extends baseDto {
+export class HareketDto extends baseDto {
   firmaDto: FirmaDto;
   hareketTipKodDto: KodDto;
   hareketDurumKodDto: KodDto;
