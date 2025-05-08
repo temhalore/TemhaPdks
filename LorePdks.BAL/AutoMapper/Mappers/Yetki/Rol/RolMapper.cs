@@ -12,8 +12,6 @@ namespace LorePdks.BAL.AutoMapper.Mappers.Yetki.Rol
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.ID))
                 .ForMember(dest => dest.rolAdi, opt => opt.MapFrom(src => src.ROL_ADI))
                 .ForMember(dest => dest.aciklama, opt => opt.MapFrom(src => src.ACIKLAMA))
-                .ForMember(dest => dest.controllerName, opt => opt.MapFrom(src => src.CONTROLLER_NAME))
-                .ForMember(dest => dest.controllerMethodName, opt => opt.MapFrom(src => src.CONTROLLER_METHOD_NAME)) 
                 .ForMember(dest => dest.rolAdi, opt => opt.MapFrom(src => src.ROL_ADI))
                 .ForMember(dest => dest.ekranlar, opt => opt.Ignore());
 
@@ -21,8 +19,6 @@ namespace LorePdks.BAL.AutoMapper.Mappers.Yetki.Rol
                 .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.id))
                 .ForMember(dest => dest.ROL_ADI, opt => opt.MapFrom(src => src.rolAdi))
                 .ForMember(dest => dest.ACIKLAMA, opt => opt.MapFrom(src => src.aciklama))
-                .ForMember(dest => dest.CONTROLLER_NAME , opt => opt.MapFrom(src => src.controllerName))
-                .ForMember(dest => dest.CONTROLLER_METHOD_NAME , opt => opt.MapFrom(src => src.controllerMethodName))
                 ;
         }
     }

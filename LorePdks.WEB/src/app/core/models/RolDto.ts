@@ -7,7 +7,5 @@ import { EkranDto } from './EkranDto';
 export interface RolDto extends baseDto {
   rolAdi: string;
   aciklama: string;
-  controllerName: string;
-  controllerMethodName: string;
   ekranlar: EkranDto[];
 }

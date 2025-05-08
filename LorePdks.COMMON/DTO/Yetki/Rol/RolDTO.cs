@@ -9,8 +9,6 @@ namespace LorePdks.COMMON.DTO.Yetki.Rol
     {
         public string rolAdi { get; set; }
         public string aciklama { get; set; }
-        public string controllerName { get; set; }
-        public string controllerMethodName { get; set; }
         public List<EkranDTO> ekranlar { get; set; }
     }
 }
