@@ -9,7 +9,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TreeModule } from 'primeng/tree';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
-import { DataGridComponent } from '../../../core/components/data-grid/data-grid.component';
+import { DataGridComponent, ActionButtonConfig } from '../../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
 import { ControllerAndMethodsDTO } from '../../../core/models/ControllerAndMethodsDTO';
 import { YetkiService } from '../../../core/services/modules/yetki.service';
@@ -39,6 +39,14 @@ export class RolComponent implements OnInit {
   // Rol listesi
   rolList: RolDto[] = [];
   loading: boolean = false;
+  
+  // İşlem butonları tanımı
+  actionButtons: ActionButtonConfig[] = [
+    { icon: 'pi pi-pencil', tooltip: 'Düzenle', action: 'edit' },
+    { icon: 'pi pi-trash', tooltip: 'Sil', action: 'delete', class: 'p-button-danger' },
+    { icon: 'pik pi-list', tooltip: 'Ekran Ekle/Çıkar', action: 'ekran', class: 'p-button-info' },
+    { icon: 'pi pi-cog', tooltip: 'Controller-Method Ekle/Çıkar', action: 'controller', class: 'p-button-info' }
+  ];
   
   // Data grid sütun tanımları
   columns = [

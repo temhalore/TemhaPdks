@@ -27,26 +27,15 @@
         </div>
         
         <ng-template pTemplate="footer">
-          <div class="action-buttons">
-            <button 
-              pButton 
-              pRipple 
-              icon="pi pi-pencil" 
-              class="p-button-rounded p-button-text p-button-sm" 
-              pTooltip="Düzenle" 
-              tooltipPosition="top"
-              (click)="onAction('edit', item); $event.stopPropagation();">
-            </button>
-            <button 
-              pButton 
-              pRipple 
-              icon="pi pi-trash" 
-              class="p-button-rounded p-button-text p-button-danger p-button-sm" 
-              pTooltip="Sil" 
-              tooltipPosition="top"
-              (click)="onAction('delete', item); $event.stopPropagation();">
-            </button>
-            <!-- Özel butonlar için ng-container kullanımı -->
+          <div class="action-buttons" (click)="$event.stopPropagation()">
+            <!-- İşlem butonları bileşenini kullan -->
+            <app-islem-buttons 
+              [buttons]="actionButtons" 
+              [data]="item"
+              (buttonClick)="onAction($event.action, $event.data)">
+            </app-islem-buttons>
+            
+            <!-- Özel butonlar için ng-container kullanımı (geriye dönük uyumluluk için) -->
             <ng-container *ngIf="customActionsTemplate">
               <ng-container *ngTemplateOutlet="customActionsTemplate; context: {$implicit: item}"></ng-container>
             </ng-container>

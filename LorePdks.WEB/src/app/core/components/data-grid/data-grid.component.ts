@@ -4,6 +4,9 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { DataCardComponent } from '../data-card/data-card.component';
+import { IslemButtonsComponent, IslemButton } from '../islem-buttons/islem-buttons.component';
+
+export interface ActionButtonConfig extends IslemButton {}
 
 enum ViewMode {
   LIST = 'list',
@@ -15,7 +18,7 @@ enum ViewMode {
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.scss'],
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TooltipModule, DataCardComponent]
+  imports: [CommonModule, TableModule, ButtonModule, TooltipModule, DataCardComponent, IslemButtonsComponent]
 })
 export class DataGridComponent implements OnInit {
   @Input() data: any[] = [];
@@ -27,6 +30,7 @@ export class DataGridComponent implements OnInit {
   @Input() rowsPerPageOptions: number[] = [5, 10, 20, 50];
   @Input() headerTitle: string = '';
   @Input() tableStyle: any;
+  @Input() actionButtons: ActionButtonConfig[] = [];
   
   @ContentChild('customActions') customActionsTemplate!: TemplateRef<any>;
 

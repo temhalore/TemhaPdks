@@ -61,25 +61,14 @@
         <tr [pSelectableRow]="rowData">
           <td>
             <div class="action-buttons">
-              <button 
-                pButton 
-                pRipple 
-                icon="pi pi-pencil" 
-                class="p-button-rounded p-button-text p-button-sm" 
-                pTooltip="Düzenle" 
-                tooltipPosition="top"
-                (click)="onAction('edit', rowData)">
-              </button>
-              <button 
-                pButton 
-                pRipple 
-                icon="pi pi-trash" 
-                class="p-button-rounded p-button-text p-button-danger p-button-sm" 
-                pTooltip="Sil" 
-                tooltipPosition="top"
-                (click)="onAction('delete', rowData)">
-              </button>
-              <!-- Özel butonlar için ng-container -->
+              <!-- İşlem butonları -->
+              <app-islem-buttons 
+                [buttons]="actionButtons" 
+                [data]="rowData"
+                (buttonClick)="onAction($event.action, $event.data)">
+              </app-islem-buttons>
+              
+              <!-- Özel butonlar için ng-container (geriye dönük uyumluluk için) -->
               <ng-container *ngIf="customActionsTemplate">
                 <ng-container *ngTemplateOutlet="customActionsTemplate; context: {$implicit: rowData}"></ng-container>
               </ng-container>
@@ -113,6 +102,7 @@
       [columns]="columns"
       [loading]="loading"
       [headerTitle]="''"
+      [actionButtons]="actionButtons"
       (rowSelect)="rowSelect.emit($event)"
       (rowAction)="onAction($event.action, $event.data)">
       <ng-template #customActions let-rowData>

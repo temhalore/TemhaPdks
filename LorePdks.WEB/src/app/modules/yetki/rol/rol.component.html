@@ -19,27 +19,8 @@
       headerTitle="Rol Listesi"
       [responsive]="true"
       [tableStyle]="{'width': '100%', 'min-width': '800px'}"
+      [actionButtons]="actionButtons"
       (rowAction)="onRowAction($event)">
-      <ng-template #customActions let-rol>
-        <button 
-          pButton 
-          pRipple 
-          icon="pi pi-list" 
-          class="p-button-rounded p-button-text p-button-info p-button-sm" 
-          pTooltip="Ekran Ekle/Çıkar" 
-          tooltipPosition="top"
-          (click)="onAction('ekran', rol)">
-        </button>
-        <button 
-          pButton 
-          pRipple 
-          icon="pi pi-cog" 
-          class="p-button-rounded p-button-text p-button-info p-button-sm" 
-          pTooltip="Controller-Method Ekle/Çıkar" 
-          tooltipPosition="top"
-          (click)="onAction('controller', rol)">
-        </button>
-      </ng-template>
     </app-data-grid>
   </div>
   

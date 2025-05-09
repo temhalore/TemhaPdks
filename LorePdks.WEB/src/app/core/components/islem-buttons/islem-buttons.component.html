@@ -1,0 +1,34 @@
+<div class="islem-buttons-container" *ngIf="hasButtons">
+  <!-- Normal butonlar (maxVisibleButtons veya daha az buton olduğunda) -->
+  <ng-container *ngIf="showNormalButtons">
+    <ng-container *ngFor="let button of visibleButtons">
+      <button 
+        pButton 
+        pRipple 
+        [icon]="button.icon" 
+        [class]="buttonClass" 
+        [ngClass]="button.class || ''"
+        [pTooltip]="button.tooltip" 
+        tooltipPosition="top"
+        [disabled]="isButtonDisabled(button)"
+        (click)="onButtonClick(button.action, data, $event)">
+      </button>
+    </ng-container>
+  </ng-container>
+
+  <!-- SpeedDial menüsü (maxVisibleButtons'dan fazla buton olduğunda) -->
+  <p-speedDial 
+    *ngIf="showSpeedDial"
+    [model]="speedDialItems" 
+    [direction]="direction" 
+    [radius]="radius"
+    [type]="type"
+    [showIcon]="buttonIcon"
+    [hideIcon]="'pi pi-times'"
+    styleClass="speeddial-wrapper"
+    [buttonClassName]="buttonClass"
+    [mask]="mask"
+    [maskStyle]="{'background': 'rgba(0,0,0,0.1)'}"
+    [transitionDelay]="30">
+  </p-speedDial>
+</div>

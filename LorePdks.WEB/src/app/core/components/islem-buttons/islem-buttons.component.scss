@@ -1,0 +1,209 @@
+.islem-buttons-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 40px; /* Kaymaları önlemek için minimum genişlik */
+  min-height: 32px; /* Kaymaları önlemek için minimum yükseklik */
+  
+  /* Normal butonlar için düzenleme */
+  button {
+    margin-right: 0.25rem;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  
+  ::ng-deep {
+    .speeddial-wrapper {
+      position: absolute !important; /* SpeedDial'ı mutlak konumlandırma */
+      right: 0;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      transform: translateY(-2px); /* Hafif yukarı konumlandırma */
+      z-index: 10; /* Z-index ile üstte gösterme */
+      
+      /* SpeedDial container düzenlemeleri */
+      .p-speeddial {
+        min-height: 2rem;
+        
+        /* Liste elemanlarının pozisyonlanması */
+        .p-speeddial-list {
+          z-index: 100; /* Liste öğelerini daha üst katmana çıkar */
+          
+          /* Butonların hizalanması */
+          &.p-speeddial-list-up {
+            bottom: calc(100% + 0.25rem);
+            left: 50%;
+            transform: translateX(-50%);
+          }
+          
+          &.p-speeddial-list-down {
+            top: calc(100% + 0.25rem);
+            left: 50%;
+            transform: translateX(-50%);
+          }
+          
+          &.p-speeddial-list-left {
+            right: calc(100% + 0.25rem);
+            top: 50%;
+            transform: translateY(-50%);
+          }
+          
+          &.p-speeddial-list-right {
+            left: calc(100% + 0.25rem);
+            top: 50%;
+            transform: translateY(-50%);
+          }
+        }
+      }
+      
+      /* Ana speedDial butonu */
+      .p-speeddial-button.p-button.p-button-icon-only {
+        width: 2rem;
+        height: 2rem;
+        position: relative;
+        z-index: 15; /* Ana butonu listenin altında ama diğer içerikten üstte tut */
+        
+        &.p-button-rounded {
+          border-radius: 50%;
+        }
+        
+        &.p-button-text {
+          background-color: transparent;
+          color: var(--primary-color, #3B82F6);
+          border: none;
+          
+          &:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color, #3B82F6);
+          }
+          
+          &:focus {
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--primary-color-light, #93C5FD);
+          }
+        }
+      }
+      
+      /* SpeedDial menü öğeleri */
+      .p-speeddial-action {
+        width: 2rem;
+        height: 2rem;
+        background-color: #ffffff;
+        color: var(--text-color, #495057);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 0.25rem 0; /* Butonlar arası mesafeyi artır */
+        position: relative;
+        z-index: 20; /* Diğer butonlardan daha üstte olmasını sağla */
+        
+        &:hover {
+          background-color: var(--surface-hover, #f8f9fa);
+          color: var(--text-color, #495057);
+          z-index: 25; /* Hover durumunda daha üstte göster */
+        }
+        
+        &.p-button-danger {
+          color: var(--red-500, #ef4444);
+          
+          &:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+          }
+        }
+        
+        &.p-button-info {
+          color: var(--blue-500, #3b82f6);
+          
+          &:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+          }
+        }
+        
+        &.p-button-success {
+          color: var(--green-500, #10b981);
+          
+          &:hover {
+            background-color: rgba(16, 185, 129, 0.1);
+          }
+        }
+        
+        &.p-button-warning {
+          color: var(--yellow-500, #f59e0b);
+          
+          &:hover {
+            background-color: rgba(245, 158, 11, 0.1);
+          }
+        }
+      }
+      
+      /* Mask özelleştirmeleri */
+      .p-speeddial-mask {
+        background-color: transparent !important;
+        z-index: 5; /* Mask'ı butonların arkasında tut */
+      }
+    }
+  }
+}
+
+/* Data grid içinde kullanıldığında özel düzenlemeler */
+:host-context(.action-buttons) {
+  .islem-buttons-container {
+    justify-content: center;
+    
+    ::ng-deep {
+      .speeddial-wrapper {
+        position: relative !important;
+        top: auto;
+        right: auto;
+        transform: none;
+      }
+    }
+  }
+}
+
+/* PrimeNG Table içinde kullanıldığında özel düzenlemeler */
+:host-context(td) {
+  .islem-buttons-container {
+    display: flex;
+    justify-content: center;
+    min-height: 2rem;
+    
+    ::ng-deep {
+      .speeddial-wrapper {
+        position: relative !important;
+        display: inline-flex;
+        margin: 0 auto;
+      }
+    }
+  }
+}
+
+/* Responsive medya sorguları */
+@media screen and (max-width: 576px) {
+  .islem-buttons-container {
+    ::ng-deep {
+      .speeddial-wrapper {
+        .p-speeddial-action {
+          width: 1.75rem;
+          height: 1.75rem;
+        }
+        
+        .p-speeddial-button.p-button.p-button-icon-only {
+          width: 1.75rem;
+          height: 1.75rem;
+        }
+        
+        /* Mobil cihazlarda tıklama alanını genişlet */
+        .p-speeddial-list {
+          .p-speeddial-item {
+            margin: 0.5rem 0;
+            
+            button.p-speeddial-action {
+              box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -3,19 +3,23 @@ import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef } fro
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
+import { IslemButtonsComponent, IslemButton } from '../islem-buttons/islem-buttons.component';
+
+export interface ActionButtonConfig extends IslemButton {}
 
 @Component({
   selector: 'app-data-card',
   templateUrl: './data-card.component.html',
   styleUrls: ['./data-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, TooltipModule]
+  imports: [CommonModule, CardModule, ButtonModule, TooltipModule, IslemButtonsComponent]
 })
 export class DataCardComponent {
   @Input() data: any[] = [];
   @Input() columns: any[] = [];
   @Input() loading: boolean = false;
   @Input() headerTitle: string = '';
+  @Input() actionButtons: ActionButtonConfig[] = [];
   
   @ContentChild('customActions') customActionsTemplate!: TemplateRef<any>;
 
