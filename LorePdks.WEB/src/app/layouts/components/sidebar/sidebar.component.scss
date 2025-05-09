@@ -11,6 +11,34 @@ $primary-color: #4158d0;
 $secondary-color: #c850c0;
 $gradient-bg: linear-gradient(45deg, $primary-color, $secondary-color);
 
+// Mobil menü butonu stili
+.mobile-menu-button {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: lighten($primary-color, 10%);
+  }
+  
+  i {
+    font-size: 1.3rem;
+  }
+}
+
 // Sidebar ana container
 .sidebar {
   width: $sidebar-width;
@@ -21,9 +49,34 @@ $gradient-bg: linear-gradient(45deg, $primary-color, $secondary-color);
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  position: relative;
+  position: fixed; // Pozisyon sabit olsun
+  left: 0;
+  top: 0;
+  bottom: 0;
   overflow: hidden;
-  z-index: 100;
+  z-index: 1050;
+  
+  // Genişletilmiş durum (varsayılan)
+  &.expanded {
+    width: $sidebar-width;
+    
+    // Menü metni ve ikonları görünür yap
+    .menu-text, 
+    .submenu-icon {
+      display: inline-block;
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .menu-item {
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      
+      .menu-icon {
+        margin-right: 0.75rem;
+      }
+    }
+  }
   
   // Daraltılmış sidebar durumu
   &.collapsed {
@@ -54,36 +107,92 @@ $gradient-bg: linear-gradient(45deg, $primary-color, $secondary-color);
       }
     }
     
+    // Daraltılmış sidebar'da özel alt menü gösterimi
+    .menu-item.has-submenu {
+      position: relative;
+      
+      &:hover {
+        .submenu-popup {
+          display: block;
+        }
+      }
+    }
+    
     .submenu {
       display: none;
     }
+    
+    // Popup tarzı alt menü
+    .submenu-popup {
+      display: none;
+      position: absolute;
+      left: 100%; // Sidebar'ın sağında göster
+      top: 0;
+      min-width: 200px;
+      background-color: $sidebar-background;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      z-index: 1060;
+      padding: 0.5rem;
+      
+      .submenu-popup-title {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        border-bottom: $sidebar-border;
+        color: $sidebar-text-color;
+        font-size: 1rem;
+        white-space: nowrap;
+        background: $gradient-bg;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      
+      .submenu-item {
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        border-radius: 4px;
+        white-space: nowrap; // Metni tek satırda tut
+        
+        .menu-text {
+          display: inline-block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          color: $sidebar-text-color;
+        }
+        
+        .menu-icon {
+          margin-right: 0.75rem;
+          display: inline-block !important;
+        }
+        
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          
+          .menu-text {
+            background: $gradient-bg;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+        }
+      }
+    }
   }
   
-  // Hover ile genişletilmiş sidebar durumu
-  &.hover-expanded {
+  // Mobil görünüm durumu
+  &.mobile {
     width: $sidebar-width;
+    transform: translateX(-100%);
     
-    .logo-container {
-      opacity: 1;
-      visibility: visible;
-      transition-delay: 0.1s;
+    &.expanded {
+      transform: translateX(0);
     }
     
-    .menu-text, 
-    .submenu-icon {
-      display: inline-block;
-      opacity: 1;
-      visibility: visible;
-      transition-delay: 0.1s;
-    }
-    
-    .menu-item {
-      justify-content: flex-start;
-      padding: 0.75rem 1rem;
-      
-      .menu-icon {
-        margin-right: 0.75rem;
-      }
+    &.collapsed {
+      transform: translateX(-100%);
     }
   }
 }
@@ -267,6 +376,17 @@ $gradient-bg: linear-gradient(45deg, $primary-color, $secondary-color);
   .submenu {
     padding-left: 1.5rem;
     margin-top: 2px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    opacity: 0;
+    will-change: max-height, opacity;
+    
+    // Aktif alt menü gösterimi
+    &.active {
+      max-height: 1000px; // Yeterince büyük bir değer
+      opacity: 1;
+    }
     
     .submenu-item {
       padding: 0.6rem 1rem;
@@ -299,32 +419,43 @@ $gradient-bg: linear-gradient(45deg, $primary-color, $secondary-color);
 
 // Mobil görünüm için overlay
 .sidebar-overlay {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 99;
+  z-index: 1040; // Sidebar'dan düşük, diğer içerikten yüksek
+  
+  &.active {
+    display: block;
+  }
 }
 
-// Responsive tasarım
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 60px; // Header yüksekliği
-    left: 0;
-    width: 270px;
-    height: calc(100vh - 60px);
-    transform: translateX(-100%);
-    
-    &.collapsed {
-      transform: translateX(-100%);
-      width: 270px;
-    }
-    
-    &:not(.collapsed) {
-      transform: translateX(0);
-    }
+// Ana içerik alanı için margin ayarı (global)
+::ng-deep .content-area {
+  transition: margin-left $sidebar-transition-speed ease, width $sidebar-transition-speed ease;
+  will-change: margin-left, width;
+  margin-left: $sidebar-width;
+  width: calc(100% - #{$sidebar-width});
+  
+  // Sidebar küçük durumda
+  .sidebar.collapsed:not(.mobile) ~ & {
+    margin-left: $sidebar-collapsed-width;
+    width: calc(100% - #{$sidebar-collapsed-width});
+  }
+  
+  // Geçici genişletilmiş durumda ve küçük durum açıkken içerik alanı ayarı
+  .sidebar.expanded:not(.mobile) ~ & {
+    margin-left: $sidebar-width;
+    width: calc(100% - #{$sidebar-width});
+  }
+  
+  // Mobil görünümde tam genişlik kullan
+  @media (max-width: 768px) {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-left: 0 !important;
   }
 }

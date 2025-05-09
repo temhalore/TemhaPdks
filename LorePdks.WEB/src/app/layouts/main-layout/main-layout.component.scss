@@ -42,6 +42,13 @@ $transition-speed: 0.3s;
   }
 }
 
+// Header için z-index ekleyelim ve pozisyonu düzenleyelim
+.header {
+  position: relative;
+  z-index: 1000; // Header her zaman en üstte olacak şekilde yüksek z-index
+  height: $header-height;
+}
+
 // Ana içerik alanı
 .main-container {
   display: flex;
@@ -56,16 +63,16 @@ $transition-speed: 0.3s;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: margin-left $transition-speed ease;
-  will-change: margin-left;
+  transition: margin-left $transition-speed ease, width $transition-speed ease;
+  will-change: margin-left, width;
+  z-index: 1;
+  margin-left: $sidebar-width; // Sidebar genişliğine göre içerik alanını konumlandır
+  width: calc(100% - #{$sidebar-width}); // Sidebar genişken içerik alanı genişliği
   
-  // Sidebar daraltıldığında içerik alanını genişlet
-  @media (min-width: 769px) {
-    margin-left: 0;
-    
-    .sidebar-collapsed & {
-      margin-left: -($sidebar-width - $sidebar-collapsed-width);
-    }
+  // Sidebar durumlarına göre içerik alanı genişliği ve konumu
+  .sidebar-collapsed & {
+    margin-left: $sidebar-collapsed-width; // Sidebar daraltıldığında içerik alanının konumu
+    width: calc(100% - #{$sidebar-collapsed-width}); // Sidebar daraltıldığında içerik alanı genişliği
   }
 }
 
@@ -182,7 +189,9 @@ $transition-speed: 0.3s;
   
   .content-area {
     width: 100%;
-    margin-left: 0 !important;
+    margin-left: 0 !important; // Mobil görünümde margin sıfırla
+    padding-left: 0;
+    padding-top: 60px; // Header için alan bırak
   }
   
   .content-container {

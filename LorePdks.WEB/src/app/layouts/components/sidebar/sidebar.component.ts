@@ -1,11 +1,13 @@
-import { Component, OnInit, HostListener, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, HostListener, Output, EventEmitter, OnDestroy, ElementRef, NgZone, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/modules/auth.service';
 import { EkranDto } from '../../../core/models/EkranDto';
 import { KisiTokenDto } from '../../../core/models/KisiTokenDto';
-import { filter } from 'rxjs/operators';
+import { filter, debounceTime } from 'rxjs/operators';
+import { Subject, takeUntil, fromEvent } from 'rxjs';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 // PrimeNG imports
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +20,7 @@ interface MenuItemModel {
   children?: MenuItemModel[];
   expanded?: boolean;
   routerLink?: string[];
+  showSubmenu?: boolean;
 }
 
 @Component({
@@ -25,14 +28,34 @@ interface MenuItemModel {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule]
+  imports: [CommonModule, RouterModule, ButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush, // Performans iyileştirmesi için değişiklik algılama stratejisini değiştirelim
+  animations: [
+    trigger('submenuAnimation', [
+      state('void', style({
+        height: '0',
+        opacity: '0',
+        overflow: 'hidden'
+      })),
+      state('*', style({
+        height: '*',
+        opacity: '1'
+      })),
+      transition('void <=> *', animate('300ms cubic-bezier(0.25, 0.8, 0.25, 1)'))
+    ])
+  ]
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   menuItems: MenuItemModel[] = [];
-  isCollapsed = false;
-  isHoverExpanded = false;
-  isMobileView = false;
+  
+  // Sidebar durumları
+  isCollapsed = false; // Kalıcı durum (toggle butonu ile değişir)
+  isTemporaryExpanded = false; // Geçici durum (menü öğesine tıklama ile değişir)
+  isMobileView = false; // Mobil görünüm durumu
+  hasHoveredSubmenu = false; // Alt menüye hover yapıldı mı?
+  
   currentUrl: string = '';
+  private destroy$ = new Subject<void>();
   
   @Output() sidebarToggled = new EventEmitter<boolean>();
 
@@ -40,18 +63,52 @@ export class SidebarComponent implements OnInit {
   onResize() {
     this.checkScreenSize();
   }
+  
+  // Dışarı tıklama olayı
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Mobil görünümde veya geçici genişleme durumundaysa sidebar dışına tıklama kontrolü
+    if ((this.isTemporaryExpanded || (!this.isCollapsed && this.isMobileView)) && 
+        this.elementRef.nativeElement && !this.elementRef.nativeElement.contains(event.target)) {
+      this.isTemporaryExpanded = false;
+      
+      // Mobil görünümde sidebar'ı kapat
+      if (this.isMobileView) {
+        this.isCollapsed = true;
+        this.sidebarToggled.emit(this.isCollapsed);
+      }
+    }
+  }
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     // URL değişikliklerini dinle
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe((event: any) => {
       this.currentUrl = event.url;
       this.updateMenuActiveState();
+      
+      // Sayfa değiştiğinde geçici genişlemeyi kapat
+      if (this.isTemporaryExpanded) {
+        this.isTemporaryExpanded = false;
+      }
+      
+      // Mobil görünümde sayfa değiştiğinde sidebar'ı kapat
+      if (this.isMobileView && !this.isCollapsed) {
+        this.isCollapsed = true;
+        this.sidebarToggled.emit(this.isCollapsed);
+      }
+      
+      // Değişiklikleri görüntülemek için change detection'ı tetikle
+      this.cdr.detectChanges();
     });
   }
 
@@ -62,21 +119,28 @@ export class SidebarComponent implements OnInit {
     
     // Kullanıcı giriş yapmışsa menü öğelerini getir
     if (this.authService.isLoggedIn()) {
-      this.loadMenuDummyItems();
-      
-      // Gerçek veri kullanımı için yorum satırı olarak ekleyelim
-      // this.loadMenuItems();
+      this.loadMenuItems();
+      // Eski çağrı: this.loadMenuDummyItems();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
    * Ekran boyutunu kontrol eder ve mobil görünümü belirler
    */
   checkScreenSize(): void {
+    const prevIsMobile = this.isMobileView;
     this.isMobileView = window.innerWidth <= 768;
-    // Mobil görünümde sidebar'ı otomatik olarak kapat
-    if (this.isMobileView && !this.isCollapsed) {
+    
+    // Mobil görünüme geçiş anında sidebar durumunu değiştir
+    if (!prevIsMobile && this.isMobileView) {
+      // Mobil görünüme geçildiğinde sidebar'ı kapat
       this.isCollapsed = true;
+      this.isTemporaryExpanded = false;
       this.sidebarToggled.emit(this.isCollapsed);
     }
   }
@@ -84,9 +148,17 @@ export class SidebarComponent implements OnInit {
   /**
    * Menü öğesine hover yapıldığında tetiklenir
    */
-  onMenuItemHover(event: MouseEvent): void {
-    if (this.isCollapsed && !this.isMobileView) {
-      this.isHoverExpanded = true;
+  onMenuItemHover(event: MouseEvent, item: MenuItemModel): void {
+    // Mobil görünümde hover'ı devre dışı bırak
+    if (this.isMobileView) return;
+    
+    // Alt menüsü olan bir öğeye hover yapıldıysa
+    if (this.isCollapsed && item.children && item.children.length > 0) {
+      this.hasHoveredSubmenu = true;
+      // Alt menüsü olan öğelerde hover genişlemesini engelle
+    } else if (this.isCollapsed && (!item.children || item.children.length === 0)) {
+      // Alt menüsü olmayan öğelerde hover genişlemesini etkinleştir
+      this.hasHoveredSubmenu = false;
     }
   }
 
@@ -94,43 +166,122 @@ export class SidebarComponent implements OnInit {
    * Mouse sidebar'dan ayrıldığında tetiklenir
    */
   onMouseLeave(): void {
-    if (this.isCollapsed && this.isHoverExpanded) {
-      this.isHoverExpanded = false;
+    // Sadece kalıcı durum küçük ve geçici durum genişletilmemiş ise hover efektlerini sıfırla
+    if (this.isCollapsed && !this.isTemporaryExpanded) {
+      this.hasHoveredSubmenu = false;
+      
+      // Tüm alt menüleri kapat
+      this.menuItems.forEach(item => {
+        if (item.showSubmenu) {
+          item.showSubmenu = false;
+        }
+      });
     }
   }
 
   /**
-   * Menü öğeleri yüklenir
+   * Menü öğesine tıklandığında ilgili rotaya yönlendirir veya alt menüyü açar/kapatır
+   * Ayrıca geçici genişleme durumunu kontrol eder
    */
-  loadMenuDummyItems(): void {
-    this.createDummyMenuItems();
-    this.updateMenuActiveState();
+  onMenuItemClick(item: MenuItemModel, event?: MouseEvent): void {
+    // Tıklama olayının yayılmasını engelle (varsa)
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    // Alt menüsü olan öğelere tıklandığında
+    if (item.children && item.children.length > 0) {
+      // Alt menüyü aç/kapat
+      item.expanded = !item.expanded;
+      
+      // Sidebar küçük durumdaysa geçici olarak genişlet
+      if (this.isCollapsed && !this.isTemporaryExpanded) {
+        this.isTemporaryExpanded = true;
+      }
+      
+      // Diğer açık menüleri kapat
+      if (item.expanded) {
+        this.menuItems.forEach(menuItem => {
+          if (menuItem !== item) {
+            menuItem.expanded = false;
+          }
+        });
+      }
+      
+      // Change detection mekanizmasını manuel olarak tetikle
+      this.cdr.detectChanges();
+    } else if (item.route) {
+      // Alt menüsü yoksa ve bir rota tanımlanmışsa, o rotaya git
+      this.router.navigate([item.route]);
+      
+      // Router event zaten sayfa değişiminde sidebar'ı kapatacak
+    }
   }
-  
+
   /**
-   * Gerçek veri kullanarak menü öğeleri yüklenir
-   * Not: Bu metot şu an aktif değil, EkranDto yapısını kullanan gerçek veri için
+   * Alt menü öğesine tıklandığında rota yönlendirmesi yapar
+   */
+  onSubMenuItemClick(subItem: MenuItemModel, event: MouseEvent): void {
+    // Tıklama olayının yayılmasını engelle
+    event.stopPropagation();
+    
+    // Rota tanımlanmışsa, o rotaya git
+    if (subItem.route) {
+      this.router.navigate([subItem.route]);
+    }
+  }
+
+  /**
+   * Toggle butonu için - kalıcı durum değişimi
+   */
+  toggleSidebar(): void {
+    this.isCollapsed = !this.isCollapsed;
+    
+    // Kalıcı durum değiştiğinde geçici genişlemeyi sıfırla
+    this.isTemporaryExpanded = false;
+    
+    // Mobil görünümde overlay kontrolü için durumu dış bileşene bildir
+    this.sidebarToggled.emit(this.isCollapsed);
+  }
+
+  /**
+   * Mobil menü butonuna tıklandığında sidebar'ı aç/kapat
+   */
+  toggleMobileMenu(): void {
+    if (this.isMobileView) {
+      this.isCollapsed = !this.isCollapsed;
+      this.sidebarToggled.emit(this.isCollapsed);
+    }
+  }
+
+  /**
+   * Ekran boyutuna göre menü öğelerini yükler (dummy veya gerçek veri)
    */
   loadMenuItems(): void {
-    this.authService.getUserFromLocalStorage().subscribe({
-      next: (userData: KisiTokenDto | null) => {
-        if (userData && userData.ekranDtoList && userData.ekranDtoList.length > 0) {
-          // EkranDto listesini MenuItemModel listesine dönüştür
-          this.menuItems = this.convertEkranDtoToMenuItems(userData.ekranDtoList);
+    // Ekran boyutuna göre dummy veya gerçek menü öğelerini yükle
+    if (this.isMobileView) {
+      // Mobil görünümde dummy öğeleri yükle
+      this.createDummyMenuItems();
+    } else {
+      // Masaüstü görünümda gerçek öğeleri yükle
+      this.authService.getUserFromLocalStorage().subscribe({
+        next: (userData: KisiTokenDto | null) => {
+          if (userData && userData.ekranDtoList && userData.ekranDtoList.length > 0) {
+            // EkranDto listesini MenuItemModel listesine dönüştür
+            this.menuItems = this.convertEkranDtoToMenuItems(userData.ekranDtoList);
+          } else {
+            // Kullanıcının ekran listesi bulunamadıysa dummy data kullan
+            this.createDummyMenuItems();
+          }
+          this.updateMenuActiveState();
+        },
+        error: (error) => {
+          console.error('Kullanıcı bilgileri alınırken hata oluştu:', error);
+          this.createDummyMenuItems();
           this.updateMenuActiveState();
         }
-        // else {
-        //   // Kullanıcının ekran listesi bulunamadıysa dummy data kullan
-        //   this.createDummyMenuItems();
-        //   this.updateMenuActiveState();
-        // }
-      },
-      error: (error) => {
-        console.error('Kullanıcı bilgileri alınırken hata oluştu:', error);
-        this.createDummyMenuItems();
-        this.updateMenuActiveState();
-      }
-    });
+      });
+    }
   }
   
   /**
@@ -265,34 +416,6 @@ export class SidebarComponent implements OnInit {
   }
 
   /**
-   * Menü öğesine tıklandığında ilgili rotaya yönlendirir veya alt menüyü açar/kapatır
-   */
-  navigateToLink(item: MenuItemModel): void {
-    if (item.children && item.children.length > 0) {
-      // Alt menüsü varsa, açılıp kapanmasını toggle et
-      item.expanded = !item.expanded;
-      
-      // Diğer tüm açık menüleri kapat
-      if (item.expanded) {
-        this.menuItems.forEach(menuItem => {
-          if (menuItem !== item) {
-            menuItem.expanded = false;
-          }
-        });
-      }
-    } else if (item.route) {
-      // Alt menüsü yoksa ve bir rota tanımlanmışsa, o rotaya git
-      this.router.navigate([item.route]);
-      
-      // Mobil görünümde menüyü kapat
-      if (this.isMobileView) {
-        this.isCollapsed = true;
-        this.sidebarToggled.emit(this.isCollapsed);
-      }
-    }
-  }
-
-  /**
    * Belirtilen menü öğesinin aktif olup olmadığını kontrol eder
    */
   isMenuItemActive(item: MenuItemModel): boolean {
@@ -329,13 +452,5 @@ export class SidebarComponent implements OnInit {
         }
       }
     });
-  }
-
-  /**
-   * Sidebar'ı daraltır veya genişletir
-   */
-  toggleSidebar(): void {
-    this.isCollapsed = !this.isCollapsed;
-    this.sidebarToggled.emit(this.isCollapsed);
   }
 }
