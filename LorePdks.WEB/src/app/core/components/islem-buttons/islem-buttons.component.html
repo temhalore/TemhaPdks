@@ -16,19 +16,35 @@
     </ng-container>
   </ng-container>
 
-  <!-- SpeedDial menüsü (3+ buton olduğunda) -->
-  <p-speedDial 
-    *ngIf="showSpeedDial"
-    [model]="speedDialItems" 
-    [direction]="direction" 
-    [radius]="radius"
-    [type]="type"
-    [showIcon]="buttonIcon"
-    [hideIcon]="'pi pi-times'"
-    styleClass="speeddial-wrapper"
-    [buttonClassName]="buttonClass"
-    [mask]="mask"
-    [maskStyle]="{'background': 'rgba(0,0,0,0.1)'}"
-    [transitionDelay]="30">
-  </p-speedDial>
+  <!-- Özel Toggle Menü (3+ buton olduğunda) -->
+  <div class="toggle-menu-container" *ngIf="showToggleMenu">
+    <!-- Ana Toggle Butonu (X ikonu) -->
+    <button 
+      pButton 
+      pRipple 
+      icon="pi pi-bars"
+      [class]="buttonClass" 
+      pTooltip="İşlem Menüsü" 
+      tooltipPosition="top"
+      (click)="toggleMenu($event)"
+      [ngClass]="{'toggle-active': isMenuOpen}">
+    </button>
+    
+    <!-- Açılır Menü Butonları -->
+    <div class="toggle-menu-items" *ngIf="isMenuOpen" [ngClass]="direction">
+      <ng-container *ngFor="let button of visibleButtons; let i = index">
+        <button 
+          pButton 
+          pRipple 
+          [icon]="button.icon" 
+          [class]="buttonClass" 
+          [ngClass]="[button.class || '', 'position-' + i]"
+          [pTooltip]="button.tooltip" 
+          tooltipPosition="top"
+          [disabled]="isButtonDisabled(button)"
+          (click)="onButtonClick(button.action, data, $event)">
+        </button>
+      </ng-container>
+    </div>
+  </div>
 </div>

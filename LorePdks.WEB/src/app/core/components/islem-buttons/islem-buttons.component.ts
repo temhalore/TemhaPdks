@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, HostListener, ElementRef } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { SpeedDialModule } from 'primeng/speeddial';
-import { MenuItem } from 'primeng/api';
 
 export interface IslemButton {
   icon: string;
@@ -19,22 +17,20 @@ export interface IslemButton {
   templateUrl: './islem-buttons.component.html',
   styleUrls: ['./islem-buttons.component.scss'],
   standalone: true,
-  imports: [CommonModule, ButtonModule, TooltipModule, SpeedDialModule]
+  imports: [CommonModule, ButtonModule, TooltipModule]
 })
-export class IslemButtonsComponent implements OnChanges {
+export class IslemButtonsComponent implements OnChanges, OnDestroy {
   @Input() buttons: IslemButton[] = [];
   @Input() data: any;
   @Input() direction: 'up' | 'down' | 'left' | 'right' = 'up';
-  @Input() radius: number = 80;
-  @Input() type: 'linear' | 'circle' | 'semi-circle' | 'quarter-circle' = 'semi-circle';
-  @Input() mask: boolean = true;
   @Input() buttonClass: string = 'p-button-rounded p-button-text p-button-sm';
-  @Input() buttonIcon: string = 'pi pi-ellipsis-v';
   
   @Output() buttonClick = new EventEmitter<{action: string, data: any}>();
   
-  speedDialItems: MenuItem[] = [];
   visibleButtons: IslemButton[] = [];
+  isMenuOpen = false;
+  
+  constructor(private elementRef: ElementRef) {}
   
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['buttons'] || changes['data']) {
@@ -42,30 +38,50 @@ export class IslemButtonsComponent implements OnChanges {
     }
   }
   
+  ngOnDestroy(): void {
+    // Component yok edildiğinde menu açıksa kapatalım
+    this.closeMenu();
+  }
+  
   /**
-   * Butonları günceller ve SpeedDial için menü öğelerini oluşturur
+   * Document'e tıklandığında tetiklenir
+   * Eğer tıklanan eleman menü dışındaysa menüyü kapat
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Tıklanan eleman bu bileşenin içinde değilse menüyü kapat
+    if (this.isMenuOpen && !this.elementRef.nativeElement.contains(event.target)) {
+      this.closeMenu();
+    }
+  }
+  
+  /**
+   * Butonları günceller
    */
   updateButtons(): void {
     // Görünür butonları filtrele
     this.visibleButtons = this.buttons.filter(button => this.isButtonVisible(button));
     
-    // SpeedDial için menü öğelerini oluştur - Tüm butonları SpeedDial'a ekle (3+ buton varsa)
-    if (this.visibleButtons.length > 2) {
-      this.speedDialItems = this.visibleButtons.map(button => ({
-        icon: button.icon,
-        disabled: this.isButtonDisabled(button),
-        tooltipOptions: {
-          tooltipLabel: button.tooltip,
-          tooltipPosition: 'left'
-        },
-        command: () => {
-          this.onButtonClick(button.action, this.data);
-        },
-        styleClass: button.class || ''
-      }));
-    } else {
-      this.speedDialItems = [];
+    // Eğer hiç buton yoksa veya 1-2 buton varsa menüyü kapat
+    if (this.visibleButtons.length <= 2) {
+      this.closeMenu();
     }
+  }
+  
+  /**
+   * Toggle menüyü açar veya kapatır
+   * @param event Olay nesnesi
+   */
+  toggleMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+  
+  /**
+   * Menüyü kapatır
+   */
+  closeMenu(): void {
+    this.isMenuOpen = false;
   }
   
   /**
@@ -79,6 +95,10 @@ export class IslemButtonsComponent implements OnChanges {
       event.stopPropagation();
     }
     
+    // Menüyü kapat
+    this.closeMenu();
+    
+    // Tıklama olayını bildir
     this.buttonClick.emit({ action, data });
   }
   
@@ -117,11 +137,11 @@ export class IslemButtonsComponent implements OnChanges {
   }
   
   /**
-   * SpeedDial butonunun gösterilip gösterilmeyeceğini belirler
-   * 3 veya daha fazla buton olduğunda SpeedDial gösterilir
-   * @returns SpeedDial butonu gösterilmeli mi
+   * Toggle menünün gösterilip gösterilmeyeceğini belirler
+   * 3 veya daha fazla buton olduğunda toggle menü gösterilir
+   * @returns Toggle menü gösterilmeli mi
    */
-  get showSpeedDial(): boolean {
+  get showToggleMenu(): boolean {
     return this.visibleButtons.length > 2;
   }
   

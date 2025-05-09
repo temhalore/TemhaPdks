@@ -12,28 +12,195 @@
       margin-right: 0;
     }
   }
+  
+  /* Toggle menü container */
+  .toggle-menu-container {
+    position: relative;
+    display: inline-block;
+    
+    /* Ana toggle butonu */
+    .toggle-active {
+      transform: rotate(90deg);
+      transition: transform 0.2s ease-in-out;
+    }
+    
+    /* Toggle menü öğeleri */
+    .toggle-menu-items {
+      position: absolute;
+      z-index: 1000;
+      
+      /* Butonlar için animasyon */
+      button {
+        transform: scale(0);
+        opacity: 0;
+        transition: all 0.2s ease-in-out;
+        
+        &:hover {
+          transform: scale(1.1) !important;
+        }
+      }
+      
+      /* Yönlendirme: Yukarı */
+      &.up {
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
+        
+        button {
+          margin-bottom: 0.5rem;
+          animation: fadeInUp 0.3s forwards;
+          
+          @for $i from 0 through 10 {
+            &.position-#{$i} {
+              animation-delay: #{$i * 0.05}s;
+            }
+          }
+        }
+      }
+      
+      /* Yönlendirme: Aşağı */
+      &.down {
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        button {
+          margin-top: 0.5rem;
+          animation: fadeInDown 0.3s forwards;
+          
+          @for $i from 0 through 10 {
+            &.position-#{$i} {
+              animation-delay: #{$i * 0.05}s;
+            }
+          }
+        }
+      }
+      
+      /* Yönlendirme: Sol */
+      &.left {
+        top: 50%;
+        right: 100%;
+        transform: translateY(-50%);
+        margin-right: 0.5rem;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        
+        button {
+          margin-right: 0.5rem;
+          animation: fadeInLeft 0.3s forwards;
+          
+          @for $i from 0 through 10 {
+            &.position-#{$i} {
+              animation-delay: #{$i * 0.05}s;
+            }
+          }
+        }
+      }
+      
+      /* Yönlendirme: Sağ */
+      &.right {
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        margin-left: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        
+        button {
+          margin-left: 0.5rem;
+          animation: fadeInRight 0.3s forwards;
+          
+          @for $i from 0 through 10 {
+            &.position-#{$i} {
+              animation-delay: #{$i * 0.05}s;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
-/* SpeedDial özelliklerini sıfırlamak için en temel stil */
-::ng-deep {
-  .p-speeddial {
-    position: static !important;
-    
-    .p-speeddial-button.p-button.p-button-icon-only {
-      width: 2rem;
-      height: 2rem;
-    }
-    
-    .p-speeddial-list {
-      z-index: 1000;
-    }
-    
-    .p-speeddial-item {
-      margin: 0.25rem 0;
-      
-      .p-speeddial-action {
-        width: 2rem;
-        height: 2rem;
+/* Animasyonlar */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -30px, 0) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(30px, 0, 0) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(-30px, 0, 0) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Responsive tasarım için medya sorguları */
+@media (max-width: 768px) {
+  .islem-buttons-container {
+    .toggle-menu-container {
+      .toggle-menu-items {
+        button {
+          width: 1.8rem !important;
+          height: 1.8rem !important;
+          
+          .p-button-icon {
+            font-size: 0.8rem;
+          }
+        }
+        
+        &.up, &.down {
+          button {
+            margin: 0.3rem 0;
+          }
+        }
+        
+        &.left, &.right {
+          button {
+            margin: 0 0.3rem;
+          }
+        }
       }
     }
   }
