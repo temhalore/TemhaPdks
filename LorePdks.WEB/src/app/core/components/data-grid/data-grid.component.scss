@@ -53,12 +53,41 @@
         color: #495057;
         font-weight: 600;
         padding: 0.75rem 1rem;
+        
+        &.actions-header {
+          width: 100px;
+          max-width: 100px;
+          text-align: center;
+        }
       }
       
       .p-datatable-tbody > tr > td {
         padding: 0.75rem 1rem;
         border: 1px solid #dee2e6;
         border-width: 0 0 1px 0;
+        
+        &.actions-cell {
+          width: 100px; /* Sabit genişlik */
+          max-width: 100px; /* Maksimum genişlik */
+          padding: 0.25rem; /* Az padding */
+          text-align: center;
+          vertical-align: middle;
+          overflow: visible;
+          position: relative;
+          height: 100%;
+          
+          /* Bu hücrede margin/padding sıfırlama */
+          * {
+            margin: 0;
+          }
+          
+          /* İşlem butonları için container */
+          app-islem-buttons {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+        }
       }
       
       .p-datatable-tbody > tr:hover {
@@ -74,8 +103,28 @@
   
   .action-buttons {
     display: flex;
-    gap: 0.5rem;
-    justify-content: flex-start;
+    justify-content: center; // Merkeze hizalama
     align-items: center;
+    position: relative; // Pozisyonlama için gerekli
+    height: 100%;
+    width: 100%;
+    min-height: 2.5rem; // Minimum yükseklik
+  }
+}
+
+// Mobil cihazlar için düzenlemeler
+@media screen and (max-width: 768px) {
+  .data-grid-container {
+    ::ng-deep {
+      .p-datatable {
+        .p-datatable-tbody > tr > td {
+          &.actions-cell {
+            width: 80px;
+            max-width: 80px;
+            padding: 0.15rem;
+          }
+        }
+      }
+    }
   }
 }

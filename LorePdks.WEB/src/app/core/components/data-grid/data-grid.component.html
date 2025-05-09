@@ -49,7 +49,7 @@
       
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th style="width: 150px;">İşlemler</th>
+          <th class="actions-header" style="width: 100px;">İşlemler</th>
           <th *ngFor="let col of columns" [pSortableColumn]="col.field">
             {{col.header}}
             <p-sortIcon [field]="col.field"></p-sortIcon>
@@ -59,20 +59,12 @@
       
       <ng-template pTemplate="body" let-rowData let-columns="columns">
         <tr [pSelectableRow]="rowData">
-          <td>
-            <div class="action-buttons">
-              <!-- İşlem butonları -->
-              <app-islem-buttons 
-                [buttons]="actionButtons" 
-                [data]="rowData"
-                (buttonClick)="onAction($event.action, $event.data)">
-              </app-islem-buttons>
-              
-              <!-- Özel butonlar için ng-container (geriye dönük uyumluluk için) -->
-              <ng-container *ngIf="customActionsTemplate">
-                <ng-container *ngTemplateOutlet="customActionsTemplate; context: {$implicit: rowData}"></ng-container>
-              </ng-container>
-            </div>
+          <td class="actions-cell">
+            <app-islem-buttons 
+              [buttons]="actionButtons" 
+              [data]="rowData"
+              (buttonClick)="onAction($event.action, $event.data)">
+            </app-islem-buttons>
           </td>
           <td *ngFor="let col of columns">
             <ng-container *ngIf="!col.template">
