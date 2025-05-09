@@ -1,5 +1,5 @@
 <div class="islem-buttons-container" *ngIf="hasButtons">
-  <!-- Normal butonlar (maxVisibleButtons veya daha az buton olduğunda) -->
+  <!-- Normal butonlar (1-2 buton olduğunda) -->
   <ng-container *ngIf="showNormalButtons">
     <ng-container *ngFor="let button of visibleButtons">
       <button 
@@ -16,7 +16,7 @@
     </ng-container>
   </ng-container>
 
-  <!-- SpeedDial menüsü (maxVisibleButtons'dan fazla buton olduğunda) -->
+  <!-- SpeedDial menüsü (3+ buton olduğunda) -->
   <p-speedDial 
     *ngIf="showSpeedDial"
     [model]="speedDialItems" 

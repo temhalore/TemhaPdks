@@ -30,13 +30,11 @@ export class IslemButtonsComponent implements OnChanges {
   @Input() mask: boolean = true;
   @Input() buttonClass: string = 'p-button-rounded p-button-text p-button-sm';
   @Input() buttonIcon: string = 'pi pi-ellipsis-v';
-  @Input() maxVisibleButtons: number = 2;
   
   @Output() buttonClick = new EventEmitter<{action: string, data: any}>();
   
   speedDialItems: MenuItem[] = [];
   visibleButtons: IslemButton[] = [];
-  mainButtons: IslemButton[] = [];
   
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['buttons'] || changes['data']) {
@@ -51,22 +49,23 @@ export class IslemButtonsComponent implements OnChanges {
     // Görünür butonları filtrele
     this.visibleButtons = this.buttons.filter(button => this.isButtonVisible(button));
     
-    // Ana görünümde gösterilecek butonları belirle
-    this.mainButtons = this.visibleButtons.slice(0, this.maxVisibleButtons);
-    
-    // SpeedDial için menü öğelerini oluştur
-    this.speedDialItems = this.visibleButtons.map(button => ({
-      icon: button.icon,
-      disabled: this.isButtonDisabled(button),
-      tooltipOptions: {
-        tooltipLabel: button.tooltip,
-        tooltipPosition: 'left'
-      },
-      command: () => {
-        this.onButtonClick(button.action, this.data);
-      },
-      styleClass: button.class || ''
-    }));
+    // SpeedDial için menü öğelerini oluştur - Tüm butonları SpeedDial'a ekle (3+ buton varsa)
+    if (this.visibleButtons.length > 2) {
+      this.speedDialItems = this.visibleButtons.map(button => ({
+        icon: button.icon,
+        disabled: this.isButtonDisabled(button),
+        tooltipOptions: {
+          tooltipLabel: button.tooltip,
+          tooltipPosition: 'left'
+        },
+        command: () => {
+          this.onButtonClick(button.action, this.data);
+        },
+        styleClass: button.class || ''
+      }));
+    } else {
+      this.speedDialItems = [];
+    }
   }
   
   /**
@@ -119,18 +118,20 @@ export class IslemButtonsComponent implements OnChanges {
   
   /**
    * SpeedDial butonunun gösterilip gösterilmeyeceğini belirler
+   * 3 veya daha fazla buton olduğunda SpeedDial gösterilir
    * @returns SpeedDial butonu gösterilmeli mi
    */
   get showSpeedDial(): boolean {
-    return this.visibleButtons.length > this.maxVisibleButtons;
+    return this.visibleButtons.length > 2;
   }
   
   /**
-   * Normal butonları gösterip göstermeyeceğini belirler
+   * Normal butonların gösterilip gösterilmeyeceğini belirler
+   * 1 veya 2 buton olduğunda normal butonlar gösterilir
    * @returns Normal butonlar gösterilmeli mi
    */
   get showNormalButtons(): boolean {
-    return this.visibleButtons.length > 0 && this.visibleButtons.length <= this.maxVisibleButtons;
+    return this.visibleButtons.length > 0 && this.visibleButtons.length <= 2;
   }
   
   /**
