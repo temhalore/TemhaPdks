@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: center;
   min-height: 32px;
+  position: relative; /* İçindeki mutlak konumlu elementler için referans noktası */
   
   /* Normal butonlar için düzenleme */
   button {
@@ -17,6 +18,7 @@
   .toggle-menu-container {
     position: relative;
     display: inline-block;
+    z-index: 9999; /* Yüksek z-index değeri */
     
     /* Ana toggle butonu */
     .toggle-active {
@@ -27,16 +29,25 @@
     /* Toggle menü öğeleri */
     .toggle-menu-items {
       position: absolute;
-      z-index: 1000;
+      z-index: 10000; /* Container'dan daha yüksek z-index */
+      background-color: #ffffff; /* Beyaz arka plan */
+      border-radius: 8px; /* Yuvarlatılmış kenarlar */
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2); /* Belirgin gölge */
+      border: 1px solid #f0f0f0; /* İnce kenarlık */
+      padding: 8px; /* İç boşluk */
+      min-width: 120px; /* Minimum genişlik */
       
       /* Butonlar için animasyon */
       button {
         transform: scale(0);
         opacity: 0;
         transition: all 0.2s ease-in-out;
+        margin: 5px; /* Butonlar arası boşluk */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hafif gölge */
         
         &:hover {
           transform: scale(1.1) !important;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Hover durumunda daha belirgin gölge */
         }
       }
       
@@ -176,14 +187,46 @@
   }
 }
 
+/* PrimeNG bileşenlerinin z-index düzenlemeleri için global override */
+::ng-deep {
+  /* DataTable ve diğer PrimeNG bileşenlerinin z-index'i düzeltmesi */
+  .p-datatable, .p-card, .p-component {
+    &:not(.toggle-menu-items, .toggle-menu-container) {
+      z-index: auto !important;
+    }
+  }
+  
+  /* PrimeNG Dropdown ve diğer overlay'lerin islem-buttons menüsünü ezebilmesi için */
+  .p-dropdown-panel, .p-dialog, .p-calendar-panel, .p-tooltip {
+    z-index: 10001 !important; /* Toggle menüden daha yüksek z-index */
+  }
+  
+  /* İşlem butonlarının her durumda görünür olmasını sağlama */
+  .islem-buttons-container {
+    .toggle-menu-container {
+      position: relative !important;
+      z-index: 9999 !important;
+      
+      .toggle-menu-items {
+        position: absolute !important;
+        z-index: 10000 !important;
+      }
+    }
+  }
+}
+
 /* Responsive tasarım için medya sorguları */
 @media (max-width: 768px) {
   .islem-buttons-container {
     .toggle-menu-container {
       .toggle-menu-items {
+        min-width: 100px; /* Mobil için daha küçük genişlik */
+        padding: 5px; /* Daha küçük padding */
+        
         button {
           width: 1.8rem !important;
           height: 1.8rem !important;
+          margin: 3px; /* Daha küçük margin */
           
           .p-button-icon {
             font-size: 0.8rem;
@@ -192,13 +235,13 @@
         
         &.up, &.down {
           button {
-            margin: 0.3rem 0;
+            margin: 0.2rem 0;
           }
         }
         
         &.left, &.right {
           button {
-            margin: 0 0.3rem;
+            margin: 0 0.2rem;
           }
         }
       }

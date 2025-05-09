@@ -162,3 +162,40 @@ html, body {
 .toast-warning {
   background-color: var(--warning-color);
 }
+
+/* İşlem Butonları Toggle Menü Yapısı İçin Global Stiller */
+body.toggle-menu-active {
+  /* Toggle menü açıkken diğer elementlerin z-index hiyerarşisi */
+  .p-component:not(.toggle-menu-container):not(.toggle-menu-items):not(.p-tooltip):not(.p-dialog):not(.p-dropdown-panel):not(.p-overlaypanel):not(.p-menu):not(.p-tieredmenu):not(.p-contextmenu) {
+    z-index: auto !important;
+  }
+  
+  /* Data Grid içinde toggle menü açılması durumunda grid'in üzerinde kalmasını sağla */
+  .p-datatable {
+    .p-datatable-wrapper, .p-datatable-header, .p-datatable-footer, .p-column-title, .p-sortable-column, .p-datatable-tbody, .p-datatable-tbody > tr, .p-datatable-tbody > tr > td {
+      z-index: auto !important;
+    }
+  }
+  
+  /* Card bileşeni içinde toggle menü açılması durumunda */
+  .p-card {
+    .p-card-body, .p-card-content, .p-card-footer, .p-card-header {
+      z-index: auto !important;
+    }
+  }
+  
+  /* İşlem butonları toggle menüsü her koşulda en üstte kalmalı */
+  .toggle-menu-container, .toggle-menu-items {
+    z-index: 9999 !important;
+  }
+  
+  /* Sistem dialogları ve dropdown paneller toggle menüsünden üstte olmalı */
+  .p-dialog, .p-dropdown-panel, .p-overlaypanel, .p-tooltip, .p-menu, .p-tieredmenu, .p-contextmenu {
+    z-index: 10001 !important;
+  }
+  
+  /* Toastr bildirimleri en üstte olmalı */
+  .toast-container {
+    z-index: 10002 !important;
+  }
+}

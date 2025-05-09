@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, HostListener, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, HostListener, ElementRef, Renderer2 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -22,7 +22,7 @@ export interface IslemButton {
 export class IslemButtonsComponent implements OnChanges, OnDestroy {
   @Input() buttons: IslemButton[] = [];
   @Input() data: any;
-  @Input() direction: 'up' | 'down' | 'left' | 'right' = 'up';
+  @Input() direction: 'up' | 'down' | 'left' | 'right' = 'right';
   @Input() buttonClass: string = 'p-button-rounded p-button-text p-button-sm';
   
   @Output() buttonClick = new EventEmitter<{action: string, data: any}>();
@@ -30,7 +30,7 @@ export class IslemButtonsComponent implements OnChanges, OnDestroy {
   visibleButtons: IslemButton[] = [];
   isMenuOpen = false;
   
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, private renderer: Renderer2) {}
   
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['buttons'] || changes['data']) {
@@ -41,6 +41,9 @@ export class IslemButtonsComponent implements OnChanges, OnDestroy {
   ngOnDestroy(): void {
     // Component yok edildiğinde menu açıksa kapatalım
     this.closeMenu();
+    
+    // Document body'den özel sınıfı kaldır
+    this.renderer.removeClass(document.body, 'toggle-menu-active');
   }
   
   /**
@@ -75,13 +78,23 @@ export class IslemButtonsComponent implements OnChanges, OnDestroy {
   toggleMenu(event: MouseEvent): void {
     event.stopPropagation();
     this.isMenuOpen = !this.isMenuOpen;
+    
+    // Menü durumuna göre document body'e özel sınıf ekle/kaldır
+    if (this.isMenuOpen) {
+      this.renderer.addClass(document.body, 'toggle-menu-active');
+    } else {
+      this.renderer.removeClass(document.body, 'toggle-menu-active');
+    }
   }
   
   /**
    * Menüyü kapatır
    */
   closeMenu(): void {
-    this.isMenuOpen = false;
+    if (this.isMenuOpen) {
+      this.isMenuOpen = false;
+      this.renderer.removeClass(document.body, 'toggle-menu-active');
+    }
   }
   
   /**
