@@ -3,6 +3,7 @@ import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef, Host
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { PaginatorModule } from 'primeng/paginator';
 import { DataCardComponent } from '../data-card/data-card.component';
 import { IslemButtonsComponent, IslemButton } from '../islem-buttons/islem-buttons.component';
 
@@ -18,7 +19,7 @@ enum ViewMode {
   templateUrl: './data-grid.component.html',
   styleUrls: ['./data-grid.component.scss'],
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TooltipModule, DataCardComponent, IslemButtonsComponent]
+  imports: [CommonModule, TableModule, ButtonModule, TooltipModule, DataCardComponent, IslemButtonsComponent, PaginatorModule]
 })
 export class DataGridComponent implements OnInit {
   @Input() data: any[] = [];
@@ -43,12 +44,51 @@ export class DataGridComponent implements OnInit {
   isMobile: boolean = false;
   readonly ViewMode = ViewMode;
 
+  // Sayfalama Değişkenleri
+  first: number = 0;
+  currentPage: number = 0;
+  totalRecords: number = 0;
+  
+  // Sayfalanmış veri
+  pagedData: any[] = [];
+
   constructor() {
     this.checkScreenSize();
   }
 
   ngOnInit(): void {
     this.checkScreenSize();
+    this.totalRecords = this.data.length;
+    this.updatePagedData();
+  }
+
+  ngOnChanges(): void {
+    this.totalRecords = this.data.length;
+    this.updatePagedData();
+  }
+
+  /**
+   * Sayfalanmış veriyi günceller
+   */
+  updatePagedData(): void {
+    if (this.paginator && this.data.length > 0) {
+      const startIndex = this.currentPage * this.rows;
+      const endIndex = startIndex + this.rows;
+      this.pagedData = this.data.slice(startIndex, endIndex);
+    } else {
+      this.pagedData = this.data;
+    }
+  }
+
+  /**
+   * Sayfalama değiştiğinde tetiklenir
+   * @param event Sayfalama olayı
+   */
+  onPageChange(event: any): void {
+    this.first = event.first;
+    this.rows = event.rows;
+    this.currentPage = event.page;
+    this.updatePagedData();
   }
 
   @HostListener('window:resize', ['$event'])

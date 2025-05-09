@@ -39,6 +39,48 @@
     width: 100%;
   }
   
+  /* Sayfalama bileşeni için stiller */
+  .data-grid-paginator {
+    padding: 0.5rem 1rem;
+    border-top: 1px solid #f0f0f0;
+    background-color: #fafafa;
+    border-radius: 0 0 4px 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .paginator-info {
+      font-size: 0.9rem;
+      color: #666;
+      
+      .total-records {
+        background-color: #e3f2fd;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        font-weight: 500;
+        color: #2196F3;
+      }
+    }
+    
+    ::ng-deep {
+      .p-paginator {
+        justify-content: flex-end;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        
+        .p-paginator-pages .p-paginator-page.p-highlight {
+          background-color: #e3f2fd;
+          color: #2196F3;
+        }
+        
+        .p-paginator-current {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
   ::ng-deep {
     .p-datatable {
       .p-datatable-header {
@@ -115,6 +157,18 @@
 // Mobil cihazlar için düzenlemeler
 @media screen and (max-width: 768px) {
   .data-grid-container {
+    .data-grid-paginator {
+      padding: 0.25rem 0.5rem;
+      
+      ::ng-deep {
+        .p-paginator {
+          .p-paginator-current {
+            display: none; /* Mobil görünümde current text gizleme */
+          }
+        }
+      }
+    }
+    
     ::ng-deep {
       .p-datatable {
         .p-datatable-tbody > tr > td {

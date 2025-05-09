@@ -33,12 +33,9 @@
   <!-- Liste görünümü -->
   <div *ngIf="viewMode === ViewMode.LIST" class="data-grid-list-view">
     <p-table 
-      [value]="data" 
+      [value]="paginator ? pagedData : data" 
       [columns]="columns"
       [responsive]="responsive"
-      [paginator]="paginator"
-      [rows]="rows"
-      [rowsPerPageOptions]="rowsPerPageOptions"
       [loading]="loading"
       selectionMode="single"
       [(selection)]="selectedRow"
@@ -91,7 +88,7 @@
   <!-- Kart görünümü -->
   <div *ngIf="viewMode === ViewMode.CARD" class="data-grid-card-view">
     <app-data-card
-      [data]="data"
+      [data]="paginator ? pagedData : data"
       [columns]="columns"
       [loading]="loading"
       [headerTitle]="''"
@@ -104,5 +101,21 @@
         </ng-container>
       </ng-template>
     </app-data-card>
+  </div>
+  
+  <!-- Ortak Sayfalama Bileşeni -->
+  <div class="data-grid-paginator" *ngIf="paginator && data.length > 0">
+    <div class="paginator-info">
+      <span class="total-records">Toplam: {{ totalRecords }} kayıt</span>
+    </div>
+    <p-paginator 
+      [first]="first" 
+      [rows]="rows" 
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first} - {last} / {totalRecords}"
+      (onPageChange)="onPageChange($event)">
+    </p-paginator>
   </div>
 </div>
