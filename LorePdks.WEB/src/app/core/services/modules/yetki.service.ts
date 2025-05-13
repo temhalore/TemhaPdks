@@ -143,8 +143,13 @@ export class YetkiService {
     return this.apiService.post<EkranDto>(`${this.endpoint}/saveEkranByEkranDto`, ekran);
   }
 
-      deleteEkran
-(eid: string): Observable<boolean> {
-    return this.apiService.post<boolean>(`${this.endpoint}/deleteEkranByEkranDto`, { eid });
+  /**
+   * Ekran siler
+   * @param eid Ekranın encrypt edilmiş ID'si
+   * @returns Observable<boolean>
+   */
+  deleteEkran(eid: string): Observable<boolean> {
+    return this.apiService.post<boolean>(`${this.endpoint}/deleteEkranByEIdDto`, { eid });
   }
+
 }

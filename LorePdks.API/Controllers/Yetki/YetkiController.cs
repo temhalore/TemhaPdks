@@ -161,8 +161,8 @@ namespace LorePdks.API.Controllers.Yetki
         }
 
         [HttpPost]
-        [Route("deleteEkranByEkranDto")]
-        public IActionResult deleteEkranByEkranDto(EkranDTO request)
+        [Route("deleteEkranByEIdDto")]
+        public IActionResult deleteEkranByEIdDto(EIdDTO request)
         {
             var response = new ServiceResponse<EkranDTO>();
             _ekranManager.deleteEkranByEkranId(request.id);

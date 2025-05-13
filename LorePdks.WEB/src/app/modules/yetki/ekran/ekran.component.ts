@@ -233,14 +233,32 @@ export class EkranComponent implements OnInit {
     this.confirmDialog.message = `"${ekran.ekranAdi}" ekranını silmek istediğinize emin misiniz?`;
     this.confirmDialog.show();
   }
-  
-  /**
+    /**
    * Onay sonrası ekran silme işlemini gerçekleştirir
    */
   deleteEkran(): void {
-    // YetkiService'te ekran silme endpoint'i olsaydı burada kullanılırdı
-    // Şu an için, bu işlevsellik eksik görünüyor
-    console.error('Ekran silme fonksiyonu henüz implemente edilmemiş');
+    if (!this.selectedEkran || !this.selectedEkran.eid) {
+      console.error('Silinecek ekran seçilmemiş');
+      return;
+    }
+    
+    this.loading = true;
+    this.yetkiService.deleteEkran(this.selectedEkran.eid)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (success) => {
+          if (success) {
+            console.log('Ekran başarıyla silindi');
+            // Ekran listesini yeniden yükle
+            this.loadEkranList();
+          } else {
+            console.error('Ekran silme işlemi başarısız oldu');
+          }
+        },
+        error: (err) => {
+          console.error('Ekran silinirken hata oluştu:', err);
+        }
+      });
   }
   /**
    * Ekran kaydetme/güncelleme işlemini gerçekleştirir
