@@ -14,6 +14,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DataGridComponent, ActionButtonConfig } from '../../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
+import { TextInputComponent } from '../../../core/components/text-input/text-input.component';
 
 // Servisler ve Modeller
 import { KisiService } from '../../../core/services/modules/kisi.service';
@@ -22,8 +23,7 @@ import { KisiDto } from '../../../core/models/KisiDto';
 @Component({
   selector: 'app-kisi-list',
   templateUrl: './kisi-list.component.html',
-  styleUrls: ['./kisi-list.component.scss'],
-  standalone: true,
+  styleUrls: ['./kisi-list.component.scss'],  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -34,7 +34,8 @@ import { KisiDto } from '../../../core/models/KisiDto';
     TooltipModule,
     DataGridComponent,
     ModalComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    TextInputComponent
   ]
 })
 export class KisiListComponent implements OnInit, OnDestroy {
@@ -93,12 +94,20 @@ export class KisiListComponent implements OnInit, OnDestroy {
         }
       });
   }
-  
-  /**
+    /**
    * Kişi ekleme modalını açar
    */
   openAddKisiModal(): void {
     this.kisiModel = new KisiDto();
+    // Başlangıç değerlerini ayarla
+    this.kisiModel.ad = '';
+    this.kisiModel.soyad = '';
+    this.kisiModel.tc = '';
+    this.kisiModel.cepTel = '';
+    this.kisiModel.email = '';
+    this.kisiModel.loginName = '';
+    this.kisiModel.sifre = '';
+    
     this.selectedKisi = null;
     this.kisiModalVisible = true;
   }
@@ -119,8 +128,7 @@ export class KisiListComponent implements OnInit, OnDestroy {
         break;
     }
   }
-  
-  /**
+    /**
    * Kişi düzenleme modalını açar
    */
   openEditKisiModal(): void {
@@ -128,8 +136,17 @@ export class KisiListComponent implements OnInit, OnDestroy {
     
     // Kişi bilgilerini formda göstermek için kopyalama
     this.kisiModel = { ...this.selectedKisi };
+    
+    // Null veya undefined değerleri boş string ile değiştir
+    this.kisiModel.ad = this.kisiModel.ad || '';
+    this.kisiModel.soyad = this.kisiModel.soyad || '';
+    this.kisiModel.tc = this.kisiModel.tc || '';
+    this.kisiModel.cepTel = this.kisiModel.cepTel || '';
+    this.kisiModel.email = this.kisiModel.email || '';
+    this.kisiModel.loginName = this.kisiModel.loginName || '';
+    
     this.kisiModalVisible = true;
-  }  /**
+  }/**
    * Kişi silme işlemi için onay dialogu açar
    */
   confirmDelete(): void {
@@ -154,24 +171,38 @@ export class KisiListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Tüm subscription'ları temizle
     this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-  
-  /**
+  }  /**
    * Kişi kaydeder veya günceller
    */
   saveKisi(): void {
+    // Form doğrulama kontrolü - artık butonu disable ettiğimiz için burada tekrar kontrol etmeye gerek yok
+    console.log('saveKisi metodu çağrıldı! Gönderilecek veri:', this.kisiModel);
     this.loading = true;
     this.kisiService.saveKisi(this.kisiModel)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (response) => {
+          console.log('Kişi kaydedildi:', response);
           this.kisiModalVisible = false;
           this.loadKisiList(); // Listeyi yenile
         },
         error: (err) => {
           console.error('Kişi kaydedilirken hata oluştu:', err);
+          // Hata yönetimi WebUI'daki genel mekanizma ile yapılacak
+          // Hata bilgileri ApiService içerisinde işleniyor
         }
       });
+  }
+  
+  /**
+   * Form alanlarının geçerli olup olmadığını kontrol eder
+   * @returns boolean
+   */
+  isFormValid(): boolean {
+    // Zorunlu alanların dolu olup olmadığını kontrol et
+    return !!(this.kisiModel.ad && this.kisiModel.soyad && this.kisiModel.loginName && 
+      // Yeni kişi ekliyorsak şifre zorunlu, düzenliyorsak değil
+      (this.selectedKisi || (this.kisiModel.sifre && this.kisiModel.sifre.trim() !== '')));
   }
   
   /**

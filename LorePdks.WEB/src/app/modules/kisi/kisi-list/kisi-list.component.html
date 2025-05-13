@@ -25,55 +25,72 @@
       [rows]="10" 
       [rowsPerPageOptions]="[5, 10, 25, 50]">
     </app-data-grid>
-  </div>
-  <!-- Kişi Ekleme/Düzenleme Modal -->
+  </div>  <!-- Kişi Ekleme/Düzenleme Modal -->
   <app-modal 
     [(visible)]="kisiModalVisible" 
     [title]="selectedKisi ? 'Kişi Düzenle' : 'Yeni Kişi Ekle'" 
     [width]="'600px'"
-    (visibleChange)="closeKisiModal()">
+    [saveLabel]="'Kaydet'"
+    [cancelLabel]="'İptal'"
+    [saveBtnDisabled]="!isFormValid()"
+    (save)="saveKisi()"
+    (cancel)="closeKisiModal()">
     
     <div class="form-container">
-      <div class="form-group">
-        <label for="ad">Ad</label>
-        <input id="ad" type="text" pInputText [(ngModel)]="kisiModel.ad" placeholder="Ad" class="form-control">
-      </div>
+      <app-text-input
+        title="Ad"
+        [value]="kisiModel.ad"
+        (valueChange)="kisiModel.ad = $event"
+        placeholder="Adını giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="soyad">Soyad</label>
-        <input id="soyad" type="text" pInputText [(ngModel)]="kisiModel.soyad" placeholder="Soyad" class="form-control">
-      </div>
+      <app-text-input
+        title="Soyad"
+        [value]="kisiModel.soyad"
+        (valueChange)="kisiModel.soyad = $event"
+        placeholder="Soyadı giriniz"
+        [isRequired]="true">
+      </app-text-input>
+        <app-text-input
+        title="TC Kimlik No"
+        [value]="kisiModel.tc"
+        (valueChange)="kisiModel.tc = $event"
+        placeholder="TC Kimlik No giriniz">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="tc">TC Kimlik No</label>
-        <input id="tc" type="text" pInputText [(ngModel)]="kisiModel.tc" placeholder="TC Kimlik No" class="form-control">
-      </div>
+      <app-text-input
+        title="Telefon"
+        [value]="kisiModel.cepTel"
+        (valueChange)="kisiModel.cepTel = $event"
+        placeholder="Telefon numarasını giriniz">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="cepTel">Telefon</label>
-        <input id="cepTel" type="text" pInputText [(ngModel)]="kisiModel.cepTel" placeholder="Telefon" class="form-control">
-      </div>
+      <app-text-input
+        title="E-posta"
+        [value]="kisiModel.email"
+        (valueChange)="kisiModel.email = $event"
+        type="email"
+        placeholder="E-posta adresini giriniz">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="email">E-posta</label>
-        <input id="email" type="email" pInputText [(ngModel)]="kisiModel.email" placeholder="E-posta" class="form-control">
-      </div>
-      
-      <div class="form-group">
-        <label for="loginName">Kullanıcı Adı</label>
-        <input id="loginName" type="text" pInputText [(ngModel)]="kisiModel.loginName" placeholder="Kullanıcı Adı" class="form-control">
-      </div>
-      
-      <div class="form-group" *ngIf="!selectedKisi">
-        <label for="sifre">Şifre</label>
-        <input id="sifre" type="password" pInputText [(ngModel)]="kisiModel.sifre" placeholder="Şifre" class="form-control">
+      <app-text-input
+        title="Kullanıcı Adı"
+        [value]="kisiModel.loginName"
+        (valueChange)="kisiModel.loginName = $event"
+        placeholder="Kullanıcı adını giriniz"
+        [isRequired]="true">
+      </app-text-input>      <div *ngIf="!selectedKisi">
+        <app-text-input
+          title="Şifre"
+          [value]="kisiModel.sifre"
+          (valueChange)="kisiModel.sifre = $event"
+          type="password"
+          placeholder="Şifre giriniz"
+          [isRequired]="!selectedKisi">
+        </app-text-input>
       </div>
     </div>
-    
-    <ng-template pTemplate="footer">
-      <button pButton label="İptal" icon="pi pi-times" class="p-button-outlined p-button-secondary" (click)="closeKisiModal()"></button>
-      <button pButton label="Kaydet" icon="pi pi-save" class="p-button-success" (click)="saveKisi()"></button>
-    </ng-template>
   </app-modal>
   
   <!-- Silme Onayı Dialog -->

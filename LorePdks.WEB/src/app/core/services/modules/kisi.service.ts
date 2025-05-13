@@ -13,13 +13,14 @@ export class KisiService {
   private endpoint = 'Kisi';
 
   constructor(private apiService: ApiService) { }
-
   /**
    * Kişi kaydeder veya günceller
    * @param kisi Kişi modeli
    * @returns Observable<KisiDto>
    */
   saveKisi(kisi: KisiDto): Observable<KisiDto> {
+    console.log('KisiService.saveKisi çağrıldı:', kisi);
+    console.log('API endpoint:', `${this.endpoint}/saveKisiByKisiDto`);
     return this.apiService.post<KisiDto>(`${this.endpoint}/saveKisiByKisiDto`, kisi);
   }
 
