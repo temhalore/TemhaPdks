@@ -1,43 +1,45 @@
-<ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
-  <ng-container *ngIf="!multiple">
-    <p-dropdown 
-      [options]="itemListDto$ | async" 
-      [placeholder]="placeholder"
-      [disabled]="isDisabled"
-      [required]="isRequired"
-      [styleClass]="'w-100 ' + class"
-      [(ngModel)]="selectedValue"
-      optionLabel="value"
-      optionValue="key"
-      (onChange)="onSelectionChange($event)"
-      [showClear]="!isRequired"
-      appendTo="body">
-    </p-dropdown>
-  </ng-container>
-
-  <ng-container *ngIf="multiple">
-    <p-multiSelect 
-      [options]="itemListDto$ | async" 
-      [placeholder]="placeholder"
-      [disabled]="isDisabled"
-      [required]="isRequired"
-      [styleClass]="'w-100 ' + class"
-      [(ngModel)]="selectedValue"
-      optionLabel="value"
-      optionValue="key"
-      (onChange)="onSelectionChange($event)"
-      appendTo="body"
-      [showToggleAll]="true"
-      [showHeader]="true">
-    </p-multiSelect>
-  </ng-container>
-</ng-container>
-
-<ng-template #loadingTemplate>
-  <div class="select-loading">
-    <div class="d-flex align-items-center">
-      <i class="pi pi-spin pi-spinner mr-2"></i>
-      <span>Yükleniyor...</span>
-    </div>
+<div class="select-container">
+  <!-- Yükleniyor durumu -->
+  <div *ngIf="(isLoading$ | async); else contentTemplate" class="select-loading">
+    <i class="pi pi-spin pi-spinner"></i> Yükleniyor...
   </div>
-</ng-template>
+  
+  <!-- İçerik şablonu -->
+  <ng-template #contentTemplate>
+    <!-- Debug bilgisi (gizli) -->
+    <pre *ngIf="false">{{ itemList | json }}</pre>
+    
+    <!-- Tekli seçim -->
+    <div *ngIf="!multiple">
+      <p-dropdown 
+        [options]="itemList" 
+        [placeholder]="placeholder"
+        [disabled]="isDisabled"
+        [required]="isRequired"
+        [styleClass]="'w-100 ' + class"
+        [(ngModel)]="selectedValue"
+        optionLabel="value"
+        optionValue="key"
+        (onChange)="onSelectionChange($event)"
+        [showClear]="!isRequired">
+      </p-dropdown>
+    </div>
+    
+    <!-- Çoklu seçim -->
+    <div *ngIf="multiple">
+      <p-multiSelect 
+        [options]="itemList" 
+        [placeholder]="placeholder"
+        [disabled]="isDisabled"
+        [required]="isRequired"
+        [styleClass]="'w-100 ' + class"
+        [(ngModel)]="selectedValue"
+        optionLabel="value"
+        optionValue="key"
+        (onChange)="onSelectionChange($event)"
+        [showToggleAll]="true"
+        [showHeader]="true">
+      </p-multiSelect>
+    </div>
+  </ng-template>
+</div>

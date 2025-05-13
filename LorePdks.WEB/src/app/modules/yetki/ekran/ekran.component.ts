@@ -64,7 +64,7 @@ export class EkranComponent implements OnInit {
   // Seçili ekran ve form modeli
   selectedEkran: EkranDto | null = null;
   ekranModel: EkranDto = new EkranDto();
-    // Üst ekran seçimi için
+  // Üst ekran seçimi için
   ustEkranListDto$: BehaviorSubject<SelectInputModel[]> = new BehaviorSubject<SelectInputModel[]>([]);
   selectedUstEkranId: string | null = null;
   loadingUstEkranlar$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -114,7 +114,7 @@ export class EkranComponent implements OnInit {
     this.loadUstEkranlar();
     this.ekranModalVisible = true;
   }
-    /**
+  /**
    * Ekran düzenleme modalını açar
    * @param ekran Düzenlenecek ekran
    */
@@ -130,8 +130,12 @@ export class EkranComponent implements OnInit {
     this.ekranModel.ikon = this.ekranModel.ikon || '';
     this.ekranModel.siraNo = this.ekranModel.siraNo || 0;
     this.ekranModel.aktif = this.ekranModel.aktif !== undefined ? this.ekranModel.aktif : true;
+      // Üst ekran ID'si varsa al, yoksa null ata
+    const ustEkranId = ekran.ustEkranEidDto?.eid ? String(ekran.ustEkranEidDto.eid) : null;
+    console.log('Düzenlenen ekranın üst ekran ID\'si:', ustEkranId);
+    this.selectedUstEkranId = ustEkranId;
     
-    this.selectedUstEkranId = ekran.ustEkranEidDto?.eid || null;
+    // Önce üst ekranlar yüklensin, sonra modal açılsın
     this.loadUstEkranlar();
     this.ekranModalVisible = true;
   }
@@ -155,20 +159,28 @@ export class EkranComponent implements OnInit {
     // Şu an için, bu işlevsellik eksik görünüyor
     console.error('Ekran silme fonksiyonu henüz implemente edilmemiş');
   }
-    /**
+  /**
    * Ekran kaydetme/güncelleme işlemini gerçekleştirir
    */
   saveEkran(): void {
+    console.log('Kaydedilecek ekran modeli:', JSON.stringify(this.ekranModel));
+    console.log('Seçilen üst ekran ID:', this.selectedUstEkranId);
+    
     // Üst ekran seçimini ayarla
     if (this.selectedUstEkranId) {
       this.ekranModel.ustEkranEidDto = { eid: this.selectedUstEkranId };
+      console.log('Üst ekran ataması yapıldı:', this.ekranModel.ustEkranEidDto);
     } else {
       this.ekranModel.ustEkranEidDto = null as any;
+      console.log('Üst ekran ataması temizlendi');
     }
     
     // Güncelleme kontrolü için eid bilgisini doğru şekilde ayarla
     if (this.selectedEkran && this.selectedEkran.eid) {
       this.ekranModel.eid = this.selectedEkran.eid;
+      console.log('Mevcut ekran güncelleniyor, EID:', this.ekranModel.eid);
+    } else {
+      console.log('Yeni ekran oluşturuluyor');
     }
     
     // Ekran kaydet servis çağrısı
@@ -194,7 +206,7 @@ export class EkranComponent implements OnInit {
   onEkranModalClosed(): void {
     this.selectedEkran = null;
   }
-    /**
+  /**
    * Üst ekran seçimi için ekran listesini yükler
    */
   loadUstEkranlar(): void {
@@ -203,32 +215,51 @@ export class EkranComponent implements OnInit {
       .pipe(finalize(() => this.loadingUstEkranlar$.next(false)))
       .subscribe({
         next: (data) => {
+          console.log('Tüm ekranlar:', data);  // Debug amaçlı log
+
           // Kendisini üst ekran olarak seçememeli
           const filteredData = this.selectedEkran 
             ? data.filter(e => e.eid !== this.selectedEkran!.eid) 
             : data;
           
-          // Select component için uygun formata dönüştür
+          console.log('Filtrelenmiş ekranlar:', filteredData);  // Debug amaçlı log
+            // Select component için uygun formata dönüştür
           const selectItems = filteredData.map(e => ({
-            key: e.eid,
-            value: e.ekranAdi
+            key: String(e.eid), // Ekran ID'sini string'e dönüştür
+            value: e.ekranAdi || 'İsimsiz Ekran'  // Null veya boş değer kontrolü ekledik
           }));
+          
+          console.log('Select için hazırlanan veri:', selectItems);  // Debug amaçlı log
           
           // BehaviorSubject'e ekran listesini aktar
           this.ustEkranListDto$.next(selectItems);
         },
         error: (err) => {
           console.error('Üst ekranlar yüklenirken hata oluştu:', err);
+          // Hata durumunda bile en azından boş bir liste göster
+          this.ustEkranListDto$.next([]);
         }
       });
   }
-  
-  /**
+    /**
    * Üst ekran seçim değişikliğini işler
    * @param event Seçim değişikliği olayı
    */
   onUstEkranChange(value: any): void {
+    console.log('Üst ekran seçimi değişti:', value);
     this.selectedUstEkranId = value;
+    
+    // Seçilen üst ekranın adını bul ve göster (debug amaçlı)
+    if (value) {
+      const secilenEkran = this.ekranList.find(e => e.eid === value);
+      if (secilenEkran) {
+        console.log('Seçilen üst ekran:', secilenEkran.ekranAdi);
+      } else {
+        console.log('Seçilen ID\'ye sahip ekran bulunamadı');
+      }
+    } else {
+      console.log('Üst ekran seçimi temizlendi');
+    }
   }
   
   /**
