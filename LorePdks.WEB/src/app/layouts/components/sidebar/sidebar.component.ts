@@ -259,10 +259,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
    */
   loadMenuItems(): void {
     // Ekran boyutuna göre dummy veya gerçek menü öğelerini yükle
-    if (this.isMobileView) {
-      // Mobil görünümde dummy öğeleri yükle
-      this.createDummyMenuItems();
-    } else {
+    // if (this.isMobileView) {
+    //   // Mobil görünümde dummy öğeleri yükle
+    //   this.createDummyMenuItems();
+    // } else {
       // Masaüstü görünümda gerçek öğeleri yükle
       this.authService.getUserFromLocalStorage().subscribe({
         next: (userData: KisiTokenDto | null) => {
@@ -277,11 +277,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Kullanıcı bilgileri alınırken hata oluştu:', error);
-          this.createDummyMenuItems();
+          // this.createDummyMenuItems();
           this.updateMenuActiveState();
         }
       });
-    }
+    // }
   }
   
   /**
