@@ -32,7 +32,6 @@ export class YetkiService {
   getRolById(eid: string): Observable<RolDto> {
     return this.apiService.post<RolDto>(`${this.endpoint}/getRolDtoByEIdDto`, { eid });
   }
-
   /**
    * Rol kaydeder/günceller
    * @param rol Rol modeli
@@ -41,10 +40,6 @@ export class YetkiService {
   saveRol(rol: RolDto): Observable<RolDto> {
     return this.apiService.post<RolDto>(`${this.endpoint}/saveRolByRolDto`, rol);
   }
-
-saveEkran(ekran: EkranDto): Observable<EkranDto> {
-    return this.apiService.post<EkranDto>(`${this.endpoint}/saveEkranByEkranDto`, ekran);
-}
 
   /**
    * Rol siler
@@ -122,7 +117,6 @@ saveEkran(ekran: EkranDto): Observable<EkranDto> {
     };
     return this.apiService.post<boolean>(`${this.endpoint}/addEkranToRolByRolEkranDto`, request);
   }
-
   /**
    * Rolden ekran çıkarır
    * @param rolId Rolün encrypt edilmiş ID'si
@@ -135,5 +129,14 @@ saveEkran(ekran: EkranDto): Observable<EkranDto> {
       ekranEidDto: { eid: ekranId }
     };
     return this.apiService.post<boolean>(`${this.endpoint}/removeEkranFromRolByRolEkranDto`, request);
+  }
+
+  /**
+   * Ekran kaydeder/günceller
+   * @param ekran Ekran modeli
+   * @returns Observable<EkranDto>
+   */
+  saveEkran(ekran: EkranDto): Observable<EkranDto> {
+    return this.apiService.post<EkranDto>(`${this.endpoint}/saveEkranByEkranDto`, ekran);
   }
 }

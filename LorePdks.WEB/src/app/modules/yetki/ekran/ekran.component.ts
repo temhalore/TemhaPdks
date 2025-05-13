@@ -155,8 +155,7 @@ export class EkranComponent implements OnInit {
     // Şu an için, bu işlevsellik eksik görünüyor
     console.error('Ekran silme fonksiyonu henüz implemente edilmemiş');
   }
-  
-  /**
+    /**
    * Ekran kaydetme/güncelleme işlemini gerçekleştirir
    */
   saveEkran(): void {
@@ -172,14 +171,21 @@ export class EkranComponent implements OnInit {
       this.ekranModel.eid = this.selectedEkran.eid;
     }
     
-    // YetkiService'te ekran kaydetme endpoint'i olsaydı burada kullanılırdı
-    // Şu an için, bu işlevsellik eksik görünüyor
-    console.error('Ekran kaydetme fonksiyonu henüz implemente edilmemiş');
-    
-    // Başarılı kaydetme sonrası temizlik ve yeniden yükleme
-    this.ekranModalVisible = false;
-    this.selectedEkran = null;
-    this.loadEkranList();
+    // Ekran kaydet servis çağrısı
+    this.yetkiService.saveEkran(this.ekranModel)
+      .subscribe({
+        next: (response) => {
+          console.log('Ekran başarıyla kaydedildi:', response);
+          
+          // Başarılı kaydetme sonrası temizlik ve yeniden yükleme
+          this.ekranModalVisible = false;
+          this.selectedEkran = null;
+          this.loadEkranList();
+        },
+        error: (err) => {
+          console.error('Ekran kaydedilirken hata oluştu:', err);
+        }
+      });
   }
   
   /**
