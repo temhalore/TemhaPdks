@@ -164,6 +164,7 @@ namespace LorePdks.API.Controllers.Yetki
         [Route("deleteEkranByEIdDto")]
         public IActionResult deleteEkranByEIdDto(EIdDTO request)
         {
+
             var response = new ServiceResponse<EkranDTO>();
             _ekranManager.deleteEkranByEkranId(request.id);
             response.messageType = ServiceResponseMessageType.Success;

@@ -232,8 +232,7 @@ export class EkranComponent implements OnInit {
     this.confirmDialog.header = 'Ekran Silme Onayı';
     this.confirmDialog.message = `"${ekran.ekranAdi}" ekranını silmek istediğinize emin misiniz?`;
     this.confirmDialog.show();
-  }
-    /**
+  }  /**
    * Onay sonrası ekran silme işlemini gerçekleştirir
    */
   deleteEkran(): void {
@@ -242,21 +241,33 @@ export class EkranComponent implements OnInit {
       return;
     }
     
+    const silinecekId = this.selectedEkran.eid;
+    
+    // UI'ı hemen güncelle
+    this.ekranList = this.ekranList.filter(e => e.eid !== silinecekId);
+    this.treeNodes = this.prepareTreeNodes(this.ekranList);
+    this.selectedEkran = null;
+    
+    // API'ye silme isteği gönder
     this.loading = true;
-    this.yetkiService.deleteEkran(this.selectedEkran.eid)
+    this.yetkiService.deleteEkran(silinecekId)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (success) => {
           if (success) {
             console.log('Ekran başarıyla silindi');
-            // Ekran listesini yeniden yükle
+            // Sunucudan güncel listeyi al
             this.loadEkranList();
           } else {
             console.error('Ekran silme işlemi başarısız oldu');
+            // Silme başarısız olduysa, listeyi yeniden yükle
+            this.loadEkranList();
           }
         },
         error: (err) => {
           console.error('Ekran silinirken hata oluştu:', err);
+          // Hata durumunda listeyi yeniden yükle
+          this.loadEkranList();
         }
       });
   }
@@ -283,16 +294,33 @@ export class EkranComponent implements OnInit {
     } else {
       console.log('Yeni ekran oluşturuluyor');
     }
-    
-    // Ekran kaydet servis çağrısı
+      // Ekran kaydet servis çağrısı
     this.yetkiService.saveEkran(this.ekranModel)
       .subscribe({
         next: (response) => {
           console.log('Ekran başarıyla kaydedildi:', response);
           
-          // Başarılı kaydetme sonrası temizlik ve yeniden yükleme
+          // Başarılı kaydetme sonrası işlemleri yap
+          // Eğer mevcut bir ekran güncellendiyse, listede güncelle
+          if (this.selectedEkran && this.selectedEkran.eid) {
+            // Mevcut ekranı listeden bul ve güncelle
+            const index = this.ekranList.findIndex(e => e.eid === response.eid);
+            if (index !== -1) {
+              this.ekranList[index] = response;
+            }
+          } else {
+            // Yeni ekran eklendiğinde listeye ekle
+            this.ekranList.push(response);
+          }
+          
+          // Ağaç görünümünü güncelle
+          this.treeNodes = this.prepareTreeNodes(this.ekranList);
+          
+          // Modal kapat ve temizle
           this.ekranModalVisible = false;
           this.selectedEkran = null;
+          
+          // Sunucudan güncel listeyi al
           this.loadEkranList();
         },
         error: (err) => {
