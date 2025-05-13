@@ -42,6 +42,10 @@ export class YetkiService {
     return this.apiService.post<RolDto>(`${this.endpoint}/saveRolByRolDto`, rol);
   }
 
+saveEkran(ekran: EkranDto): Observable<EkranDto> {
+    return this.apiService.post<EkranDto>(`${this.endpoint}/saveEkranByEkranDto`, ekran);
+}
+
   /**
    * Rol siler
    * @param id Rolün encrypt edilmiş ID'si
@@ -80,6 +84,13 @@ export class YetkiService {
     };
     return this.apiService.post<boolean>(`${this.endpoint}/saveRolControllerMethodsByRolIdAndControllerMethods`, requestObj);
   }
+
+
+
+
+
+
+  
 
   /**
    * Tüm ekranları listeler

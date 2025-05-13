@@ -17,6 +17,8 @@ import { ModalComponent } from '../../core/components/modal/modal.component';
 import { ConfirmDialogComponent } from '../../core/components/confirm-dialog/confirm-dialog.component';
 import { YetkiRoutingModule } from './yetki-routing.module';
 import { YetkiComponent } from './yetki.component';
+import { EkranComponent } from './ekran/ekran.component';
+import { RolComponent } from './rol/rol.component';
 
 @NgModule({
   declarations: [],
@@ -31,7 +33,8 @@ import { YetkiComponent } from './yetki.component';
     TooltipModule,
     TreeModule,
     CheckboxModule,
-    YetkiComponent
+    YetkiComponent,
+    EkranComponent // Standalone bileşeni imports içine ekledik
   ]
 })
 export class YetkiModule { }

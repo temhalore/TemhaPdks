@@ -1,0 +1,119 @@
+<div class="ekran-container">
+  <div class="ekran-header">
+    <h1>Ekran Yönetimi</h1>
+    <button 
+      pButton 
+      type="button" 
+      label="Yeni Ekran" 
+      icon="pi pi-plus" 
+      class="p-button-sm" 
+      (click)="openAddEkranModal()">
+    </button>
+  </div>
+  
+  <div class="ekran-content" style="width: 100%;">
+    <app-data-grid
+      [data]="ekranList"
+      [columns]="columns"
+      [loading]="loading"
+      headerTitle="Ekran Listesi"
+      [responsive]="true"
+      [tableStyle]="{'width': '100%', 'min-width': '800px'}"
+      [actionButtons]="actionButtons"
+      (rowAction)="onRowAction($event)">
+      
+      <!-- Aktif/Pasif durumu için özel template -->
+      <ng-template #aktifTemplate let-rowData>
+        <span [ngClass]="rowData.aktif ? 'status-active' : 'status-inactive'">
+          {{ rowData.aktif ? 'Aktif' : 'Pasif' }}
+        </span>
+      </ng-template>
+    </app-data-grid>
+  </div>
+  
+  <!-- Ekran Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="ekranModalVisible"
+    [title]="ekranModel.eid ? 'Ekran Düzenle' : 'Yeni Ekran'"
+    [width]="'600px'"
+    (save)="saveEkran()"
+    (visibleChange)="!ekranModalVisible && onEkranModalClosed()">
+    <div class="ekran-form">
+      <app-text-input
+        title="Ekran Adı"
+        [value]="ekranModel.ekranAdi"
+        (valueChange)="ekranModel.ekranAdi = $event"
+        placeholder="Ekran adını giriniz"
+        [isRequired]="true">
+      </app-text-input>
+      
+      <app-text-input
+        title="Ekran Yolu"
+        [value]="ekranModel.ekranYolu"
+        (valueChange)="ekranModel.ekranYolu = $event"
+        placeholder="Ekran yolunu giriniz">
+      </app-text-input>
+      
+      <app-text-input
+        title="Ekran Kodu"
+        [value]="ekranModel.ekranKodu"
+        (valueChange)="ekranModel.ekranKodu = $event"
+        placeholder="Ekran kodunu giriniz">
+      </app-text-input>
+      
+      <div class="form-group">
+        <label for="ustEkran">Üst Ekran</label>
+        <app-select
+          [itemListDto$]="ustEkranListDto$"
+          [isLoading$]="loadingUstEkranlar$"
+          [selectedValue]="selectedUstEkranId"
+          placeholder="Üst ekran seçiniz"
+          (selectionChange)="onUstEkranChange($event)">
+        </app-select>
+      </div>
+      
+      <div class="form-group">
+        <label for="siraNo">Sıra No</label>
+        <p-inputNumber 
+          id="siraNo" 
+          [(ngModel)]="ekranModel.siraNo" 
+          [showButtons]="true" 
+          [min]="0" 
+          [step]="1" 
+          inputStyleClass="form-control" 
+          placeholder="Sıra numarası giriniz">
+        </p-inputNumber>
+      </div>
+      
+      <app-text-input
+        title="İkon"
+        [value]="ekranModel.ikon"
+        (valueChange)="ekranModel.ikon = $event"
+        placeholder="İkon sınıfını giriniz">
+      </app-text-input>
+      
+      <app-text-input
+        title="Açıklama"
+        [value]="ekranModel.aciklama"
+        (valueChange)="ekranModel.aciklama = $event"
+        placeholder="Açıklama giriniz">
+      </app-text-input>
+      
+      <div class="form-group">
+        <label class="checkbox-container">
+          <p-checkbox 
+            [(ngModel)]="ekranModel.aktif" 
+            [binary]="true" 
+            inputId="aktif">
+          </p-checkbox>
+          <label for="aktif" class="checkbox-label">Aktif</label>
+        </label>
+      </div>
+    </div>
+  </app-modal>
+  
+  <!-- Silme Onay Dialogu -->
+  <app-confirm-dialog 
+    (confirmed)="deleteEkran()">
+  </app-confirm-dialog>
+</div>

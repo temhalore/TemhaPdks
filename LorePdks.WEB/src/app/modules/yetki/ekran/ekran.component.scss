@@ -1,0 +1,72 @@
+.ekran-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  
+  .ekran-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+  
+  .ekran-content {
+    flex: 1;
+    overflow: auto;
+  }
+  
+  .ekran-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      
+      label {
+        font-weight: 500;
+      }
+      
+      .form-control {
+        width: 100%;
+      }
+      
+      &.checkbox-container {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        
+        .checkbox-label {
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+  
+  ::ng-deep {
+    .status-active {
+      color: #4caf50;
+      font-weight: 500;
+    }
+    
+    .status-inactive {
+      color: #f44336;
+      font-weight: 500;
+    }
+    
+    // PrimeNG InputNumber tam genişlikte olsun
+    .p-inputnumber {
+      width: 100%;
+    }
+  }
+}
