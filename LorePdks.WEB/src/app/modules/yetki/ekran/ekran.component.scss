@@ -16,11 +16,56 @@
       font-size: 24px;
       font-weight: 600;
     }
+    
+    .ekran-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      
+      .view-mode-buttons {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--surface-border, #dee2e6);
+        border-radius: 4px;
+        overflow: hidden;
+        
+        button {
+          border-radius: 0;
+          margin: 0;
+          width: 36px;
+          height: 36px;
+          
+          &.p-button-primary {
+            background-color: var(--surface-hover, #e9ecef);
+            color: var(--primary-color, #3B82F6);
+          }
+        }
+      }
+    }
   }
   
   .ekran-content {
     flex: 1;
     overflow: auto;
+    background-color: var(--surface-card, #ffffff);
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .tree-view-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--surface-border, #dee2e6);
+    
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+  }
+  
+  .tree-view-container {
+    padding: 1rem;
+    height: calc(100% - 60px);
   }
   
   .ekran-form {
@@ -52,21 +97,50 @@
       }
     }
   }
+}
+
+// Global stiller
+::ng-deep {
+  // PrimeNG InputNumber tam genişlikte olsun
+  .p-inputnumber {
+    width: 100%;
+  }
   
-  ::ng-deep {
-    .status-active {
-      color: #4caf50;
-      font-weight: 500;
-    }
-    
-    .status-inactive {
-      color: #f44336;
-      font-weight: 500;
-    }
-    
-    // PrimeNG InputNumber tam genişlikte olsun
-    .p-inputnumber {
-      width: 100%;
-    }
+  // Tree node hover durumunda işlem butonlarını göster
+  .tree-node-content:hover .tree-node-actions {
+    display: flex;
+  }
+}
+
+// Durum göstergesi stilleri
+.status-active {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background-color: rgba(38, 166, 154, 0.15);
+  color: #26a69a;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-inactive {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background-color: rgba(239, 83, 80, 0.15);
+  color: #ef5350;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+// Tree node işlem butonları
+.tree-node-actions {
+  position: absolute;
+  right: 0.5rem;
+  display: none;
+  
+  .p-button {
+    width: 2rem;
+    height: 2rem;
   }
 }

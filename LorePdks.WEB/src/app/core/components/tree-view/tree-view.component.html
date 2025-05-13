@@ -1,0 +1,62 @@
+<div class="tree-view-container">
+  <div *ngIf="loading" class="tree-loading">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>Yükleniyor...</span>
+  </div>
+  
+  <div *ngIf="!loading && (!nodes || nodes.length === 0)" class="tree-empty">
+    <span>{{ emptyMessage }}</span>
+  </div>
+  
+  <ul *ngIf="!loading && nodes && nodes.length > 0" class="tree-root">
+    <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: nodes }"></ng-container>
+  </ul>
+</div>
+
+<!-- Node template - recursive olarak ağacı oluşturur -->
+<ng-template #nodeTemplate let-nodes>
+  <li *ngFor="let node of nodes" 
+      class="tree-node"
+      [class.tree-node-selected]="node.selected"
+      [class.tree-node-selectable]="isNodeSelectable(node)">
+      
+    <div class="tree-node-content" 
+         (click)="onNodeClick($event, node)"
+         (dblclick)="onNodeDoubleClick($event, node)">
+      
+      <!-- Genişletme/daraltma ikonu -->
+      <span class="tree-node-toggle" (click)="onToggleClick($event, node)" *ngIf="!node.leaf">
+        <i class="tree-node-toggle-icon {{ getToggleIcon(node) }}"></i>
+      </span>
+      
+      <!-- Yaprak node için boşluk -->
+      <span class="tree-node-toggle-placeholder" *ngIf="node.leaf"></span>
+      
+      <!-- Node ikonu -->
+      <span class="tree-node-icon">
+        <i class="{{ getNodeIcon(node) }}"></i>
+      </span>
+        <!-- Node etiketi -->
+      <span class="tree-node-label">
+        {{ node.label || (node.data ? node.data.ekranAdi : '') }}
+      </span>
+      
+      <!-- İşlem Butonları -->
+      <div class="tree-node-actions">
+        <button *ngFor="let btn of actionButtons" 
+                pButton 
+                type="button"
+                [class]="'p-button-rounded p-button-text p-button-sm ' + (btn.class || '')"
+                [icon]="btn.icon"
+                [pTooltip]="btn.tooltip"
+                (click)="onActionButtonClick($event, node, btn.action)">
+        </button>
+      </div>
+    </div>
+    
+    <!-- Alt nodlar (recursive) -->
+    <ul *ngIf="node.children && node.children.length > 0 && node.expanded" class="tree-node-children">
+      <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: node.children }"></ng-container>
+    </ul>
+  </li>
+</ng-template>

@@ -12,6 +12,7 @@ import { DataGridComponent, ActionButtonConfig } from '../../../core/components/
 import { ModalComponent } from '../../../core/components/modal/modal.component';
 import { SelectComponent } from '../../../core/components/select/select.component';
 import { TextInputComponent } from '../../../core/components/text-input/text-input.component';
+import { TreeViewComponent, TreeNode, ActionButtonConfig as TreeActionButtonConfig } from '../../../core/components/tree-view/tree-view.component';
 import { YetkiService } from '../../../core/services/modules/yetki.service';
 import { EkranDto } from '../../../core/models/EkranDto';
 import { BehaviorSubject, Observable, finalize, of } from 'rxjs';
@@ -34,7 +35,8 @@ import { SelectInputModel } from '../../../core/components/select/select-input.m
     ModalComponent,
     ConfirmDialogComponent,
     SelectComponent,
-    TextInputComponent
+    TextInputComponent,
+    TreeViewComponent
   ]
 })
 export class EkranComponent implements OnInit {
@@ -42,8 +44,19 @@ export class EkranComponent implements OnInit {
   ekranList: EkranDto[] = [];
   loading: boolean = false;
   
-  // İşlem butonları tanımı
+  // Tree görünümü için hiyerarşik veri
+  treeNodes: TreeNode[] = [];
+  
+  // Görünüm modu
+  viewMode: 'grid' | 'tree' = 'grid';
+    // İşlem butonları tanımı
   actionButtons: ActionButtonConfig[] = [
+    { icon: 'pi pi-pencil', tooltip: 'Düzenle', action: 'edit' },
+    { icon: 'pi pi-trash', tooltip: 'Sil', action: 'delete', class: 'p-button-danger' }
+  ];
+  
+  // Tree görünümü için işlem butonları
+  treeActionButtons: TreeActionButtonConfig[] = [
     { icon: 'pi pi-pencil', tooltip: 'Düzenle', action: 'edit' },
     { icon: 'pi pi-trash', tooltip: 'Sil', action: 'delete', class: 'p-button-danger' }
   ];
@@ -80,9 +93,7 @@ export class EkranComponent implements OnInit {
   
   ngOnInit(): void {
     this.loadEkranList();
-  }
-  
-  /**
+  }  /**
    * Ekran listesini yükler
    */
   loadEkranList(): void {
@@ -92,11 +103,83 @@ export class EkranComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.ekranList = data;
+          // Ağaç görünümü için veriyi dönüştür
+          this.treeNodes = this.prepareTreeNodes(data);
         },
         error: (err) => {
           console.error('Ekran listesi yüklenirken hata oluştu:', err);
         }
       });
+  }
+  
+  /**
+   * Ağaç görünümü için veriyi hazırlar
+   * @param ekranList Ekran listesi
+   * @returns TreeNode listesi
+   */
+  prepareTreeNodes(ekranList: EkranDto[]): TreeNode[] {
+    // Tüm ekranları ID'ye göre hızlı erişim için map oluşturalım
+    const ekranMap = new Map<string, EkranDto>();
+    ekranList.forEach(ekran => {
+      ekranMap.set(ekran.eid, ekran);
+    });
+    
+    // Sonuç nodes dizisi
+    const nodes: TreeNode[] = [];
+    
+    // Kök ekranları bulalım (üst ekranı olmayanlar)
+    const rootEkranlar = ekranList.filter(e => !e.ustEkranEidDto || !e.ustEkranEidDto.eid);
+    
+    // Kök ekranlardan nodeları oluşturalım
+    rootEkranlar.forEach(rootEkran => {
+      const node = this.createTreeNode(rootEkran, ekranList, ekranMap);
+      nodes.push(node);
+    });
+    
+    return nodes;
+  }
+  
+  /**
+   * Bir ekran için TreeNode oluşturur
+   * @param ekran Ekran verisi
+   * @param ekranList Tüm ekranların listesi
+   * @param ekranMap Ekran ID'ye göre map
+   * @returns TreeNode
+   */
+  createTreeNode(ekran: EkranDto, ekranList: EkranDto[], ekranMap: Map<string, EkranDto>): TreeNode {
+    // Alt ekranları bulalım
+    const childEkranlar = ekranList.filter(e => 
+      e.ustEkranEidDto && 
+      e.ustEkranEidDto.eid === ekran.eid
+    );
+    
+    // TreeNode nesnesi oluştur
+    const node: TreeNode = {
+      data: ekran,
+      id: ekran.eid,
+      label: ekran.ekranAdi,
+      icon: ekran.ikon || 'pi pi-folder',
+      selectable: true,
+      expanded: false,
+      children: []
+    };
+    
+    // Alt ekranları recursive olarak ekleyelim
+    if (childEkranlar.length > 0) {
+      childEkranlar.forEach(childEkran => {
+        const childNode = this.createTreeNode(childEkran, ekranList, ekranMap);
+        node.children!.push(childNode);
+      });
+      
+      // Alt öğesi varsa yaprak değildir
+      node.leaf = false;
+    } else {
+      // Alt öğesi yoksa yapraktır
+      node.leaf = true;
+      node.icon = 'pi pi-file';
+    }
+    
+    return node;
   }
     /**
    * Yeni ekran ekleme modalını açar
@@ -261,18 +344,56 @@ export class EkranComponent implements OnInit {
       console.log('Üst ekran seçimi temizlendi');
     }
   }
-  
-  /**
+    /**
    * DataGrid'den gelen satır aksiyonlarını işler
    * @param event Aksiyon olayı
-   */
-  onRowAction(event: { action: string, data: any }): void {
+   */  onRowAction(event: { action: string, data: any }): void {
     switch (event.action) {
       case 'edit':
         this.openEditEkranModal(event.data);
         break;
       case 'delete':
         this.confirmDeleteEkran(event.data);
+        break;
+    }
+  }
+  
+  /**
+   * Görünüm modunu değiştirir (ağaç/tablo)
+   * @param mode Görünüm modu
+   */
+  switchViewMode(mode: 'grid' | 'tree'): void {
+    this.viewMode = mode;
+  }
+    /**
+   * Ağaç görünümünde node seçimi olayını işler
+   * @param node Seçilen node
+   */
+  onTreeNodeSelect(node: TreeNode): void {
+    this.selectedEkran = node.data;
+  }
+  
+  /**
+   * Ağaç görünümünde node üzerinde çift tıklama olayını işler
+   * @param event Node çift tıklama olayı
+   */
+  onTreeNodeDoubleClick(event: {originalEvent: MouseEvent, node: TreeNode}): void {
+    this.openEditEkranModal(event.node.data);
+  }
+  
+  /**
+   * Ağaç görünümünde node işlem butonlarına tıklama olayını işler
+   * @param event Node aksiyon olayı
+   */
+  onTreeNodeAction(event: {action: string, node: TreeNode}): void {
+    const { action, node } = event;
+    
+    switch (action) {
+      case 'edit':
+        this.openEditEkranModal(node.data);
+        break;
+      case 'delete':
+        this.confirmDeleteEkran(node.data);
         break;
     }
   }

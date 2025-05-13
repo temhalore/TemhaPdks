@@ -1,17 +1,41 @@
 <div class="ekran-container">
   <div class="ekran-header">
     <h1>Ekran Yönetimi</h1>
-    <button 
-      pButton 
-      type="button" 
-      label="Yeni Ekran" 
-      icon="pi pi-plus" 
-      class="p-button-sm" 
-      (click)="openAddEkranModal()">
-    </button>
+    <div class="ekran-header-actions">
+      <!-- Görünüm modu seçim butonları -->
+      <div class="view-mode-buttons">
+        <button 
+          pButton 
+          type="button" 
+          icon="pi pi-list" 
+          class="p-button-sm p-button-text" 
+          [class.p-button-primary]="viewMode === 'grid'"
+          title="Tablo Görünümü"
+          (click)="switchViewMode('grid')">
+        </button>
+        <button 
+          pButton 
+          type="button" 
+          icon="pi pi-sitemap" 
+          class="p-button-sm p-button-text" 
+          [class.p-button-primary]="viewMode === 'tree'"
+          title="Ağaç Görünümü"
+          (click)="switchViewMode('tree')">
+        </button>
+      </div>
+      <button 
+        pButton 
+        type="button" 
+        label="Yeni Ekran" 
+        icon="pi pi-plus" 
+        class="p-button-sm" 
+        (click)="openAddEkranModal()">
+      </button>
+    </div>
   </div>
   
-  <div class="ekran-content" style="width: 100%;">
+  <!-- Tablo görünümü -->
+  <div class="ekran-content" *ngIf="viewMode === 'grid'" style="width: 100%;">
     <app-data-grid
       [data]="ekranList"
       [columns]="columns"
@@ -29,6 +53,24 @@
         </span>
       </ng-template>
     </app-data-grid>
+  </div>
+  
+  <!-- Ağaç görünümü -->
+  <div class="ekran-content" *ngIf="viewMode === 'tree'" style="width: 100%;">
+    <div class="tree-view-header">
+      <h3>Ekran Hiyerarşisi</h3>
+    </div>    <div class="tree-view-container">
+      <app-tree-view
+        [nodes]="treeNodes"
+        [loading]="loading"
+        [selectionMode]="'single'"
+        [emptyMessage]="'Ekran bulunamadı'"
+        [actionButtons]="treeActionButtons"
+        (nodeSelect)="onTreeNodeSelect($event)"
+        (nodeDoubleClick)="onTreeNodeDoubleClick($event)"
+        (nodeAction)="onTreeNodeAction($event)">
+      </app-tree-view>
+    </div>
   </div>
   
   <!-- Ekran Ekleme/Düzenleme Modalı -->
@@ -94,29 +136,25 @@
         (valueChange)="ekranModel.ikon = $event"
         placeholder="İkon sınıfını giriniz">
       </app-text-input>
-      
-      <app-text-input
+        <app-text-input
         title="Açıklama"
         [value]="ekranModel.aciklama"
         (valueChange)="ekranModel.aciklama = $event"
         placeholder="Açıklama giriniz">
       </app-text-input>
       
-      <div class="form-group">
-        <label class="checkbox-container">
-          <p-checkbox 
-            [(ngModel)]="ekranModel.aktif" 
-            [binary]="true" 
-            inputId="aktif">
-          </p-checkbox>
-          <label for="aktif" class="checkbox-label">Aktif</label>
-        </label>
+      <div class="form-group checkbox-container">
+        <p-checkbox 
+          [(ngModel)]="ekranModel.aktif" 
+          [binary]="true" 
+          inputId="aktif">
+        </p-checkbox>
+        <label for="aktif" class="checkbox-label">Aktif</label>
       </div>
     </div>
   </app-modal>
-  
-  <!-- Silme Onay Dialogu -->
+    <!-- Silme Onay Dialogu -->
   <app-confirm-dialog 
-    (confirmed)="deleteEkran()">
+    (onConfirm)="deleteEkran()">
   </app-confirm-dialog>
 </div>

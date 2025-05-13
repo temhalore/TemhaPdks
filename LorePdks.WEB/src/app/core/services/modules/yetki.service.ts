@@ -50,6 +50,9 @@ export class YetkiService {
     return this.apiService.post<boolean>(`${this.endpoint}/deleteRolByEIdDto`, { eid });
   }
 
+
+
+
   /**
    * Tüm controller ve metotları listeler
    * @returns Observable<ControllerAndMethodsModel[]>
@@ -138,5 +141,10 @@ export class YetkiService {
    */
   saveEkran(ekran: EkranDto): Observable<EkranDto> {
     return this.apiService.post<EkranDto>(`${this.endpoint}/saveEkranByEkranDto`, ekran);
+  }
+
+      deleteEkran
+(eid: string): Observable<boolean> {
+    return this.apiService.post<boolean>(`${this.endpoint}/deleteEkranByEkranDto`, { eid });
   }
 }
