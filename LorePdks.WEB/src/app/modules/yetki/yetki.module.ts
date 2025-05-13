@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { RolComponent } from './rol/rol.component';
-
 // PrimeNG Modülleri
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -33,8 +31,7 @@ import { YetkiComponent } from './yetki.component';
     TooltipModule,
     TreeModule,
     CheckboxModule,
-    YetkiComponent,
-    RolComponent
+    YetkiComponent
   ]
 })
 export class YetkiModule { }

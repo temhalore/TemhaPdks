@@ -1,0 +1,37 @@
+<div class="checkbox-container" [ngClass]="{'label-left': labelPosition === 'left'}">
+  <!-- Label sol tarafta olacaksa -->
+  <label 
+    *ngIf="label && labelPosition === 'left'" 
+    [for]="inputId" 
+    class="checkbox-label"
+    [class.disabled]="disabled">
+    {{ label }}
+    <span *ngIf="required" class="required-star">*</span>
+  </label>
+  
+  <!-- Checkbox -->
+  <p-checkbox
+    [binary]="binary"
+    [name]="name"
+    [value]="value"
+    [disabled]="disabled"
+    [readonly]="readonly"
+    [required]="required"
+    [tabindex]="tabindex"
+    [inputId]="inputId"
+    [ariaLabelledBy]="ariaLabelledBy"
+    [ngModel]="checked"
+    (onChange)="onModelChange($event)"
+    [styleClass]="styleClass">
+  </p-checkbox>
+  
+  <!-- Label sağ tarafta olacaksa -->
+  <label 
+    *ngIf="label && labelPosition === 'right'" 
+    [for]="inputId" 
+    class="checkbox-label"
+    [class.disabled]="disabled">
+    {{ label }}
+    <span *ngIf="required" class="required-star">*</span>
+  </label>
+</div>
