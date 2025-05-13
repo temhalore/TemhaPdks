@@ -374,8 +374,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             route: '/secure/pdks/izinler',
             routerLink: ['/secure/pdks/izinler']
           }
-        ]
-      },      {
+        ]      },      {
         label: 'Yetki Yönetimi',
         icon: 'pi pi-shield',
         children: [
@@ -384,12 +383,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
             icon: 'pi pi-users',
             route: '/secure/yetki/rol',
             routerLink: ['/secure/yetki/rol']
-          },
-          {
+          },          {
             label: 'Ekran Yönetimi',
             icon: 'pi pi-desktop',
             route: '/secure/yetki/ekran',
             routerLink: ['/secure/yetki/ekran']
+          }
+        ]
+      },      {
+        label: 'Kişi Yönetimi',
+        icon: 'pi pi-user',
+        children: [
+          {
+            label: 'Kişi Listesi',
+            icon: 'pi pi-list',
+            route: '/secure/kisi/liste',
+            routerLink: ['/secure/kisi/liste']
           }
         ]
       },

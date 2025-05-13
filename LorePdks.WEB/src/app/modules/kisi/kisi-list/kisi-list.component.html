@@ -1,0 +1,81 @@
+<div class="kisi-list-container">
+  <div class="header-section">
+    <div class="title-container">
+      <h2>Kişi Yönetimi</h2>
+      <p>Sistem kullanıcılarını yönetebilirsiniz</p>
+    </div>
+    <div class="actions-container">
+      <div class="search-box">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText placeholder="Ara..." (input)="searchKisi($event)" />
+        </span>
+      </div>
+      <button pButton icon="pi pi-plus" label="Yeni Kişi" class="p-button-success" (click)="openAddKisiModal()"></button>
+    </div>
+  </div>
+  <div class="content-section">
+    <app-data-grid 
+      [columns]="columns" 
+      [data]="kisiList" 
+      [loading]="loading"
+      [actionButtons]="actionButtons"
+      (rowAction)="onActionClick($event)"
+      [paginator]="true" 
+      [rows]="10" 
+      [rowsPerPageOptions]="[5, 10, 25, 50]">
+    </app-data-grid>
+  </div>
+  <!-- Kişi Ekleme/Düzenleme Modal -->
+  <app-modal 
+    [(visible)]="kisiModalVisible" 
+    [title]="selectedKisi ? 'Kişi Düzenle' : 'Yeni Kişi Ekle'" 
+    [width]="'600px'"
+    (visibleChange)="closeKisiModal()">
+    
+    <div class="form-container">
+      <div class="form-group">
+        <label for="ad">Ad</label>
+        <input id="ad" type="text" pInputText [(ngModel)]="kisiModel.ad" placeholder="Ad" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="soyad">Soyad</label>
+        <input id="soyad" type="text" pInputText [(ngModel)]="kisiModel.soyad" placeholder="Soyad" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="tc">TC Kimlik No</label>
+        <input id="tc" type="text" pInputText [(ngModel)]="kisiModel.tc" placeholder="TC Kimlik No" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="cepTel">Telefon</label>
+        <input id="cepTel" type="text" pInputText [(ngModel)]="kisiModel.cepTel" placeholder="Telefon" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="email">E-posta</label>
+        <input id="email" type="email" pInputText [(ngModel)]="kisiModel.email" placeholder="E-posta" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="loginName">Kullanıcı Adı</label>
+        <input id="loginName" type="text" pInputText [(ngModel)]="kisiModel.loginName" placeholder="Kullanıcı Adı" class="form-control">
+      </div>
+      
+      <div class="form-group" *ngIf="!selectedKisi">
+        <label for="sifre">Şifre</label>
+        <input id="sifre" type="password" pInputText [(ngModel)]="kisiModel.sifre" placeholder="Şifre" class="form-control">
+      </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <button pButton label="İptal" icon="pi pi-times" class="p-button-outlined p-button-secondary" (click)="closeKisiModal()"></button>
+      <button pButton label="Kaydet" icon="pi pi-save" class="p-button-success" (click)="saveKisi()"></button>
+    </ng-template>
+  </app-modal>
+  
+  <!-- Silme Onayı Dialog -->
+  <app-confirm-dialog></app-confirm-dialog>
+</div>
