@@ -85,9 +85,9 @@
     [height]="'600px'"
     (save)="saveControllerMethods()"
     (visibleChange)="!controllerModalVisible && onControllerModalClosed()">
-    <div class="controller-form" *ngIf="!loadingControllers">
-      <div class="controller-list">
-        <div class="controller-item" *ngFor="let controller of controllerMethods">          <div class="controller-header">
+    <div class="controller-form" *ngIf="!loadingControllers">      <div class="controller-list">
+        <div class="controller-item" *ngFor="let controller of controllerMethods">
+          <div class="controller-header">
             <p-checkbox 
               [binary]="true" 
               [ngModel]="isControllerSelected(controller.controllerName)" 
@@ -96,14 +96,16 @@
             <span class="controller-name">{{ controller.controllerName }}</span>
           </div>
           
-          <div class="method-list">
-            <div class="method-item" *ngFor="let method of controller.methods">
-              <p-checkbox 
-                [binary]="true"
-                [ngModel]="isMethodSelected(controller.controllerName, method)" 
-                (onChange)="onMethodSelectionChange(controller.controllerName, method, $event)">
-              </p-checkbox>
-              <span class="method-name">{{ method }}</span>
+          <div class="method-list-container">
+            <div class="method-list">
+              <div class="method-item" *ngFor="let method of controller.methods">
+                <p-checkbox 
+                  [binary]="true"
+                  [ngModel]="isMethodSelected(controller.controllerName, method)" 
+                  (onChange)="onMethodSelectionChange(controller.controllerName, method, $event)">
+                </p-checkbox>
+                <span class="method-name">{{ method }}</span>
+              </div>
             </div>
           </div>
         </div>
