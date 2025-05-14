@@ -40,6 +40,12 @@ export class KodService {
     return this.apiService.post<KodDto[]>(`${this.endpoint}/getKodDtoListByKodTipId`, request);
   }
 
+    getKodDtoListAll(): Observable<KodDto[]> {
+    return this.apiService.post<KodDto[]>(`${this.endpoint}/getKodDtoListAll`, {});
+  }
+
+  
+
   /**
    * Kod cache'ini yeniler
    * @returns Observable<string>

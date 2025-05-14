@@ -59,6 +59,21 @@ namespace LorePdks.API.Controllers.Kod
         }
 
         /// <summary>
+        /// Tip ID'ye göre kod listesini getirir
+        /// </summary>
+        [HttpPost]
+        [Route("getKodDtoListAll")]
+        public IActionResult getKodDtoListAll()
+        {
+            var response = new ServiceResponse<List<KodDTO>>();
+            var dto = _kodManager.allKodDtoList();
+            response.data = dto;
+            return Ok(response);
+        }
+
+        
+
+        /// <summary>
         /// Kod cache'ini yeniler
         /// </summary>
         [HttpPost]

@@ -10,6 +10,8 @@ namespace LorePdks.BAL.Managers.Common.Kod.Interfaces
         KodDTO GetKodDtoByKodId(int kodId);
         KodDTO saveKod(KodDTO kodDTO);
 
+        public List<KodDTO> allKodDtoList(bool cacheYenilensinMi = false);
+
         /// <summary>
         /// gelen KodDTO tipindeki değer null ve id sinin 0 dan büyük olması kontrol edilir
         /// ayrıca gelen data genel kod tablosunda varmı diye kontrol edilir 
