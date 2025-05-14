@@ -579,8 +579,7 @@ export class RolComponent implements OnInit {
     this.loadRoleKisiler(rol.eid);
     
     this.kisiModalVisible = true;
-  }
-  /**
+  }  /**
    * Role ait kişileri yükler
    * @param rolId Rol ID
    */
@@ -588,68 +587,41 @@ export class RolComponent implements OnInit {
     this.loadingKisiler = true;
     this.roleKisiList = [];
     
-    // Önce tüm kişileri çekelim (bu, arama özelliği için gerekli)
-    this.kisiService.getAllKisiList()
+    // Önce cache kontrolü yap
+    if (this.rolIdKisiMap.has(rolId)) {
+      this.roleKisiList = this.rolIdKisiMap.get(rolId) || [];
+      this.loadingKisiler = false;
+      return;
+    }
+    
+    // Backend'den rol id'ye göre doğrudan kişileri getir
+    this.yetkiService.getKisisByRolId(rolId)
+      .pipe(finalize(() => this.loadingKisiler = false))
       .subscribe({
-        next: (allKisiList) => {
-          // Tüm kişileri saklayalım (arama için)
-          this.kisiList = allKisiList;
+        next: (kisiList) => {
+          // Kişileri sakla
+          this.roleKisiList = kisiList;
           
-          // Şimdi bu role atanmış kişileri belirlemek için bir yaklaşım uygulayalım
-          // İdeal çözüm: Backend'de "Role göre kişi getir" endpointi olmalı
+          // Önbelleğe al
+          this.rolIdKisiMap.set(rolId, kisiList);
           
-          // Mevcut yapıda, her kişi için rol bilgilerini çekmemiz gerekiyor
-          // Not: Bu yaklaşım performans açısından optimal değil, ancak mevcut API ile çalışabiliriz
-          
-          // Rol bazlı kişi listesini zaten çektiysek, önbellekten alalım
-          if (this.rolIdKisiMap.has(rolId)) {
-            this.roleKisiList = this.rolIdKisiMap.get(rolId) || [];
-            this.loadingKisiler = false;
-            return;
+          // Tüm kişi listesini daha sonra kullanmak için sakla
+          if (this.kisiList.length === 0) {
+            // Tüm kişileri çek (arama için kullanılacak)
+            this.kisiService.getAllKisiList()
+              .subscribe({
+                next: (allKisiList) => {
+                  this.kisiList = allKisiList;
+                },
+                error: (err) => {
+                  console.error('Tüm kişiler yüklenirken hata oluştu:', err);
+                }
+              });
           }
-          
-          // Her kişi için roller bilgisini çekmek yerine (ki bu çok sayıda API isteği üretecektir),
-          // rolün kendisinden kişilere ulaşmaya çalışalım
-          
-          // İlk yaklaşım: Tüm kişilerin rol bilgilerini çekip filtreleme
-          const fetchPromises = allKisiList.map(kisi => {
-            return new Promise<{kisi: KisiDto, hasRole: boolean}>((resolve) => {
-              this.yetkiService.getRolsByKisiId(kisi.eid)
-                .subscribe({
-                  next: (roles) => {
-                    // Bu kişinin rolleri arasında mevcut rol var mı kontrol et
-                    const hasRole = roles.some(role => role.eid === rolId);
-                    resolve({kisi, hasRole});
-                  },
-                  error: () => {
-                    // Hata durumunda bu kişiyi role sahip değil olarak işaretle
-                    resolve({kisi, hasRole: false});
-                  }
-                });
-            });
-          });
-          
-          // Tüm kişiler için rol kontrolünü tamamlayınca
-          Promise.all(fetchPromises)
-            .then(results => {
-              // Role sahip kişileri filtrele
-              const kisiListWithRole = results
-                .filter(result => result.hasRole)
-                .map(result => result.kisi);
-              
-              // Sonucu sakla
-              this.roleKisiList = kisiListWithRole;
-              
-              // Önbelleğe al (daha sonra hızlı erişim için)
-              this.rolIdKisiMap.set(rolId, kisiListWithRole);
-            })
-            .finally(() => {
-              this.loadingKisiler = false;
-            });
         },
         error: (err) => {
-          this.loadingKisiler = false;
-          console.error('Kişiler yüklenirken hata oluştu:', err);
+          console.error('Role ait kişiler yüklenirken hata oluştu:', err);
+          this.roleKisiList = [];
         }
       });
   }

@@ -8,6 +8,7 @@ using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
 using LorePdks.COMMON.DTO.Auth;
 using LorePdks.COMMON.DTO.Base;
 using LorePdks.COMMON.DTO.Firma;
+using LorePdks.COMMON.DTO.Kisi;
 using LorePdks.COMMON.DTO.Yetki;
 using LorePdks.COMMON.DTO.Yetki.Ekran;
 using LorePdks.COMMON.DTO.Yetki.Rol;
@@ -225,6 +226,16 @@ namespace LorePdks.API.Controllers.Yetki
             var response = new ServiceResponse<bool>();
             var success = _rolManager.removeRolFromKisi(request.kisiEidDto.id, request.rolEidDto.id);
             response.data = success;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("getKisiDtoListByRolIdDto")]
+        public IActionResult getKisiDtoListByRolIdDto(EIdDTO request)
+        {
+            var response = new ServiceResponse<List<KisiDTO>>();
+            var dto = _rolManager.getKisiDtoListByRolId(request.id);
+            response.data = dto;
             return Ok(response);
         }
 

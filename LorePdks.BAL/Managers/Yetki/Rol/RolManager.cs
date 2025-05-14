@@ -8,6 +8,7 @@ using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using System.Threading.Tasks;
 using LorePdks.BAL.Managers.Kisi.Interfaces;
+using LorePdks.COMMON.DTO.Kisi;
 using LorePdks.COMMON.DTO.Yetki.Ekran;
 using LorePdks.COMMON.DTO.Yetki.Rol;
 using LorePdks.BAL.Managers.Yetki.Rol.Interfaces;
@@ -344,6 +345,48 @@ namespace LorePdks.BAL.Managers.Yetki.Rol
                     return false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Rol ID'ye göre kişileri getirir
+        /// </summary>
+        /// <param name="rolId">Rol ID</param>
+        /// <param name="isYoksaHataDondur">Sonuç bulunamazsa hata döndürülsün mü</param>
+        /// <returns>KisiDTO listesi</returns>
+        /// <exception cref="AppException"></exception>
+        public List<KisiDTO> getKisiDtoListByRolId(int rolId, bool isYoksaHataDondur = false)
+        {
+            // Rol ID'ye göre kişi-rol ilişkilerini çek
+            var kisiRoller = _repoKisiRol.GetList("ROL_ID=@rolId AND ISDELETED=0", new { rolId });
+
+            if (isYoksaHataDondur && (kisiRoller == null || !kisiRoller.Any()))
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"{rolId} id'li role ait kişi bulunamadı");
+            }
+
+            List<KisiDTO> kisiListesi = new List<KisiDTO>();
+            
+            // Her bir kişi-rol ilişkisi için KisiDTO doldur
+            foreach (var kisiRol in kisiRoller)
+            {
+                try
+                {
+                    // Kişi ID'sine göre Kişi detaylarını getir
+                    var kisiDto = _kisiManager.getKisiDtoById(kisiRol.KISI_ID, false);
+                    
+                    if (kisiDto != null)
+                    {
+                        kisiListesi.Add(kisiDto);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Kişi bulunamazsa hata yönetimi (sessizce geç)
+                    continue;
+                }
+            }
+
+            return kisiListesi;
         }
     }
 }

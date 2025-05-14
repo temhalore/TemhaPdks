@@ -1,5 +1,7 @@
+using LorePdks.COMMON.DTO.Kisi;
 using LorePdks.COMMON.DTO.Yetki;
 using LorePdks.COMMON.DTO.Yetki.Rol;
+using LorePdks.COMMON.DTO.Kisi;
 
 namespace LorePdks.BAL.Managers.Yetki.Rol.Interfaces
 {
@@ -8,6 +10,7 @@ namespace LorePdks.BAL.Managers.Yetki.Rol.Interfaces
         List<RolDTO> getRolDtoList(bool isYoksaHataDondur = false);
         RolDTO getRolDtoById(int rolId, bool isYoksaHataDondur = false);
         List<RolDTO> getRolDtoListByKisiId(int kisiId, bool isYoksaHataDondur = false);
+        List<KisiDTO> getKisiDtoListByRolId(int rolId, bool isYoksaHataDondur = false);
         RolDTO saveRol(RolDTO rolDTO);
         void deleteRolByRolId(int rolId);
         bool addEkranToRol(int rolId, int ekranId);

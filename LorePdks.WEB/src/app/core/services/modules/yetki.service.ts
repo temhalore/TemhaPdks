@@ -7,6 +7,7 @@ import { RolControllerMethodDto } from '../../models/RolControllerMethodDto';
 import { RolControllerMethodsRequestDto } from '../../models/RolControllerMethodsRequestDto';
 import { EkranDto } from '../../models/EkranDto';
 import { KisiRolDto } from '../../models/KisiRolDto';
+import { KisiDto } from '../../models/KisiDto';
 
 
 @Injectable({
@@ -188,5 +189,14 @@ export class YetkiService {
       rolEidDto: { eid: rolId }
     };
     return this.apiService.post<boolean>(`${this.endpoint}/removeRolFromKisiByKisiRolDto`, request);
+  }
+
+  /**
+   * Role ait kişileri getirir
+   * @param rolId Rolün encrypt edilmiş ID'si
+   * @returns Observable<KisiDto[]>
+   */
+  getKisisByRolId(rolId: string): Observable<KisiDto[]> {
+    return this.apiService.post<KisiDto[]>(`${this.endpoint}/getKisiDtoListByRolIdDto`, { eid: rolId });
   }
 }
