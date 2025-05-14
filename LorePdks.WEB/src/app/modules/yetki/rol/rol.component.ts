@@ -605,19 +605,8 @@ export class RolComponent implements OnInit {
           // Önbelleğe al
           this.rolIdKisiMap.set(rolId, kisiList);
           
-          // Tüm kişi listesini daha sonra kullanmak için sakla
-          if (this.kisiList.length === 0) {
-            // Tüm kişileri çek (arama için kullanılacak)
-            this.kisiService.getAllKisiList()
-              .subscribe({
-                next: (allKisiList) => {
-                  this.kisiList = allKisiList;
-                },
-                error: (err) => {
-                  console.error('Tüm kişiler yüklenirken hata oluştu:', err);
-                }
-              });
-          }
+          // Not: Tüm kişileri önceden yüklemek yerine, 
+          // sadece arama yapıldığında ilgili kişileri getiriyoruz (searchKisi metodunda)
         },
         error: (err) => {
           console.error('Role ait kişiler yüklenirken hata oluştu:', err);
@@ -625,7 +614,7 @@ export class RolComponent implements OnInit {
         }
       });
   }
-    /**
+  /**
    * Kişi arama işlemini gerçekleştirir
    * @param query Arama metni
    */
@@ -635,13 +624,7 @@ export class RolComponent implements OnInit {
       return;
     }
     
-    // Önce cache kontrol et, zaten tüm kişiler yüklendiyse onlar üzerinde arama yap
-    if (this.kisiList.length > 0) {
-      this.performLocalSearch(query);
-      return;
-    }
-    
-    // Eğer kişi listesi henüz yüklenmediyse API'den ara
+    // API'den doğrudan arama yap
     this.kisiService.getKisiListByAramaText(query)
       .subscribe({
         next: (data) => {
@@ -655,29 +638,6 @@ export class RolComponent implements OnInit {
           this.filteredKisiList = [];
         }
       });
-  }
-  
-  /**
-   * Yerel kişi listesi üzerinde arama yapar
-   * @param query Arama metni
-   */
-  private performLocalSearch(query: string): void {
-    const normalizedQuery = query.toLowerCase().trim();
-    
-    this.filteredKisiList = this.kisiList.filter(kisi => {
-      // Zaten role eklenmiş kişileri listeden çıkar
-      const alreadyInRole = this.roleKisiList.some(rk => rk.eid === kisi.eid);
-      if (alreadyInRole) return false;
-      
-      // Ad, soyad, TC veya email üzerinde arama yap
-      const fullName = `${kisi.ad} ${kisi.soyad}`.toLowerCase();
-      const tc = kisi.tc?.toLowerCase() || '';
-      const email = kisi.email?.toLowerCase() || '';
-      
-      return fullName.includes(normalizedQuery) || 
-             tc.includes(normalizedQuery) || 
-             email.includes(normalizedQuery);
-    });
   }
   /**
    * Role kişi ekler

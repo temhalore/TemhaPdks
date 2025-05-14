@@ -5,8 +5,7 @@
   </label>
 
   <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
-    <div class="p-autocomplete-container">
-      <p-autoComplete
+    <div class="p-autocomplete-container">      <p-autoComplete
         [id]="'autocomplete-' + title"
         [(ngModel)]="selectedItem"
         [suggestions]="filteredSuggestions"
@@ -20,6 +19,9 @@
         (onSelect)="onSelect($event)"
         (onClear)="onClear()"
         styleClass="w-100">
+        <ng-template let-item pTemplate="selectedItem">
+          <div>{{ getDisplayText(item) }}</div>
+        </ng-template>
       </p-autoComplete>
     </div>
   </ng-container>
