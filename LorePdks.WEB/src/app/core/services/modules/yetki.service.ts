@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ApiService } from '../api.service';
 import { RolDto } from '../../models/RolDto';
 import { ControllerAndMethodsDTO } from '../../models/ControllerAndMethodsDTO';
@@ -162,7 +162,6 @@ export class YetkiService {
   getRolsByKisiId(kisiId: string): Observable<RolDto[]> {
     return this.apiService.post<RolDto[]>(`${this.endpoint}/getRolDtoListByKisiIdDto`, { eid: kisiId });
   }
-
   /**
    * Kişiye rol ekler
    * @param kisiId Kişinin encrypt edilmiş ID'si
@@ -170,10 +169,18 @@ export class YetkiService {
    * @returns Observable<boolean>
    */
   addRolToKisi(kisiId: string, rolId: string): Observable<boolean> {
+    console.log('YetkiService - addRolToKisi çağrıldı:');
+    console.log('  - kisiId:', kisiId);
+    console.log('  - rolId:', rolId);
+    
     const request = {
       kisiEidDto: { eid: kisiId },
       rolEidDto: { eid: rolId }
     };
+    
+    console.log('YetkiService - API isteği:', JSON.stringify(request));
+    console.log('YetkiService - API endpoint:', `${this.endpoint}/addRolToKisiByKisiRolDto`);
+    
     return this.apiService.post<boolean>(`${this.endpoint}/addRolToKisiByKisiRolDto`, request);
   }
 
@@ -190,13 +197,21 @@ export class YetkiService {
     };
     return this.apiService.post<boolean>(`${this.endpoint}/removeRolFromKisiByKisiRolDto`, request);
   }
-
   /**
    * Role ait kişileri getirir
    * @param rolId Rolün encrypt edilmiş ID'si
    * @returns Observable<KisiDto[]>
    */
   getKisisByRolId(rolId: string): Observable<KisiDto[]> {
-    return this.apiService.post<KisiDto[]>(`${this.endpoint}/getKisiDtoListByRolIdDto`, { eid: rolId });
+    console.log('YetkiService - getKisisByRolId çağrıldı. rolId:', rolId);
+    return this.apiService.post<KisiDto[]>(`${this.endpoint}/getKisiDtoListByRolIdDto`, { eid: rolId })
+      .pipe(
+        tap(kisiler => {
+          console.log('YetkiService - Role ait kişiler alındı. Kişi sayısı:', kisiler.length);
+          if (kisiler.length > 0) {
+            console.log('YetkiService - İlk kişi örneği:', JSON.stringify(kisiler[0]));
+          }
+        })
+      );
   }
 }

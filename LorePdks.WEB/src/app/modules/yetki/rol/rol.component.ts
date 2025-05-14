@@ -584,89 +584,156 @@ export class RolComponent implements OnInit {
    * @param rolId Rol ID
    */
   loadRoleKisiler(rolId: string): void {
+    console.log('RolComponent - loadRoleKisiler çağrıldı. rolId:', rolId);
     this.loadingKisiler = true;
     this.roleKisiList = [];
     
     // Önce cache kontrolü yap
     if (this.rolIdKisiMap.has(rolId)) {
+      console.log('RolComponent - Cache\'de rol kişileri bulundu');
       this.roleKisiList = this.rolIdKisiMap.get(rolId) || [];
       this.loadingKisiler = false;
+      console.log('RolComponent - Cache\'den yüklenen kişi sayısı:', this.roleKisiList.length);
       return;
     }
     
     // Backend'den rol id'ye göre doğrudan kişileri getir
+    console.log('RolComponent - Backend\'e kişiler için istek yapılıyor...');
     this.yetkiService.getKisisByRolId(rolId)
-      .pipe(finalize(() => this.loadingKisiler = false))
+      .pipe(finalize(() => {
+        this.loadingKisiler = false;
+        console.log('RolComponent - Kişi yükleme işlemi tamamlandı');
+      }))
       .subscribe({
         next: (kisiList) => {
+          console.log('RolComponent - Backend\'den kişiler alındı. Kişi sayısı:', kisiList.length);
+          
           // Kişileri sakla
           this.roleKisiList = kisiList;
           
           // Önbelleğe al
           this.rolIdKisiMap.set(rolId, kisiList);
           
-          // Not: Tüm kişileri önceden yüklemek yerine, 
-          // sadece arama yapıldığında ilgili kişileri getiriyoruz (searchKisi metodunda)
+          if (kisiList.length > 0) {
+            console.log('RolComponent - Alınan ilk kişi örneği:', 
+              JSON.stringify({
+                eid: kisiList[0].eid,
+                ad: kisiList[0].ad,
+                soyad: kisiList[0].soyad
+              })
+            );
+          }
         },
         error: (err) => {
-          console.error('Role ait kişiler yüklenirken hata oluştu:', err);
+          console.error('RolComponent - Role ait kişiler yüklenirken hata oluştu:', err);
           this.roleKisiList = [];
         }
       });
-  }
-  /**
+  }/**
    * Kişi arama işlemini gerçekleştirir
    * @param query Arama metni
    */
   searchKisi(query: string): void {
+    console.log('RolComponent - searchKisi çağrıldı. Arama metni:', query);
+    
     if (!query || query.length < 2) {
+      console.log('RolComponent - Arama metni çok kısa, filtreleme yapılmadı');
       this.filteredKisiList = [];
       return;
     }
     
     // API'den doğrudan arama yap
+    console.log('RolComponent - API arama isteği yapılıyor...', query);
     this.kisiService.getKisiListByAramaText(query)
       .subscribe({
         next: (data) => {
-          // Role ait olmayan kişileri filtrele
-          this.filteredKisiList = data.filter(k => 
-            !this.roleKisiList.some(rk => rk.eid === k.eid)
-          );
+          console.log('RolComponent - API yanıtı alındı. Gelen kişi sayısı:', data.length);
+          
+          if (data.length > 0) {
+            console.log('RolComponent - Gelen ilk kişi örneği:', JSON.stringify(data[0]));
+          } else {
+            console.log('RolComponent - API yanıtında hiç kişi yok!');
+          }
+          
+          // Role ait olmayan kişileri filtrele (eğer rol seçilmişse)
+          if (this.selectedRol && this.roleKisiList.length > 0) {
+            const filteredData = data.filter(k => 
+              !this.roleKisiList.some(rk => rk.eid === k.eid)
+            );
+            console.log('RolComponent - Rol filtresi sonrası kişi sayısı:', filteredData.length);
+            this.filteredKisiList = filteredData;
+          } else {
+            // Rolde kişi yoksa veya rol seçilmemişse tüm sonuçları göster
+            this.filteredKisiList = [...data];
+          }
+          
+          console.log('RolComponent - filteredKisiList güncellemesi yapıldı. Kişi sayısı:', this.filteredKisiList.length);
         },
         error: (err) => {
-          console.error('Kişi araması yapılırken hata oluştu:', err);
+          console.error('RolComponent - Kişi araması yapılırken hata oluştu:', err);
           this.filteredKisiList = [];
         }
       });
-  }
-  /**
+  }  /**
    * Role kişi ekler
    */
   addKisiToRol(): void {
-    if (!this.selectedRol || !this.selectedKisi) return;
+    console.log('RolComponent - addKisiToRol çağrıldı');
+    console.log('RolComponent - selectedRol:', this.selectedRol);
+    console.log('RolComponent - selectedKisi:', this.selectedKisi);
+    
+    if (!this.selectedRol || !this.selectedKisi) {
+      console.log('RolComponent - selectedRol veya selectedKisi null olduğu için işlem yapılmadı');
+      return;
+    }
+    
+    // SelectedKisi değerlerini kontrol et
+    console.log('RolComponent - selectedKisi değerleri:');
+    console.log('  - eid:', this.selectedKisi.eid);
+    console.log('  - ad:', this.selectedKisi.ad);
+    console.log('  - soyad:', this.selectedKisi.soyad);
+    
+    // Eğer kişinin eid'si yoksa uyarı ver ve işlemi yapma
+    if (!this.selectedKisi.eid) {
+      console.error('RolComponent - Seçilen kişinin eid değeri bulunamadı!');
+      return;
+    }
     
     // Yükleniyor durumunu göster
     this.loadingKisiler = true;
     
+    console.log('RolComponent - API isteği yapılıyor: addRolToKisi');
+    console.log('  - kisiEid:', this.selectedKisi.eid);
+    console.log('  - rolEid:', this.selectedRol.eid);
+    
     this.yetkiService.addRolToKisi(this.selectedKisi.eid, this.selectedRol.eid)
-      .pipe(finalize(() => this.loadingKisiler = false))
+      .pipe(finalize(() => {
+        this.loadingKisiler = false;
+        console.log('RolComponent - Yükleme işlemi tamamlandı');
+      }))
       .subscribe({
         next: () => {
+          console.log('RolComponent - API yanıtı başarılı: addRolToKisi');
+          
           // Önbelleği temizle
           if (this.selectedRol) {
             this.rolIdKisiMap.delete(this.selectedRol.eid);
           }
           
           // Listeyi güncelle
-          this.loadRoleKisiler(this.selectedRol!.eid);
+          if (this.selectedRol) {
+            this.loadRoleKisiler(this.selectedRol.eid);
+          }
+          
+          // Seçili kişiyi temizle
           this.selectedKisi = null;
           
           // Filtrelenmiş listeyi temizle
           this.filteredKisiList = [];
         },
         error: (err) => {
-          console.error('Kişi role eklenirken hata oluştu:', err);
-          // Hatayı kullanıcıya göster (burada bir toast mesajı gösterilebilir)
+          console.error('RolComponent - Kişi role eklenirken hata oluştu:', err);
+          // Hatayı kullanıcıya göster
           alert('Kişi role eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
         }
       });

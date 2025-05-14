@@ -3,9 +3,12 @@
     {{ title }}
     <span *ngIf="isRequired" class="text-danger">*</span>
   </label>
+  
+{{selectedItem | json}}
 
   <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
-    <div class="p-autocomplete-container">      <p-autoComplete
+    <div class="p-autocomplete-container">
+      <p-autoComplete
         [id]="'autocomplete-' + title"
         [(ngModel)]="selectedItem"
         [suggestions]="filteredSuggestions"
@@ -19,8 +22,20 @@
         (onSelect)="onSelect($event)"
         (onClear)="onClear()"
         styleClass="w-100">
+        
+        <!-- Seçili öğe template'i -->
         <ng-template let-item pTemplate="selectedItem">
           <div>{{ getDisplayText(item) }}</div>
+        </ng-template>
+        
+        <!-- Önerilerde gösterilecek öğeler için içerik projeksiyonu -->
+        <ng-template let-item pTemplate="item">
+          <ng-container *ngIf="contentTemplateRef; else defaultItemTemplate">
+            <ng-container *ngTemplateOutlet="contentTemplateRef; context: { $implicit: item }"></ng-container>
+          </ng-container>
+          <ng-template #defaultItemTemplate>
+            <div>{{ getDisplayText(item) }}</div>
+          </ng-template>
         </ng-template>
       </p-autoComplete>
     </div>

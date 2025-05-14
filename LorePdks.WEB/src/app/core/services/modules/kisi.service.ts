@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ApiService } from '../api.service';
 import { KisiDto } from '../../models/KisiDto';
 import { EIdDto } from '../../models/EIdDto';
@@ -78,14 +78,24 @@ export class KisiService {
     const request = new SingleValueDTO<string>(tc);
     return this.apiService.post<KisiDto>(`${this.endpoint}/getKisiByTc`, request);
   }
-
   /**
    * Arama metni ile kişileri arar
    * @param aramaText Arama metni
    * @returns Observable<KisiDto[]>
    */
   getKisiListByAramaText(aramaText: string): Observable<KisiDto[]> {
+    console.log('KisiService - getKisiListByAramaText çağrıldı. Arama metni:', aramaText);
     const request = new SingleValueDTO<string>(aramaText);
-    return this.apiService.post<KisiDto[]>(`${this.endpoint}/getKisiListByAramaText`, request);
+    console.log('KisiService - API isteği yapılıyor...');
+    
+    return this.apiService.post<KisiDto[]>(`${this.endpoint}/getKisiListByAramaText`, request)
+      .pipe(
+        tap(response => {
+          console.log('KisiService - API yanıtı alındı. Kişi sayısı:', response.length);
+          if (response.length > 0) {
+            console.log('KisiService - İlk kişi örneği:', JSON.stringify(response[0]));
+          }
+        })
+      );
   }
 }

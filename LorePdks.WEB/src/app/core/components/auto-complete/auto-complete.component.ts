@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ContentChild, TemplateRef, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -16,7 +16,7 @@ import { Observable, of } from 'rxjs';
     AutoCompleteModule
   ]
 })
-export class AutoCompleteComponent implements OnInit {
+export class AutoCompleteComponent implements OnInit, OnChanges {
   @Input() class: string = '';
   @Input() title: string = '';
   @Input() placeholder: string = '';
@@ -24,14 +24,15 @@ export class AutoCompleteComponent implements OnInit {
   @Input() isDisabled: boolean = false;
   @Input() isLoading$: Observable<boolean> = of(false);
   @Input() suggestions: any[] = [];
-  @Input() field: string = 'name'; // Varsayılan olarak gösterilecek alan
+  @Input() field: string = 'name';
   @Input() showEmptyMessage: boolean = true;
   @Input() emptyMessage: string = 'Sonuç bulunamadı';
   
-  // Filtrelenmiş öneriler
+  @ContentChild('itemTemplate') contentTemplateRef: TemplateRef<any> | null = null;
+  
+  // Bu filteredSuggestions son arama sonuçlarını tutacak
   filteredSuggestions: any[] = [];
   
-  // İki yönlü veri bağlaması için set/get kullanımı
   private _selectedItem: any = null;
   
   @Input()
@@ -40,6 +41,7 @@ export class AutoCompleteComponent implements OnInit {
   }
   
   set selectedItem(val: any) {
+    console.log('AutoComplete - selectedItem set edildi:', val);
     this._selectedItem = val;
     this.selectedItemChange.emit(this._selectedItem);
   }
@@ -50,63 +52,69 @@ export class AutoCompleteComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    // Eğer dışarıdan isLoading$ gönderilmezse varsayılan olarak false değeri kullanılır
     if (!this.isLoading$) {
       this.isLoading$ = of(false);
     }
+    console.log('AutoComplete - ngOnInit - field:', this.field);
   }
-
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    // suggestions değiştiğinde filteredSuggestions'ı güncelle
+    if (changes['suggestions'] && changes['suggestions'].currentValue) {
+      console.log('AutoComplete - Suggestions güncellendi:', changes['suggestions'].currentValue);
+      this.filteredSuggestions = [...changes['suggestions'].currentValue];
+    }
+  }
+  
   /**
    * Öğe için görüntüleme metni oluşturur
-   * @param item Öğe
-   * @returns Görüntüleme metni
    */
   getDisplayText(item: any): string {
     if (!item) return '';
     
-    // Eğer item bir string ise doğrudan döndür
-    if (typeof item === 'string') return item;
-    
-    // Belirtilen alanı kullan
-    if (item[this.field] !== undefined) {
-      return item[this.field];
-    }
-    
-    // Ad-Soyad kontrolü (Kişi nesneleri için)
-    if (item.ad && item.soyad) {
+    // Kişiler için özel durum (ad ve soyad birleştirme)
+    if (item && item.ad && item.soyad) {
       return `${item.ad} ${item.soyad}`;
     }
     
-    // JSON.stringify kullanmadan önce son bir kontrol
-    if (item.toString() !== '[object Object]') {
-      return item.toString();
+    // Belirtilen alanı kullan
+    if (item && item[this.field] !== undefined) {
+      return item[this.field];
     }
     
-    // En kötü durumda JSON olarak döndür
-    return JSON.stringify(item);
+    // Eğer item string ise
+    if (typeof item === 'string') {
+      return item;
+    }
+    
+    // Nesneyi metine çevirme
+    if (item && typeof item === 'object') {
+      try {
+        return JSON.stringify(item);
+      } catch (e) {
+        return '[Nesne gösterilemiyor]';
+      }
+    }
+    
+    return '';
   }
 
   filterSuggestions(event: any): void {
     const query = event.query;
+    console.log('AutoComplete - Arama yapılıyor:', query);
     
-    // Dışarıdan arama işlemi sağlanacak ise
+    // Dışarıdan arama isteğini emit et
     this.search.emit(query);
-    
-    // Lokalde filtreleme
-    if (this.suggestions && this.suggestions.length > 0) {
-      this.filteredSuggestions = this.suggestions.filter(item => 
-        item[this.field]?.toString().toLowerCase().includes(query.toLowerCase())
-      );
-    } else {
-      this.filteredSuggestions = [];
-    }
   }
 
   onSelect(event: any): void {
+    console.log('AutoComplete - Seçilen:', event);
     this.selectedItem = event;
   }
 
   onClear(): void {
+    console.log('AutoComplete - Seçim temizlendi');
     this.selectedItem = null;
   }
 }
+

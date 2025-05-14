@@ -122,8 +122,7 @@
       <!-- Kişi Arama ve Ekleme -->
       <div class="kisi-search mb-3">
         <div class="d-flex">
-          <div class="flex-grow-1 me-2">
-            <app-auto-complete
+          <div class="flex-grow-1 me-2">            <app-auto-complete
               title="Kişi Ara"
               placeholder="Ad, soyad veya TC ile arama yapın..."
               [suggestions]="filteredKisiList"
@@ -132,7 +131,7 @@
               emptyMessage="Kişi bulunamadı"
               [(selectedItem)]="selectedKisi"
               (search)="searchKisi($event)">
-              <ng-template let-item>
+              <ng-template #itemTemplate let-item>
                 <div class="suggestion-item">
                   <div><strong>{{ item.ad }} {{ item.soyad }}</strong></div>
                   <div *ngIf="item.tc" class="small text-muted">TC: {{ item.tc }}</div>
