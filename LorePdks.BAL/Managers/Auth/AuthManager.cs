@@ -40,20 +40,8 @@ namespace LorePdks.BAL.Managers.Auth
 
                 // Önce aktif olan bir token var mı kontrol et
                 var aktifToken = _kisiTokenManager.getAktifKisiTokenByKisiId(kisiDto.id);
-                
-                // Aktif token varsa onu dön
-                if (aktifToken != null)
-                {
-                    // IP adresi veya user agent değişmiş olabilir, güncelle
-                    aktifToken.ipAdresi = _HelperManager.GetIPAddress();
-                    aktifToken.userAgent = _HelperManager.GetUserAgent();
-                    
-                    // Token bilgilerini güncelle
-                    var guncelToken = _kisiTokenManager.saveKisiToken(aktifToken);
-                    guncelToken.isLogin = true;
-                    
-                    return guncelToken;
-                }
+                if (aktifToken != null) _kisiTokenManager.deleteKisiTokenById(aktifToken.id);
+
 
                 // Aktif token yoksa yeni token oluştur
                 var kisiTokenDto = new KisiTokenDTO

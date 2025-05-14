@@ -196,7 +196,7 @@ export class ApiService {
       try {
         const kisiToken = JSON.parse(kisiTokenJson);
         if (kisiToken && kisiToken.token) {
-          headers = headers.set('appToken', kisiToken.token);
+          headers = headers.set('lorePdksToken', kisiToken.token);
         }
       } catch (error) {
         console.error('Token parse hatası:', error);
