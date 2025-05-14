@@ -1,10 +1,10 @@
-<div class="form-group">
-  <label *ngIf="title" [for]="'autocomplete-' + title" class="mb-2">
+<div class="form-group">  <label *ngIf="title" [for]="'autocomplete-' + title" class="mb-2">
     {{ title }}
     <span *ngIf="isRequired" class="text-danger">*</span>
   </label>
   
-{{selectedItem | json}}
+<!-- Debug bilgisi: Seçilen Kişi -->
+<!-- <div class="small text-muted mb-2">{{ getDisplayText(selectedItem) }}</div> -->
 
   <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
     <div class="p-autocomplete-container">

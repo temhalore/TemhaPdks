@@ -65,12 +65,16 @@ export class AutoCompleteComponent implements OnInit, OnChanges {
       this.filteredSuggestions = [...changes['suggestions'].currentValue];
     }
   }
-  
-  /**
+    /**
    * Öğe için görüntüleme metni oluşturur
    */
   getDisplayText(item: any): string {
     if (!item) return '';
+    
+    // PrimeNG event nesnesini kontrol et
+    if (item && item.value) {
+      item = item.value;
+    }
     
     // Kişiler için özel durum (ad ve soyad birleştirme)
     if (item && item.ad && item.soyad) {
@@ -90,6 +94,19 @@ export class AutoCompleteComponent implements OnInit, OnChanges {
     // Nesneyi metine çevirme
     if (item && typeof item === 'object') {
       try {
+        // Eğer nesnenin ad/soyad gibi özellikleri varsa, bunları özetleyelim
+        const keys = Object.keys(item);
+        if (keys.includes('ad') || keys.includes('soyad') || keys.includes('name')) {
+          const parts = [];
+          if (item.ad) parts.push(item.ad);
+          if (item.soyad) parts.push(item.soyad);
+          if (item.name) parts.push(item.name);
+          
+          if (parts.length > 0) {
+            return parts.join(' ');
+          }
+        }
+        
         return JSON.stringify(item);
       } catch (e) {
         return '[Nesne gösterilemiyor]';
@@ -106,10 +123,17 @@ export class AutoCompleteComponent implements OnInit, OnChanges {
     // Dışarıdan arama isteğini emit et
     this.search.emit(query);
   }
-
   onSelect(event: any): void {
     console.log('AutoComplete - Seçilen:', event);
-    this.selectedItem = event;
+    
+    // PrimeNG'nin onSelect eventi bir complex objedir: { originalEvent, value }
+    // Biz sadece value kısmını kullanmak istiyoruz
+    if (event && event.value !== undefined) {
+      this.selectedItem = event.value;
+      console.log('AutoComplete - Sadece data kısmı alındı:', this.selectedItem);
+    } else {
+      this.selectedItem = event;
+    }
   }
 
   onClear(): void {
