@@ -1,0 +1,138 @@
+<div class="kod-container">
+  <div class="kod-header">
+    <h1>Kod Yönetimi</h1>
+    <div class="kod-header-actions">
+      <button 
+        pButton 
+        type="button" 
+        label="Yeni Kod" 
+        icon="pi pi-plus" 
+        class="p-button-sm mr-2" 
+        (click)="openAddKodModal()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Cache Yenile" 
+        icon="pi pi-refresh" 
+        class="p-button-sm p-button-info" 
+        (click)="refreshCache()">
+      </button>
+    </div>
+  </div>
+  
+  <div class="kod-filters">
+    <div class="kod-filter-item">
+      <label for="kodTipi">Kod Tipi</label>
+      <p-dropdown 
+        id="kodTipi" 
+        [options]="kodTipleri" 
+        optionLabel="label" 
+        [style]="{'width':'250px'}" 
+        (onChange)="loadKodListByTipId($event.value.value)">
+      </p-dropdown>
+    </div>
+  </div>
+  
+  <div class="kod-content" style="width: 100%;">
+    <app-data-grid
+      [data]="kodList"
+      [columns]="columns"
+      [loading]="loading"
+      headerTitle="Kod Listesi"
+      [responsive]="true"
+      [tableStyle]="{'width': '100%', 'min-width': '800px'}"
+      [actionButtons]="actionButtons"
+      (rowAction)="onRowAction($event)">
+    </app-data-grid>
+  </div>
+  
+  <!-- Kod Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="kodModalVisible"
+    [title]="kodModel.eid ? 'Kod Düzenle' : 'Yeni Kod'"
+    [width]="'600px'"
+    (save)="saveKod()"
+    (visibleChange)="!kodModalVisible && onKodModalClosed()">
+    <div class="kod-form">
+      <div class="form-group">
+        <label for="tipId">Kod Tipi</label>
+        <p-dropdown 
+          id="tipId" 
+          [options]="kodTipleri" 
+          [(ngModel)]="kodModel.tipId" 
+          optionLabel="label" 
+          optionValue="value"
+          [style]="{'width':'100%'}" 
+          placeholder="Kod tipi seçiniz">
+        </p-dropdown>
+      </div>
+      
+      <div class="form-group">
+        <label for="kod">Kod</label>
+        <input 
+          id="kod" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="kodModel.kod" 
+          class="form-control" 
+          placeholder="Kod değerini giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="kisaAd">Kısa Ad</label>
+        <input 
+          id="kisaAd" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="kodModel.kisaAd" 
+          class="form-control" 
+          placeholder="Kısa ad giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="sira">Sıra</label>
+        <p-inputNumber 
+          id="sira" 
+          [(ngModel)]="kodModel.sira" 
+          [showButtons]="false" 
+          placeholder="Sıra numarası" 
+          [min]="0"
+          [style]="{'width':'100%'}">
+        </p-inputNumber>
+      </div>
+      
+      <div class="form-group">
+        <label for="digerUygEnumAd">Diğer Uygulama Enum Adı</label>
+        <input 
+          id="digerUygEnumAd" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="kodModel.digerUygEnumAd" 
+          class="form-control" 
+          placeholder="Diğer uygulama enum adı">
+      </div>
+      
+      <div class="form-group">
+        <label for="digerUygEnumDeger">Diğer Uygulama Enum Değeri</label>
+        <p-inputNumber 
+          id="digerUygEnumDeger" 
+          [(ngModel)]="kodModel.digerUygEnumDeger" 
+          [showButtons]="false" 
+          placeholder="Diğer uygulama enum değeri" 
+          [min]="0"
+          [style]="{'width':'100%'}">
+        </p-inputNumber>
+      </div>
+    </div>
+  </app-modal>
+  <!-- Silme Onay Modalı -->
+  <app-confirm-dialog
+    #confirmDialog
+    header="Kod Silme"
+    message="Bu kodu silmek istediğinize emin misiniz?"
+    (confirmed)="deleteKod()">
+  </app-confirm-dialog>
+</div>

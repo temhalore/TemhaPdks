@@ -217,7 +217,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       // Router event zaten sayfa değişiminde sidebar'ı kapatacak
     }
   }
-
   /**
    * Alt menü öğesine tıklandığında rota yönlendirmesi yapar
    */
@@ -388,8 +387,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             label: 'Ekran Yönetimi',
             icon: 'pi pi-desktop',
             route: '/secure/yetki/ekran',
-            routerLink: ['/secure/yetki/ekran']
-          }
+            routerLink: ['/secure/yetki/ekran']          }
         ]
       },      {
         label: 'Kişi Yönetimi',
@@ -400,6 +398,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
             icon: 'pi pi-list',
             route: '/secure/kisi/liste',
             routerLink: ['/secure/kisi/liste']
+          }
+        ]
+      },      {
+        label: 'Kod Yönetimi',
+        icon: 'pi pi-list-ol',
+        children: [
+          {
+            label: 'Kod Listesi',
+            icon: 'pi pi-list',
+            route: '/secure/kod/liste',
+            routerLink: ['/secure/kod/liste']
           }
         ]
       },

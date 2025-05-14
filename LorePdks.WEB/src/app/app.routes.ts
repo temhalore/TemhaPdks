@@ -26,11 +26,14 @@ export const routes: Routes = [
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
-      },
-      {
+      },      {
         path: 'dashboard',
         loadChildren: () => import('./modules/dashboard/dashboard.module').then(m => m.DashboardModule)
-      }
+      },
+      // {
+      //   path: 'kod',
+      //   loadChildren: () => import('./modules/kod/kod.module').then(m => m.KodModule)
+      // }
       // Diğer korumalı sayfalar buraya eklenebilir
     ]
   },

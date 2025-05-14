@@ -39,7 +39,12 @@ const routes: Routes = [
       {
         path: 'kisi',
         loadChildren: () => import('./modules/kisi/kisi.module').then(m => m.KisiModule)
+      },
+      {
+        path: 'kod',
+        loadChildren: () => import('./modules/kod/kod.module').then(m => m.KodModule)
       }
+      
       // Diğer korumalı sayfalar buraya eklenebilir
     ]
   },
