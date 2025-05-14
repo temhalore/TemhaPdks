@@ -14,11 +14,6 @@ import { KodService } from '../../../core/services/modules/kod.service';
 import { KodDto } from '../../../core/models/KodDto';
 import { finalize } from 'rxjs';
 
-interface KodTip {
-  label: string;
-  value: number;
-}
-
 @Component({
   selector: 'app-kod-list',
   templateUrl: './kod-list.component.html',
@@ -31,7 +26,7 @@ interface KodTip {
     InputTextModule,
     InputTextareaModule,
     InputNumberModule,
-    DropdownModule,
+    DropdownModule, 
     DataGridComponent,
     ModalComponent,
     ConfirmDialogComponent
@@ -47,13 +42,14 @@ export class KodListComponent implements OnInit {
     { icon: 'pi pi-pencil', tooltip: 'Düzenle', action: 'edit' },
     { icon: 'pi pi-trash', tooltip: 'Sil', action: 'delete', class: 'p-button-danger' },
   ];
-  
   // Data grid sütun tanımları
   columns = [
     { field: 'tipId', header: 'Tip ID' },
     { field: 'kod', header: 'Kod' },
     { field: 'kisaAd', header: 'Kısa Ad' },
-    { field: 'sira', header: 'Sıra' }
+    { field: 'sira', header: 'Sıra' },
+    { field: 'digerUygEnumAd', header: 'Enum Adı' },
+    { field: 'digerUygEnumDeger', header: 'Enum Değeri' }
   ];
   
   // Confirm Dialog referansı
@@ -66,49 +62,19 @@ export class KodListComponent implements OnInit {
   selectedKod: KodDto | null = null;
   kodModel: KodDto = new KodDto();
   
-  // Kod tipleri listesi (örnek olarak, gerçek uygulama için düzenlenebilir)
-  kodTipleri: KodTip[] = [
-    { label: 'Sistem Ayarları', value: 1 },
-    { label: 'PDKS Durumları', value: 2 },
-    { label: 'Cihaz Tipleri', value: 3 },
-    { label: 'Departmanlar', value: 4 },
-    { label: 'Unvanlar', value: 5 }
-  ];
-  
   constructor(private kodService: KodService) { }
   
   ngOnInit(): void {
     this.loadKodList();
   }
-  
-  /**
-   * Kod listesini yükler
+    /**
+   * Kod listesini yükler (tüm kodları getirir)
    */
   loadKodList(): void {
     if (this.loading) return;
     
     this.loading = true;
-    // Burada gerçek veri yerine tipId'yi belirli bir değere sabitledik, kullanıcı seçimi için düzenlenebilir
-    this.kodService.getKodListByTipId(1)
-      .pipe(finalize(() => this.loading = false))
-      .subscribe({
-        next: (data) => {
-          this.kodList = data;
-        },
-        error: (error) => {
-          console.error('Kod listesi yüklenirken hata oluştu:', error);
-        }
-      });
-  }
-  
-  /**
-   * Kod tipine göre kodları getirir
-   */
-  loadKodListByTipId(tipId: number): void {
-    if (this.loading) return;
-    
-    this.loading = true;
-    this.kodService.getKodListByTipId(tipId)
+    this.kodService.getKodDtoListAll()
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (data) => {
@@ -125,6 +91,8 @@ export class KodListComponent implements OnInit {
    */
   openAddKodModal(): void {
     this.kodModel = new KodDto();
+    // Tip ID başlangıç değeri olarak 0 atıyoruz (kullanıcı değiştirebilir)
+    this.kodModel.tipId = 0;
     this.kodModalVisible = true;
   }
   
@@ -155,7 +123,8 @@ export class KodListComponent implements OnInit {
   /**
    * Silme işlemi için onay modalını açar
    * @param kod Silinecek kod
-   */  confirmDelete(kod: KodDto): void {
+   */
+  confirmDelete(kod: KodDto): void {
     this.selectedKod = kod;
     this.confirmDialog.show();
   }
@@ -180,7 +149,8 @@ export class KodListComponent implements OnInit {
    * Kod siler (backend'de bir silme metodu olsaydı kullanılırdı,
    * ancak mevcut serviste silme metodu yok. saveKod içinde ISDELETED değeri
    * true yapılarak silme işlemi gerçekleştirilebilir)
-   */  deleteKod(): void {
+   */
+  deleteKod(): void {
     if (!this.selectedKod) return;
     
     // Silme işlemi için model manipülasyonu (backend'de ISDELETED = true olarak işaretlenir)

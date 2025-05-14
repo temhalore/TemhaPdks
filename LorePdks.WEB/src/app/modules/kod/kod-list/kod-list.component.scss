@@ -28,15 +28,18 @@
   margin-bottom: 1.5rem;
   gap: 1rem;
   flex-wrap: wrap;
+  align-items: center;
   
   .kod-filter-item {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
     
     label {
       font-weight: 500;
       font-size: 0.875rem;
+      margin-right: 0.5rem;
     }
   }
 }

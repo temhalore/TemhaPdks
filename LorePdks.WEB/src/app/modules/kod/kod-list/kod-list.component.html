@@ -17,22 +17,7 @@
         icon="pi pi-refresh" 
         class="p-button-sm p-button-info" 
         (click)="refreshCache()">
-      </button>
-    </div>
-  </div>
-  
-  <div class="kod-filters">
-    <div class="kod-filter-item">
-      <label for="kodTipi">Kod Tipi</label>
-      <p-dropdown 
-        id="kodTipi" 
-        [options]="kodTipleri" 
-        optionLabel="label" 
-        [style]="{'width':'250px'}" 
-        (onChange)="loadKodListByTipId($event.value.value)">
-      </p-dropdown>
-    </div>
-  </div>
+      </button>    </div>  </div>
   
   <div class="kod-content" style="width: 100%;">
     <app-data-grid
@@ -53,19 +38,17 @@
     [title]="kodModel.eid ? 'Kod Düzenle' : 'Yeni Kod'"
     [width]="'600px'"
     (save)="saveKod()"
-    (visibleChange)="!kodModalVisible && onKodModalClosed()">
-    <div class="kod-form">
+    (visibleChange)="!kodModalVisible && onKodModalClosed()">    <div class="kod-form">
       <div class="form-group">
-        <label for="tipId">Kod Tipi</label>
-        <p-dropdown 
+        <label for="tipId">Tip ID</label>
+        <p-inputNumber 
           id="tipId" 
-          [options]="kodTipleri" 
           [(ngModel)]="kodModel.tipId" 
-          optionLabel="label" 
-          optionValue="value"
-          [style]="{'width':'100%'}" 
-          placeholder="Kod tipi seçiniz">
-        </p-dropdown>
+          [showButtons]="false" 
+          placeholder="Tip ID değerini giriniz" 
+          [min]="0"
+          [style]="{'width':'100%'}">
+        </p-inputNumber>
       </div>
       
       <div class="form-group">
@@ -128,6 +111,7 @@
       </div>
     </div>
   </app-modal>
+  
   <!-- Silme Onay Modalı -->
   <app-confirm-dialog
     #confirmDialog

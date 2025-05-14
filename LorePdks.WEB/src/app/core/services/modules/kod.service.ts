@@ -29,7 +29,6 @@ export class KodService {
   getKodById(eid: string): Observable<KodDto> {
     return this.apiService.post<KodDto>(`${this.endpoint}/getKodDtoByEIdDto`, { eid });
   }
-
   /**
    * Tip ID'ye göre kod listesini getirir
    * @param tipId Kod tipi ID'si
@@ -38,13 +37,14 @@ export class KodService {
   getKodListByTipId(tipId: number): Observable<KodDto[]> {
     const request = new SingleValueDTO<number>(tipId);
     return this.apiService.post<KodDto[]>(`${this.endpoint}/getKodDtoListByKodTipId`, request);
-  }
-
-    getKodDtoListAll(): Observable<KodDto[]> {
+  }  
+  
+  /**
+   * Tüm kod listesini getirir
+   * @returns Observable<KodDto[]>
+   */  getKodDtoListAll(): Observable<KodDto[]> {
     return this.apiService.post<KodDto[]>(`${this.endpoint}/getKodDtoListAll`, {});
   }
-
-  
 
   /**
    * Kod cache'ini yeniler
