@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TreeModule } from 'primeng/tree';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
 import { DataGridComponent, ActionButtonConfig } from '../../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
@@ -16,6 +17,9 @@ import { YetkiService } from '../../../core/services/modules/yetki.service';
 import { RolDto } from '../../../core/models/RolDto';
 import { EkranDto } from '../../../core/models/EkranDto';
 import { RolControllerMethodsRequestDto } from '../../../core/models/RolControllerMethodsRequestDto';
+import { KisiService } from '../../../core/services/modules/kisi.service';
+import { KisiDto } from '../../../core/models/KisiDto';
+import { AutoCompleteComponent } from '../../../core/components/auto-complete';
 
 @Component({
   selector: 'app-rol',
@@ -30,9 +34,11 @@ import { RolControllerMethodsRequestDto } from '../../../core/models/RolControll
     InputTextareaModule,
     TreeModule,
     CheckboxModule,
+    TooltipModule,
     DataGridComponent,
     ModalComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    AutoCompleteComponent
   ]
 })
 export class RolComponent implements OnInit {
@@ -45,7 +51,8 @@ export class RolComponent implements OnInit {
     { icon: 'pi pi-pencil', tooltip: 'Düzenle', action: 'edit' },
     { icon: 'pi pi-trash', tooltip: 'Sil', action: 'delete', class: 'p-button-danger' },
     { icon: 'pik pi-list', tooltip: 'Ekran Ekle/Çıkar', action: 'ekran', class: 'p-button-info' },
-    { icon: 'pi pi-cog', tooltip: 'Controller-Method Ekle/Çıkar', action: 'controller', class: 'p-button-info' }
+    { icon: 'pi pi-cog', tooltip: 'Controller-Method Ekle/Çıkar', action: 'controller', class: 'p-button-info' },
+    { icon: 'pi pi-users', tooltip: 'Kişi Ekle/Çıkar', action: 'kisi', class: 'p-button-success' }
   ];
   
   // Data grid sütun tanımları
@@ -58,6 +65,7 @@ export class RolComponent implements OnInit {
   rolModalVisible: boolean = false;
   ekranModalVisible: boolean = false;
   controllerModalVisible: boolean = false;
+  kisiModalVisible: boolean = false;
   
   // Seçili rol ve form modeli
   selectedRol: RolDto | null = null;
@@ -73,11 +81,21 @@ export class RolComponent implements OnInit {
   controllerMethods: ControllerAndMethodsDTO[] = [];
   selectedControllerMethods: ControllerAndMethodsDTO[] = [];
   loadingControllers: boolean = false;
+    // Kişi-Rol özellikleri
+  kisiList: KisiDto[] = [];
+  filteredKisiList: KisiDto[] = [];
+  selectedKisi: KisiDto | null = null;
+  loadingKisiler: boolean = false;
+  roleKisiList: KisiDto[] = [];
+  rolIdKisiMap: Map<string, KisiDto[]> = new Map();
   
   // Onay dialogu
   @ViewChild(ConfirmDialogComponent) confirmDialog!: ConfirmDialogComponent;
   
-  constructor(private yetkiService: YetkiService) { }
+  constructor(
+    private yetkiService: YetkiService,
+    private kisiService: KisiService
+  ) { }
   
   ngOnInit(): void {
     this.loadRolList();
@@ -541,10 +559,214 @@ export class RolComponent implements OnInit {
   }
   
   /**
-   * Controller modalı kapatıldığında seçili rolü temizler
+   * Controller modal kapatıldığında seçili rolü temizler
    */
   onControllerModalClosed(): void {
     this.selectedRol = null;
+  }
+  
+  /**
+   * Kişi ekleme/çıkarma modalını açar
+   * @param rol Rol verisi
+   */
+  openKisiModal(rol: RolDto): void {
+    this.selectedRol = rol;
+    this.selectedKisi = null;
+    this.filteredKisiList = [];
+    this.loadingKisiler = true;
+    
+    // Role ait kişileri yükle
+    this.loadRoleKisiler(rol.eid);
+    
+    this.kisiModalVisible = true;
+  }
+  /**
+   * Role ait kişileri yükler
+   * @param rolId Rol ID
+   */
+  loadRoleKisiler(rolId: string): void {
+    this.loadingKisiler = true;
+    this.roleKisiList = [];
+    
+    // Önce tüm kişileri çekelim (bu, arama özelliği için gerekli)
+    this.kisiService.getAllKisiList()
+      .subscribe({
+        next: (allKisiList) => {
+          // Tüm kişileri saklayalım (arama için)
+          this.kisiList = allKisiList;
+          
+          // Şimdi bu role atanmış kişileri belirlemek için bir yaklaşım uygulayalım
+          // İdeal çözüm: Backend'de "Role göre kişi getir" endpointi olmalı
+          
+          // Mevcut yapıda, her kişi için rol bilgilerini çekmemiz gerekiyor
+          // Not: Bu yaklaşım performans açısından optimal değil, ancak mevcut API ile çalışabiliriz
+          
+          // Rol bazlı kişi listesini zaten çektiysek, önbellekten alalım
+          if (this.rolIdKisiMap.has(rolId)) {
+            this.roleKisiList = this.rolIdKisiMap.get(rolId) || [];
+            this.loadingKisiler = false;
+            return;
+          }
+          
+          // Her kişi için roller bilgisini çekmek yerine (ki bu çok sayıda API isteği üretecektir),
+          // rolün kendisinden kişilere ulaşmaya çalışalım
+          
+          // İlk yaklaşım: Tüm kişilerin rol bilgilerini çekip filtreleme
+          const fetchPromises = allKisiList.map(kisi => {
+            return new Promise<{kisi: KisiDto, hasRole: boolean}>((resolve) => {
+              this.yetkiService.getRolsByKisiId(kisi.eid)
+                .subscribe({
+                  next: (roles) => {
+                    // Bu kişinin rolleri arasında mevcut rol var mı kontrol et
+                    const hasRole = roles.some(role => role.eid === rolId);
+                    resolve({kisi, hasRole});
+                  },
+                  error: () => {
+                    // Hata durumunda bu kişiyi role sahip değil olarak işaretle
+                    resolve({kisi, hasRole: false});
+                  }
+                });
+            });
+          });
+          
+          // Tüm kişiler için rol kontrolünü tamamlayınca
+          Promise.all(fetchPromises)
+            .then(results => {
+              // Role sahip kişileri filtrele
+              const kisiListWithRole = results
+                .filter(result => result.hasRole)
+                .map(result => result.kisi);
+              
+              // Sonucu sakla
+              this.roleKisiList = kisiListWithRole;
+              
+              // Önbelleğe al (daha sonra hızlı erişim için)
+              this.rolIdKisiMap.set(rolId, kisiListWithRole);
+            })
+            .finally(() => {
+              this.loadingKisiler = false;
+            });
+        },
+        error: (err) => {
+          this.loadingKisiler = false;
+          console.error('Kişiler yüklenirken hata oluştu:', err);
+        }
+      });
+  }
+    /**
+   * Kişi arama işlemini gerçekleştirir
+   * @param query Arama metni
+   */
+  searchKisi(query: string): void {
+    if (!query || query.length < 2) {
+      this.filteredKisiList = [];
+      return;
+    }
+    
+    // Önce cache kontrol et, zaten tüm kişiler yüklendiyse onlar üzerinde arama yap
+    if (this.kisiList.length > 0) {
+      this.performLocalSearch(query);
+      return;
+    }
+    
+    // Eğer kişi listesi henüz yüklenmediyse API'den ara
+    this.kisiService.getKisiListByAramaText(query)
+      .subscribe({
+        next: (data) => {
+          // Role ait olmayan kişileri filtrele
+          this.filteredKisiList = data.filter(k => 
+            !this.roleKisiList.some(rk => rk.eid === k.eid)
+          );
+        },
+        error: (err) => {
+          console.error('Kişi araması yapılırken hata oluştu:', err);
+          this.filteredKisiList = [];
+        }
+      });
+  }
+  
+  /**
+   * Yerel kişi listesi üzerinde arama yapar
+   * @param query Arama metni
+   */
+  private performLocalSearch(query: string): void {
+    const normalizedQuery = query.toLowerCase().trim();
+    
+    this.filteredKisiList = this.kisiList.filter(kisi => {
+      // Zaten role eklenmiş kişileri listeden çıkar
+      const alreadyInRole = this.roleKisiList.some(rk => rk.eid === kisi.eid);
+      if (alreadyInRole) return false;
+      
+      // Ad, soyad, TC veya email üzerinde arama yap
+      const fullName = `${kisi.ad} ${kisi.soyad}`.toLowerCase();
+      const tc = kisi.tc?.toLowerCase() || '';
+      const email = kisi.email?.toLowerCase() || '';
+      
+      return fullName.includes(normalizedQuery) || 
+             tc.includes(normalizedQuery) || 
+             email.includes(normalizedQuery);
+    });
+  }
+  /**
+   * Role kişi ekler
+   */
+  addKisiToRol(): void {
+    if (!this.selectedRol || !this.selectedKisi) return;
+    
+    // Yükleniyor durumunu göster
+    this.loadingKisiler = true;
+    
+    this.yetkiService.addRolToKisi(this.selectedKisi.eid, this.selectedRol.eid)
+      .pipe(finalize(() => this.loadingKisiler = false))
+      .subscribe({
+        next: () => {
+          // Önbelleği temizle
+          if (this.selectedRol) {
+            this.rolIdKisiMap.delete(this.selectedRol.eid);
+          }
+          
+          // Listeyi güncelle
+          this.loadRoleKisiler(this.selectedRol!.eid);
+          this.selectedKisi = null;
+          
+          // Filtrelenmiş listeyi temizle
+          this.filteredKisiList = [];
+        },
+        error: (err) => {
+          console.error('Kişi role eklenirken hata oluştu:', err);
+          // Hatayı kullanıcıya göster (burada bir toast mesajı gösterilebilir)
+          alert('Kişi role eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+      });
+  }
+  /**
+   * Rolden kişi çıkarır
+   * @param kisi Çıkarılacak kişi
+   */
+  removeKisiFromRol(kisi: KisiDto): void {
+    if (!this.selectedRol) return;
+    
+    // Yükleniyor durumunu göster
+    this.loadingKisiler = true;
+    
+    this.yetkiService.removeRolFromKisi(kisi.eid, this.selectedRol.eid)
+      .pipe(finalize(() => this.loadingKisiler = false))
+      .subscribe({
+        next: () => {
+          // Önbelleği temizle
+          if (this.selectedRol) {
+            this.rolIdKisiMap.delete(this.selectedRol.eid);
+          }
+          
+          // Listeyi güncelle
+          this.loadRoleKisiler(this.selectedRol!.eid);
+        },
+        error: (err) => {
+          console.error('Kişi rolden çıkarılırken hata oluştu:', err);
+          // Hatayı kullanıcıya göster
+          alert('Kişi rolden çıkarılırken bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+      });
   }
   
   /**
@@ -565,6 +787,9 @@ export class RolComponent implements OnInit {
       case 'controller':
         this.openControllerModal(event.data);
         break;
+      case 'kisi':
+        this.openKisiModal(event.data);
+        break;
     }
   }
 
@@ -575,5 +800,14 @@ export class RolComponent implements OnInit {
    */
   onAction(action: string, rol: RolDto): void {
     this.onRowAction({action, data: rol});
+  }
+
+  /**
+   * Kişi modal kapatıldığında seçili rol ve kişi verilerini temizler
+   */
+  onKisiModalClosed(): void {
+    this.selectedRol = null;
+    this.selectedKisi = null;
+    this.filteredKisiList = [];
   }
 }

@@ -168,7 +168,7 @@ namespace LorePdks.API.Controllers.Yetki
             var response = new ServiceResponse<EkranDTO>();
             _ekranManager.deleteEkranByEkranId(request.id);
             response.messageType = ServiceResponseMessageType.Success;
-            response.message ="Silme İşlemi Başarılı";
+            response.message ="Silme İşlemi Başarılı";
             return Ok(response);
         }
 
@@ -190,6 +190,40 @@ namespace LorePdks.API.Controllers.Yetki
         {
             var response = new ServiceResponse<bool>();
             var success = _rolManager.removeEkranFromRol(request.rolEidDto.id, request.ekranEidDto.id);
+            response.data = success;
+            return Ok(response);
+        }
+
+        #endregion
+
+        #region Kişi-Rol İlişkilendirme
+
+        [HttpPost]
+        [Route("getRolDtoListByKisiIdDto")]
+        public IActionResult getRolDtoListByKisiIdDto(EIdDTO request)
+        {
+            var response = new ServiceResponse<List<RolDTO>>();
+            var dto = _rolManager.getRolDtoListByKisiId(request.id);
+            response.data = dto;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("addRolToKisiByKisiRolDto")]
+        public IActionResult addRolToKisiByKisiRolDto(KisiRolDTO request)
+        {
+            var response = new ServiceResponse<bool>();
+            var success = _rolManager.addRolToKisi(request.kisiEidDto.id, request.rolEidDto.id);
+            response.data = success;
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("removeRolFromKisiByKisiRolDto")]
+        public IActionResult removeRolFromKisiByKisiRolDto(KisiRolDTO request)
+        {
+            var response = new ServiceResponse<bool>();
+            var success = _rolManager.removeRolFromKisi(request.kisiEidDto.id, request.rolEidDto.id);
             response.data = success;
             return Ok(response);
         }

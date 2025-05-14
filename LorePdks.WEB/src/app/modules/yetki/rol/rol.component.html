@@ -57,15 +57,14 @@
       </div>
     </div>
   </app-modal>
-  
-  <!-- Ekran Ekleme/Çıkarma Modalı -->
+    <!-- Ekran Ekleme/Çıkarma Modalı -->
   <app-modal
     [(visible)]="ekranModalVisible"
     [title]="selectedRol?.rolAdi + ' - Ekran Yönetimi'"
     [width]="'700px'"
     [height]="'500px'"
     (save)="saveEkranlar()"
-    (visibleChange)="!ekranModalVisible && onEkranModalClosed()">
+    (visibleChange)="!ekranModalVisible && onRolModalClosed()">
     <div class="ekran-form">
       <p-tree 
         [value]="ekranTree" 
@@ -76,15 +75,14 @@
       </p-tree>
     </div>
   </app-modal>
-  
-  <!-- Controller-Method Ekleme/Çıkarma Modalı -->
+    <!-- Controller-Method Ekleme/Çıkarma Modalı -->
   <app-modal
     [(visible)]="controllerModalVisible"
     [title]="selectedRol?.rolAdi + ' - Controller ve Method Yönetimi'"
     [width]="'800px'"
     [height]="'600px'"
     (save)="saveControllerMethods()"
-    (visibleChange)="!controllerModalVisible && onControllerModalClosed()">
+    (visibleChange)="!controllerModalVisible && onRolModalClosed()">
     <div class="controller-form" *ngIf="!loadingControllers">      <div class="controller-list">
         <div class="controller-item" *ngFor="let controller of controllerMethods">
           <div class="controller-header">
@@ -113,6 +111,83 @@
     </div>
     <div class="loading-container" *ngIf="loadingControllers">
       <p>Controller ve methodlar yükleniyor...</p>
+    </div>
+  </app-modal>  <!-- Kişi Ekleme/Çıkarma Modalı -->
+  <app-modal
+    [(visible)]="kisiModalVisible"
+    [title]="(selectedRol?.rolAdi || '') + ' - Kişi Yönetimi'"
+    [width]="'800px'"
+    [height]="'600px'"
+    (visibleChange)="!kisiModalVisible && onKisiModalClosed()"><div class="kisi-form">
+      <!-- Kişi Arama ve Ekleme -->
+      <div class="kisi-search mb-3">
+        <div class="d-flex">
+          <div class="flex-grow-1 me-2">
+            <app-auto-complete
+              title="Kişi Ara"
+              placeholder="Ad, soyad veya TC ile arama yapın..."
+              [suggestions]="filteredKisiList"
+              field="ad"
+              [showEmptyMessage]="true"
+              emptyMessage="Kişi bulunamadı"
+              [(selectedItem)]="selectedKisi"
+              (search)="searchKisi($event)">
+              <ng-template let-item>
+                <div class="suggestion-item">
+                  <div><strong>{{ item.ad }} {{ item.soyad }}</strong></div>
+                  <div *ngIf="item.tc" class="small text-muted">TC: {{ item.tc }}</div>
+                  <div *ngIf="item.email" class="small text-muted">{{ item.email }}</div>
+                </div>
+              </ng-template>
+            </app-auto-complete>
+          </div>
+          <div>
+            <button 
+              pButton 
+              type="button" 
+              label="Ekle" 
+              [disabled]="!selectedKisi"
+              class="p-button-success" 
+              (click)="addKisiToRol()">
+            </button>
+          </div>
+        </div>
+      </div>      <!-- Role ait kişiler -->
+      <div class="role-kisiler">
+        <h4>Role Atanmış Kişiler</h4>
+        <div class="loading-container text-center p-4" *ngIf="loadingKisiler">
+          <i class="pi pi-spin pi-spinner mr-2" style="font-size: 1.5rem"></i>
+          <p>Kişiler yükleniyor...</p>
+        </div>
+        <div class="no-data p-4 text-center border rounded" *ngIf="!loadingKisiler && roleKisiList.length === 0">
+          <i class="pi pi-user-minus mb-2" style="font-size: 2rem"></i>
+          <p>Bu role atanmış kişi bulunmamaktadır.</p>
+        </div>
+        <div class="kisi-list" *ngIf="!loadingKisiler && roleKisiList.length > 0">
+          <div class="kisi-item d-flex justify-content-between align-items-center p-3 mb-2 border rounded" 
+               *ngFor="let kisi of roleKisiList">
+            <div>
+              <div class="d-flex align-items-center">
+                <i class="pi pi-user mr-2" style="font-size: 1.2rem"></i>
+                <strong>{{ kisi.ad }} {{ kisi.soyad }}</strong>
+              </div>
+              <div *ngIf="kisi.tc" class="small text-muted mt-1">TC: {{ kisi.tc }}</div>
+              <div *ngIf="kisi.email" class="small text-muted">{{ kisi.email }}</div>
+            </div>
+            <div>
+              <button 
+                pButton 
+                type="button" 
+                icon="pi pi-trash" 
+                pTooltip="Rolden Çıkar"
+                tooltipPosition="left"
+                class="p-button-danger p-button-rounded" 
+                (click)="removeKisiFromRol(kisi)">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </app-modal>
   

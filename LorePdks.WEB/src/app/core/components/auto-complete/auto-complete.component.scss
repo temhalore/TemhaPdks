@@ -1,0 +1,18 @@
+.input-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da;
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+:host ::ng-deep .p-autocomplete {
+  width: 100%;
+}
+
+:host ::ng-deep .p-autocomplete-panel {
+  max-height: 200px;
+  overflow-y: auto;
+}

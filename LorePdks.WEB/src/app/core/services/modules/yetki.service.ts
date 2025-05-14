@@ -6,6 +6,7 @@ import { ControllerAndMethodsDTO } from '../../models/ControllerAndMethodsDTO';
 import { RolControllerMethodDto } from '../../models/RolControllerMethodDto';
 import { RolControllerMethodsRequestDto } from '../../models/RolControllerMethodsRequestDto';
 import { EkranDto } from '../../models/EkranDto';
+import { KisiRolDto } from '../../models/KisiRolDto';
 
 
 @Injectable({
@@ -152,4 +153,40 @@ export class YetkiService {
     return this.apiService.post<boolean>(`${this.endpoint}/deleteEkranByEIdDto`, { eid });
   }
 
+  /**
+   * Kişiye ait rolleri getirir
+   * @param kisiId Kişinin encrypt edilmiş ID'si
+   * @returns Observable<RolDto[]>
+   */
+  getRolsByKisiId(kisiId: string): Observable<RolDto[]> {
+    return this.apiService.post<RolDto[]>(`${this.endpoint}/getRolDtoListByKisiIdDto`, { eid: kisiId });
+  }
+
+  /**
+   * Kişiye rol ekler
+   * @param kisiId Kişinin encrypt edilmiş ID'si
+   * @param rolId Rolün encrypt edilmiş ID'si
+   * @returns Observable<boolean>
+   */
+  addRolToKisi(kisiId: string, rolId: string): Observable<boolean> {
+    const request = {
+      kisiEidDto: { eid: kisiId },
+      rolEidDto: { eid: rolId }
+    };
+    return this.apiService.post<boolean>(`${this.endpoint}/addRolToKisiByKisiRolDto`, request);
+  }
+
+  /**
+   * Kişiden rol çıkarır
+   * @param kisiId Kişinin encrypt edilmiş ID'si
+   * @param rolId Rolün encrypt edilmiş ID'si
+   * @returns Observable<boolean>
+   */
+  removeRolFromKisi(kisiId: string, rolId: string): Observable<boolean> {
+    const request = {
+      kisiEidDto: { eid: kisiId },
+      rolEidDto: { eid: rolId }
+    };
+    return this.apiService.post<boolean>(`${this.endpoint}/removeRolFromKisiByKisiRolDto`, request);
+  }
 }

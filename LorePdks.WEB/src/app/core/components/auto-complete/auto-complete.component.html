@@ -1,0 +1,35 @@
+<div class="form-group">
+  <label *ngIf="title" [for]="'autocomplete-' + title" class="mb-2">
+    {{ title }}
+    <span *ngIf="isRequired" class="text-danger">*</span>
+  </label>
+
+  <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
+    <div class="p-autocomplete-container">
+      <p-autoComplete
+        [id]="'autocomplete-' + title"
+        [(ngModel)]="selectedItem"
+        [suggestions]="filteredSuggestions"
+        [field]="field"
+        [placeholder]="placeholder"
+        [disabled]="isDisabled"
+        [ngClass]="class"
+        [showEmptyMessage]="showEmptyMessage"
+        [emptyMessage]="emptyMessage"
+        (completeMethod)="filterSuggestions($event)"
+        (onSelect)="onSelect($event)"
+        (onClear)="onClear()"
+        styleClass="w-100">
+      </p-autoComplete>
+    </div>
+  </ng-container>
+
+  <ng-template #loadingTemplate>
+    <div class="input-loading">
+      <div class="d-flex align-items-center">
+        <i class="pi pi-spin pi-spinner mr-2"></i>
+        <span>Yükleniyor...</span>
+      </div>
+    </div>
+  </ng-template>
+</div>
