@@ -199,9 +199,9 @@ namespace LorePdks.BAL.Managers.Kisi
 
             allKisiList = allKisiList.Where(x => x.ID != kisiDto.id).ToList();
 
-            var kisiKayitliMiTc = allKisiList.Where(x => x.TC!=null && x.TC.ToLower().ToTurkishChars().Contains(kisiDto.tc.ToLower().ToTurkishChars())).FirstOrDefault();
+            var kisiKayitliMiTc = allKisiList.Where(x => x.TC!=null && x.TC.ToLower().ToTurkishChars().Equals(kisiDto.tc.ToLower().ToTurkishChars())).FirstOrDefault();
 
-            var kisiKayitliMiLoginName = allKisiList.Where(x => x.LOGIN_NAME.ToLower().ToTurkishChars().Contains(kisiDto.loginName.ToLower().ToTurkishChars())).FirstOrDefault();
+            var kisiKayitliMiLoginName = allKisiList.Where(x => x.LOGIN_NAME.ToLower().ToTurkishChars().Equals(kisiDto.loginName.ToLower().ToTurkishChars())).FirstOrDefault();
 
             if (kisiKayitliMiTc != null)
             {

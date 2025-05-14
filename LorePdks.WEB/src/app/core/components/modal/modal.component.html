@@ -20,8 +20,7 @@
   </div>
   
   <ng-template pTemplate="footer" *ngIf="showFooter">
-    <div class="modal-footer">
-      <button 
+    <div class="modal-footer">      <button 
         pButton 
         type="button" 
         [label]="cancelLabel" 
@@ -29,6 +28,7 @@
         (click)="onCancel()">
       </button>
       <button 
+        *ngIf="showSaveButton"
         pButton 
         type="button" 
         [label]="saveLabel" 

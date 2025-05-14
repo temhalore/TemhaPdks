@@ -10,8 +10,7 @@ import { ButtonModule } from 'primeng/button';
   standalone: true,
   imports: [CommonModule, DialogModule, ButtonModule]
 })
-export class ModalComponent {
-  @Input() visible: boolean = false;
+export class ModalComponent {  @Input() visible: boolean = false;
   @Input() title: string = '';
   @Input() width: string = '50%';
   @Input() height: string = 'auto';
@@ -23,6 +22,7 @@ export class ModalComponent {
   @Input() cancelLabel: string = 'İptal';
   @Input() saveBtnDisabled: boolean = false;
   @Input() saveBtnLoading: boolean = false;
+  @Input() showSaveButton: boolean = true;
   @Input() position: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright' = 'center';
   
   @Output() visibleChange = new EventEmitter<boolean>();

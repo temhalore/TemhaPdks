@@ -9,6 +9,8 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TreeModule } from 'primeng/tree';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
+import { PaginatorModule } from 'primeng/paginator';
+import { DropdownModule } from 'primeng/dropdown';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
 import { DataGridComponent, ActionButtonConfig } from '../../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
@@ -35,6 +37,8 @@ import { AutoCompleteComponent } from '../../../core/components/auto-complete';
     TreeModule,
     CheckboxModule,
     TooltipModule,
+    PaginatorModule,
+    DropdownModule,
     DataGridComponent,
     ModalComponent,
     ConfirmDialogComponent,
@@ -88,6 +92,11 @@ export class RolComponent implements OnInit {
   loadingKisiler: boolean = false;
   roleKisiList: KisiDto[] = [];
   rolIdKisiMap: Map<string, KisiDto[]> = new Map();
+
+  // Sayfalama için parametreler
+  kisiPageSize: number = 10;
+  kisiCurrentPage: number = 0;
+  paginatedKisiList: KisiDto[] = [];
   
   // Onay dialogu
   @ViewChild(ConfirmDialogComponent) confirmDialog!: ConfirmDialogComponent;
@@ -564,8 +573,7 @@ export class RolComponent implements OnInit {
   onControllerModalClosed(): void {
     this.selectedRol = null;
   }
-  
-  /**
+    /**
    * Kişi ekleme/çıkarma modalını açar
    * @param rol Rol verisi
    */
@@ -575,15 +583,17 @@ export class RolComponent implements OnInit {
     this.filteredKisiList = [];
     this.loadingKisiler = true;
     
+    // Sayfalama ayarlarını sıfırla
+    this.kisiCurrentPage = 0;
+    
     // Role ait kişileri yükle
     this.loadRoleKisiler(rol.eid);
     
     this.kisiModalVisible = true;
-  }  /**
+  }/**
    * Role ait kişileri yükler
    * @param rolId Rol ID
-   */
-  loadRoleKisiler(rolId: string): void {
+   */  loadRoleKisiler(rolId: string): void {
     console.log('RolComponent - loadRoleKisiler çağrıldı. rolId:', rolId);
     this.loadingKisiler = true;
     this.roleKisiList = [];
@@ -594,6 +604,9 @@ export class RolComponent implements OnInit {
       this.roleKisiList = this.rolIdKisiMap.get(rolId) || [];
       this.loadingKisiler = false;
       console.log('RolComponent - Cache\'den yüklenen kişi sayısı:', this.roleKisiList.length);
+      
+      // Sayfalama için listeyi güncelle
+      this.updatePaginatedList();
       return;
     }
     
@@ -603,6 +616,9 @@ export class RolComponent implements OnInit {
       .pipe(finalize(() => {
         this.loadingKisiler = false;
         console.log('RolComponent - Kişi yükleme işlemi tamamlandı');
+        
+        // Sayfalama için listeyi güncelle
+        this.updatePaginatedList();
       }))
       .subscribe({
         next: (kisiList) => {
@@ -806,7 +822,46 @@ export class RolComponent implements OnInit {
    */
   onKisiModalClosed(): void {
     this.selectedRol = null;
-    this.selectedKisi = null;
-    this.filteredKisiList = [];
+    this.kisiCurrentPage = 0; // Sayfa numarasını sıfırla
+  }
+
+  /**
+   * Sayfa boyutu değiştiğinde çağrılır
+   */
+  onPageSizeChange(): void {
+    this.kisiCurrentPage = 0; // Sayfa numarasını sıfırla
+    this.updatePaginatedList(); // Listeyi güncelle
+  }
+
+  /**
+   * Sayfa değiştiğinde çağrılır
+   * @param event Sayfa değişim olayı
+   */
+  onPageChange(event: any): void {
+    this.kisiCurrentPage = event.page;
+    this.kisiPageSize = event.rows;
+    this.updatePaginatedList();
+  }
+  /**
+   * Sayfalanmış kişi listesini günceller
+   */
+  updatePaginatedList(): void {
+    // Boş listeyi kontrol et
+    if (!this.roleKisiList || this.roleKisiList.length === 0) {
+      this.paginatedKisiList = [];
+      return;
+    }
+    
+    // Sayfa numarasını kontrol et ve gerekirse düzelt
+    const totalPages = Math.ceil(this.roleKisiList.length / this.kisiPageSize);
+    if (this.kisiCurrentPage >= totalPages) {
+      this.kisiCurrentPage = Math.max(0, totalPages - 1);
+    }
+    
+    const startIndex = this.kisiCurrentPage * this.kisiPageSize;
+    const endIndex = startIndex + this.kisiPageSize;
+    this.paginatedKisiList = this.roleKisiList.slice(startIndex, endIndex);
+    
+    console.log(`RolComponent - Sayfalama güncellendi: Sayfa ${this.kisiCurrentPage + 1}/${totalPages}, Gösterilen ${this.paginatedKisiList.length} kişi`);
   }
 }
