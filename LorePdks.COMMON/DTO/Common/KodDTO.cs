@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LorePdks.COMMON.DTO.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,9 @@ namespace LorePdks.COMMON.DTO.Common
 {
 
 
-    public class KodDTO
+    public class KodDTO:BaseDTO
     {
-        public int id { get; set; }
+        //public int id { get; set; }
         public int tipId { get; set; }
         public string kod { get; set; }
         public string kisaAd { get; set; }

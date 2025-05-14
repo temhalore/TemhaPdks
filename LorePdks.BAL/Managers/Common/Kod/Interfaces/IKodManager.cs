@@ -5,11 +5,10 @@ namespace LorePdks.BAL.Managers.Common.Kod.Interfaces
 {
     public interface IKodManager
     {
-
         List<KodDTO> GetKodDtoListByKodTipId(int kodTipID);
         string refreshKodListCache();
-
         KodDTO GetKodDtoByKodId(int kodId);
+        KodDTO saveKod(KodDTO kodDTO);
 
         /// <summary>
         /// gelen KodDTO tipindeki değer null ve id sinin 0 dan büyük olması kontrol edilir
