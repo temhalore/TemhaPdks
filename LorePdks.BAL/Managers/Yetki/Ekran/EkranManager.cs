@@ -215,7 +215,7 @@ namespace LorePdks.BAL.Managers.Yetki.Ekran
             }
 
             // Ekran yolu benzersiz olmalı
-            if (allEkranList.Any(x => x.EKRAN_YOLU.Equals(ekranDTO.ekranYolu, StringComparison.OrdinalIgnoreCase)))
+            if (ekranDTO.ustEkranEidDto != null && allEkranList.Any(x => x.EKRAN_YOLU.Equals(ekranDTO.ekranYolu, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"'{ekranDTO.ekranYolu}' yollu başka bir ekran zaten mevcut");
             }

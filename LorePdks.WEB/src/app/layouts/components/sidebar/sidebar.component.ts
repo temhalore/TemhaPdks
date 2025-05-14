@@ -268,7 +268,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
         next: (userData: KisiTokenDto | null) => {
           if (userData && userData.ekranDtoList && userData.ekranDtoList.length > 0) {
             // EkranDto listesini MenuItemModel listesine dönüştür
-            this.menuItems = this.convertEkranDtoToMenuItems(userData.ekranDtoList);
+            this.createDummyMenuItems();
+            //this.menuItems = this.convertEkranDtoToMenuItems(userData.ekranDtoList);
           } else {
             // Kullanıcının ekran listesi bulunamadıysa dummy data kullan
             this.createDummyMenuItems();
