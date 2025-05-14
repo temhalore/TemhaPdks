@@ -39,7 +39,7 @@ namespace LorePdks.API.Controllers.Firma
         [Route("getFirmaCihazDtoByEIdDto")]
         public IActionResult getFirmaCihazDtoByEIdDto(EIdDTO request)
         {
-            var response = new ServiceResponse<object>();
+            var response = new ServiceResponse<FirmaCihazDTO>();
             var dto = _firmaCihazManager.getFirmaCihazDtoById(request.id);
             response.data = dto;
             return Ok(response);
@@ -49,7 +49,7 @@ namespace LorePdks.API.Controllers.Firma
         [Route("getFirmaCihazDtoListByFirmaDto")]
         public IActionResult getFirmaCihazDtoListByFirmaDto(FirmaDTO request)
         {
-            var response = new ServiceResponse<object>();
+            var response = new ServiceResponse<List<FirmaCihazDTO>>();
             var dto = _firmaCihazManager.getFirmaCihazDtoListByFirmaId(request.id);
             response.data = dto;
             return Ok(response);
