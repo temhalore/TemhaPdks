@@ -16,12 +16,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 // NGX-Spinner import
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
+// Custom Components
+import { IzinDagilimiComponent } from './izin-dagilimi/izin-dagilimi.component';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     CardModule,
     ButtonModule,
@@ -31,7 +33,8 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
     BadgeModule,
     TagModule,
     NgxChartsModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    IzinDagilimiComponent
   ]
 })
 export class DashboardComponent implements OnInit {
@@ -98,8 +101,7 @@ export class DashboardComponent implements OnInit {
         value: 5
       }
     ];
-    
-    // NGX-Charts için izin durum verileri
+      // NGX-Charts için izin durum verileri
     this.izinDurumData = [
       {
         name: "Yıllık İzin",
@@ -112,6 +114,14 @@ export class DashboardComponent implements OnInit {
       {
         name: "Rapor",
         value: 1
+      },
+      {
+        name: "Doğum İzni",
+        value: 0
+      },
+      {
+        name: "Babalık İzni",
+        value: 0
       }
     ];
     

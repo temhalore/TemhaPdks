@@ -1,0 +1,36 @@
+<div class="izin-dagilimi-container">
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <h2>İzin Dağılımı</h2>
+      <span class="toplam-izin">Toplam: {{ toplamIzin }} izin</span>
+    </div>
+    
+    <div *ngIf="!loading" class="charts-container">
+      <!-- Görselleştirme seçenekleri: İki farklı grafik tipi -->
+      <div class="chart pie-chart">
+        <p-chart type="pie" [data]="pieChartData" [options]="pieChartOptions" height="250px"></p-chart>
+      </div>
+      
+      <div class="chart donut-chart">
+        <p-chart type="doughnut" [data]="donutChartData" [options]="donutChartOptions" height="250px"></p-chart>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="skeleton-chart">
+      <p-skeleton height="250px" styleClass="mb-2"></p-skeleton>
+    </div>
+
+    <!-- İzin sayılarını listeleyen kart bileşenleri -->
+    <div *ngIf="!loading" class="izin-cards">
+      <div class="izin-card" *ngFor="let izin of izinVerileri" [style.border-left-color]="izin.renk">
+        <div class="izin-card-content">
+          <div class="izin-card-title">{{ izin.name }}</div>
+          <div class="izin-card-value">{{ izin.value }}</div>
+        </div>
+        <div class="izin-card-percentage">
+          {{ (izin.value / toplamIzin * 100) | number:'1.0-0' }}%
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

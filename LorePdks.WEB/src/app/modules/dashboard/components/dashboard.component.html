@@ -102,22 +102,12 @@
           <p-skeleton height="250px" styleClass="mb-2"></p-skeleton>
         </div>
       </p-card>
-    </div>
-
-    <!-- İzin Dağılımı Grafiği -->
+    </div>    <!-- İzin Dağılımı Grafiği - Zenginleştirilmiş Bileşen -->
     <div class="col-md-4 mb-3">
-      <p-card header="İzin Dağılımı" styleClass="chart-card h-100">
-        <div *ngIf="!loading" class="chart-container">
-          <ngx-charts-advanced-pie-chart
-            [results]="izinDurumData"
-            [scheme]="'cool'"
-            [gradient]="true"
-          ></ngx-charts-advanced-pie-chart>
-        </div>
-        <div *ngIf="loading" class="skeleton-chart">
-          <p-skeleton height="250px" styleClass="mb-2"></p-skeleton>
-        </div>
-      </p-card>
+      <app-izin-dagilimi
+        [loading]="loading"
+        [izinDurumData]="izinDurumData">
+      </app-izin-dagilimi>
     </div>
 
     <!-- Haftalık Giriş Grafiği -->
