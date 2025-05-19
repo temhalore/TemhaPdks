@@ -100,9 +100,7 @@ namespace LorePdks.BAL.Managers.Common.Kod
             if (string.IsNullOrEmpty(kodDTO.kod))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Kod alanı boş olamaz");
             
-            if (string.IsNullOrEmpty(kodDTO.kisaAd))
-                throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Kısa ad alanı boş olamaz");
-            
+          
            
             // Kod benzersizlik kontrolü
             var allKodList = _repoKod.GetList("ID <> @id", new { id = kodDTO.id });
@@ -131,7 +129,7 @@ namespace LorePdks.BAL.Managers.Common.Kod
                 var repo = new GenericRepository<t_kod>();
 
                 var data = repo.GetList();
-
+                var yeniList = new List<KodDTO>();
                 foreach (var item in data)
                 {
 
@@ -152,11 +150,10 @@ namespace LorePdks.BAL.Managers.Common.Kod
                         dto.digerUygEnumDeger = Convert.ToInt32(item.DIGER_UYG_ID);
                         dto.digerUygEnumAd = item.DIGER_UYG_ENUM_AD;
                     }
-
-                    //yoksa ekle
-                    if (!_allKodDtoList.Select(x => x.id).ToList().Contains(dto.id)) _allKodDtoList.Add(dto);
+                    yeniList.Add(dto);
+                  
                 }
-
+                _allKodDtoList = yeniList;
                 //_allKodDtoList = Mapper.Map<List<T_OSS_KOD>, List<KodDTO>>(data);
 
             }
