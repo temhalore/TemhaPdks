@@ -115,12 +115,20 @@ export class FirmaListeComponent implements OnInit {
         }
       });
   }
-
   /**
    * Yeni firma eklemek için modal açar
    */
   openAddFirmaModal(): void {
-    this.firmaModel = {} as FirmaDto;
+    this.firmaModel = { 
+      ad: '', 
+      kod: '', 
+      aciklama: '', 
+      adres: '', 
+      mesaiSaat: null,
+      molaSaat: null,
+      cumartesiMesaiSaat: null,
+      cumartesiMolaSaat: null
+    } as FirmaDto;
     this.firmaModalVisible = true;
   }
 

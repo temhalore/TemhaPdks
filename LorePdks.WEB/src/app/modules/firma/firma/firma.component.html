@@ -30,7 +30,7 @@
     (visibleChange)="!firmaModalVisible && onFirmaModalClosed()">
     <div class="firma-form">      <app-text-input
         title="Firma Adı"
-        [value]="firmaModel.ad"
+        [value]="firmaModel.ad || ''"
         (valueChange)="firmaModel.ad = $event"
         placeholder="Firma adını giriniz"
         [isRequired]="true">
@@ -38,60 +38,55 @@
       
       <app-text-input
         title="Firma Kodu"
-        [value]="firmaModel.kod"
+        [value]="firmaModel.kod || ''"
         (valueChange)="firmaModel.kod = $event"
         placeholder="Firma kodunu giriniz"
         [isRequired]="true">
-      </app-text-input>
-        <app-text-input
+      </app-text-input>        <app-text-input
         title="Adres"
-        [value]="firmaModel.adres"
+        [value]="firmaModel.adres || ''"
         (valueChange)="firmaModel.adres = $event"
         placeholder="Adres giriniz">
       </app-text-input>
       
       <app-text-input
         title="Açıklama"
-        [value]="firmaModel.aciklama"
+        [value]="firmaModel.aciklama || ''"
         (valueChange)="firmaModel.aciklama = $event"
         placeholder="Açıklama giriniz">
       </app-text-input>
         <div class="form-row">
-        <div class="form-group col-md-6">
-          <app-text-input
+        <div class="form-group col-md-6">          <app-text-input
             title="Mesai Saati"
             type="number"
-            [value]="firmaModel.mesaiSaat?.toString()"
+            [value]="firmaModel.mesaiSaat != null ? firmaModel.mesaiSaat.toString() : ''"
             (valueChange)="firmaModel.mesaiSaat = parseFloat($event)"
             placeholder="Mesai saati">
           </app-text-input>
         </div>
         
-        <div class="form-group col-md-6">
-          <app-text-input
+        <div class="form-group col-md-6">          <app-text-input
             title="Mola Saati"
             type="number"
-            [value]="firmaModel.molaSaat?.toString()"
+            [value]="firmaModel.molaSaat != null ? firmaModel.molaSaat.toString() : ''"
             (valueChange)="firmaModel.molaSaat = parseFloat($event)"
             placeholder="Mola saati">
           </app-text-input>
         </div>
       </div>      <div class="form-row">
-        <div class="form-group col-md-6">
-          <app-text-input
+        <div class="form-group col-md-6">          <app-text-input
             title="Cumartesi Mesai Saati"
             type="number"
-            [value]="firmaModel.cumartesiMesaiSaat?.toString()"
+            [value]="firmaModel.cumartesiMesaiSaat != null ? firmaModel.cumartesiMesaiSaat.toString() : ''"
             (valueChange)="firmaModel.cumartesiMesaiSaat = parseFloat($event)"
             placeholder="Cumartesi mesai saati">
           </app-text-input>
         </div>
         
-        <div class="form-group col-md-6">
-          <app-text-input
+        <div class="form-group col-md-6">          <app-text-input
             title="Cumartesi Mola Saati"
             type="number"
-            [value]="firmaModel.cumartesiMolaSaat?.toString()"
+            [value]="firmaModel.cumartesiMolaSaat != null ? firmaModel.cumartesiMolaSaat.toString() : ''"
             (valueChange)="firmaModel.cumartesiMolaSaat = parseFloat($event)"
             placeholder="Cumartesi mola saati">
           </app-text-input>

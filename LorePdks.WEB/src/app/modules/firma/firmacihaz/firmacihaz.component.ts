@@ -170,12 +170,18 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
       }
     }
   }
-
   /**
    * Yeni firma cihaz eklemek için modal açar
    */
   openAddFirmaCihazModal(): void {
-    this.firmaCihazModel = {} as FirmaCihazDto;
+    this.firmaCihazModel = {
+      ad: '',
+      aciklama: '',
+      cihazMakineGercekId: null,
+      firmaDto: null,
+      firmaCihazTipKodDto: null
+    } as FirmaCihazDto;
+    
     // Eğer bir firma seçiliyse, yeni cihazı o firmaya atamak için
     if (this.selectedFirma) {
       this.firmaCihazModel.firmaDto = this.selectedFirma;

@@ -60,26 +60,23 @@
           (selectionChange)="onModalCihazTipChange($event)">
         </app-select>
       </div>
-      
-      <app-text-input
+        <app-text-input
         title="Cihaz Adı"
-        [value]="firmaCihazModel.ad"
+        [value]="firmaCihazModel.ad || ''"
         (valueChange)="firmaCihazModel.ad = $event"
         placeholder="Cihaz adını giriniz"
         [isRequired]="true">
-      </app-text-input>
-        <app-text-input
+      </app-text-input>      <app-text-input
         title="Cihaz ID"
         type="number"
-        [value]="firmaCihazModel.cihazMakineGercekId?.toString()"
+        [value]="firmaCihazModel.cihazMakineGercekId != null ? firmaCihazModel.cihazMakineGercekId.toString() : ''"
         (valueChange)="firmaCihazModel.cihazMakineGercekId = parseFloat($event)"
         placeholder="Cihaz ID'sini giriniz"
         [isRequired]="true">
       </app-text-input>
-      
-      <app-text-input
+        <app-text-input
         title="Açıklama"
-        [value]="firmaCihazModel.aciklama"
+        [value]="firmaCihazModel.aciklama || ''"
         (valueChange)="firmaCihazModel.aciklama = $event"
         placeholder="Açıklama giriniz">
       </app-text-input>
