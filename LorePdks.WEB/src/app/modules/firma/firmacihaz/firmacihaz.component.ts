@@ -23,6 +23,7 @@ import { SelectInputModel } from '../../../core/components/select/select-input.m
 // Servis ve Modeller
 import { FirmaCihazService } from '../../../core/services/modules/firmacihaz.service';
 import { FirmaService } from '../../../core/services/modules/firma.service';
+import { KodService } from '../../../core/services/modules/kod.service';
 import { FirmaCihazDto } from '../../../core/models/FirmaCihazDto';
 import { FirmaDto } from '../../../core/models/FirmaDto';
 import { KodDto } from '../../../core/models/KodDto';
@@ -93,23 +94,53 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
 
   // ViewChild referansı
   @ViewChild(ConfirmDialogComponent) confirmDialog!: ConfirmDialogComponent;
-
   constructor(
     private firmaCihazService: FirmaCihazService,
-    private firmaService: FirmaService
-  ) { }
-  ngOnInit(): void {
+    private firmaService: FirmaService,
+    private kodService: KodService
+  ) { }  ngOnInit(): void {
+    // Önce cihaz tiplerini yükleyelim
+    this.loadCihazTipleri();
+    
+    // Sonra diğer verileri yükleyelim
     this.loadFirmaList();
     this.loadFirmaCihazList();
-    // Normalde kod servisinden yüklenecek, şimdilik manuel ayarlıyoruz
-    this.cihazTipleri = [
-      { id: 1, tipId: 1, kod: 'KARTLI', kisaAd: 'Kartlı Geçiş', sira: 1, digerUygEnumAd: '', digerUygEnumDeger: 0 },
-      { id: 2, tipId: 1, kod: 'PARMAK', kisaAd: 'Parmak İzi', sira: 2, digerUygEnumAd: '', digerUygEnumDeger: 0 },
-      { id: 3, tipId: 1, kod: 'YUZ', kisaAd: 'Yüz Tanıma', sira: 3, digerUygEnumAd: '', digerUygEnumDeger: 0 }
-    ];
+  }
+  /**
+   * Cihaz tiplerini veritabanından yükler (tipId = 101 olan kodları getirir)
+   */
+  loadCihazTipleri(): void {
+    const CIHAZ_TIP_ID = 101;
+    console.log('Cihaz tipleri yükleniyor...');
     
-    // SelectInputModel verilerini hazırla
-    this.prepareSelectData();
+    this.kodService.getKodListByTipId(CIHAZ_TIP_ID)
+      .subscribe({
+        next: (data) => {
+          console.log('Cihaz tipleri başarıyla yüklendi, eleman sayısı:', data.length);
+          this.cihazTipleri = data;
+          
+          // Yüklenen verileri kontrol et
+          if (data && data.length > 0) {
+            console.log('Örnek cihaz tipi veri yapısı:', JSON.stringify(data[0]));
+          }
+          
+          // Cihaz tipleri yüklendikten sonra SelectInputModel'leri güncelle
+          setTimeout(() => {
+            // Verilerin Angular değişim döngüsünde işlenmesi için setTimeout kullanıyoruz
+            this.prepareSelectData();
+          });
+        },
+        error: (err) => {
+          console.error('Cihaz tipleri yüklenirken hata oluştu', err);
+          // Hata durumunda varsayılan değerleri kullan
+          this.cihazTipleri = [
+            { id: 1, tipId: CIHAZ_TIP_ID, kod: 'KARTLI', kisaAd: 'Kartlı Geçiş', sira: 1, digerUygEnumAd: '', digerUygEnumDeger: 0 },
+            { id: 2, tipId: CIHAZ_TIP_ID, kod: 'PARMAK', kisaAd: 'Parmak İzi', sira: 2, digerUygEnumAd: '', digerUygEnumDeger: 0 },
+            { id: 3, tipId: CIHAZ_TIP_ID, kod: 'YUZ', kisaAd: 'Yüz Tanıma', sira: 3, digerUygEnumAd: '', digerUygEnumDeger: 0 }
+          ];
+          this.prepareSelectData();
+        }
+      });
   }
 
   /**
@@ -169,8 +200,7 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
         });
       }
     }
-  }
-  /**
+  }  /**
    * Yeni firma cihaz eklemek için modal açar
    */
   openAddFirmaCihazModal(): void {
@@ -186,6 +216,15 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     if (this.selectedFirma) {
       this.firmaCihazModel.firmaDto = this.selectedFirma;
     }
+    
+    // Eğer cihaz tipleri henüz yüklenmemişse, tekrar yükle
+    if (!this.cihazTipleri || this.cihazTipleri.length === 0) {
+      this.loadCihazTipleri();
+    } else {
+      // Select için veri hazırlığını garanti edelim
+      this.prepareSelectData();
+    }
+    
     this.firmaCihazModalVisible = true;
   }
 
@@ -282,15 +321,31 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     if (selectedFirma) {
       this.firmaCihazModel.firmaDto = selectedFirma;
     }
-  }
-
-  /**
+  }  /**
    * Modal içindeki cihaz tipi seçimi değiştiğinde çağrılır
    */
-  onModalCihazTipChange(cihazTipId: number): void {
+  onModalCihazTipChange(cihazTipId: number | null): void {
+    console.log('onModalCihazTipChange çağrıldı, cihazTipId:', cihazTipId);
+    if (cihazTipId === null) return;
+    
+    // Cihaz tiplerinin dolu olduğunu kontrol et
+    if (!this.cihazTipleri || this.cihazTipleri.length === 0) {
+      console.warn('Cihaz tipleri henüz yüklenmedi!');
+      return;
+    }
+    
+    // Mevcut tüm tip ID'lerini logla
+    console.log('Mevcut cihaz tipleri ID listesi:', this.cihazTipleri.map(tip => tip.id));
+    
+    // Seçilen tip nesnesini bul
     const selectedTip = this.cihazTipleri.find(tip => tip.id === cihazTipId);
     if (selectedTip) {
       this.firmaCihazModel.firmaCihazTipKodDto = selectedTip;
+      console.log('Seçilen cihaz tipi:', selectedTip);
+    } else {
+      console.warn(`ID: ${cihazTipId} olan cihaz tipi bulunamadı`);
+      // Eşleştirme olmadığı için tam tipleri göster
+      console.log('Tüm cihaz tipleri:', JSON.stringify(this.cihazTipleri));
     }
   }
 
@@ -306,21 +361,31 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
    */
   onFirmaCihazModalClosed(): void {
     this.firmaCihazModel = {} as FirmaCihazDto;
-  }
-
-  /**
+  }  /**
    * Select bileşenleri için veri hazırlar
    */  prepareSelectData(): void {
     // Firma listesi için SelectInputModel nesneleri oluştur
-    const firmaSelectItems = this.firmaList.map(firma => 
-      new SelectInputModel(firma.eid, firma.ad)
-    );
-    this.firmaListDto$.next(firmaSelectItems);
+    if (this.firmaList && this.firmaList.length > 0) {
+      const firmaSelectItems = this.firmaList.map(firma => 
+        new SelectInputModel(firma.eid, firma.ad)
+      );
+      this.firmaListDto$.next(firmaSelectItems);
+    }
     
     // Cihaz tipleri için SelectInputModel nesneleri oluştur
-    const cihazTipSelectItems = this.cihazTipleri.map(tip => 
-      new SelectInputModel(tip.id, tip.kisaAd)
-    );
-    this.cihazTipleriListDto$.next(cihazTipSelectItems);
+    if (this.cihazTipleri && this.cihazTipleri.length > 0) {
+      // KodListComponent'teki yapı gibi daha açıklayıcı bir şekilde göster
+      const cihazTipSelectItems = this.cihazTipleri.map(tip => 
+        new SelectInputModel(tip.id, `${tip.kisaAd} (${tip.kod || ''})`));
+        
+      console.log('Cihaz tipleri SelectInputModel:', cihazTipSelectItems);
+      // BehaviorSubject güncelleniyor
+      this.cihazTipleriListDto$.next(cihazTipSelectItems);
+      
+      // Değişiklikleri hemen görebilmek için log
+      console.log('Cihaz tipleri listesi güncellendi, eleman sayısı:', cihazTipSelectItems.length);
+    } else {
+      console.warn('Cihaz tipleri henüz yüklenmedi veya boş!');
+    }
   }
 }

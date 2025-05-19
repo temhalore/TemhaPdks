@@ -48,17 +48,20 @@
           [isRequired]="true"
           (selectionChange)="onModalFirmaChange($event)">
         </app-select>
-      </div>
-      
-      <div class="form-group">
+      </div>      <div class="form-group">
         <app-select
           title="Cihaz Tipi"
           [itemListDto$]="cihazTipleriListDto$"
           [selectedValue]="firmaCihazModel.firmaCihazTipKodDto?.id"
           placeholder="Cihaz tipi seçiniz"
           [isRequired]="true"
+          [class]="'z-3'"
           (selectionChange)="onModalCihazTipChange($event)">
         </app-select>
+        <!-- Debug bilgisi - cihaz tiplerini kontrol için -->
+        <small *ngIf="false" class="text-muted">
+          Seçilen ID: {{firmaCihazModel.firmaCihazTipKodDto?.id}}
+        </small>
       </div>
         <app-text-input
         title="Cihaz Adı"
