@@ -1,4 +1,10 @@
 <div class="select-container">
+  <!-- Başlık -->
+  <label *ngIf="title" [for]="'select-' + title" class="mb-2">
+    {{ title }}
+    <span *ngIf="isRequired" class="text-danger">*</span>
+  </label>
+  
   <!-- Yükleniyor durumu -->
   <div *ngIf="(isLoading$ | async); else contentTemplate" class="select-loading">
     <i class="pi pi-spin pi-spinner"></i> Yükleniyor...

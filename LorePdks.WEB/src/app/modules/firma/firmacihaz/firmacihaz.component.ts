@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { finalize, BehaviorSubject } from 'rxjs';
 
 // PrimeNG Modülleri
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +15,10 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
 import { DataGridComponent, ActionButtonConfig } from '../../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
+import { TextInputComponent } from '../../../core/components/text-input/text-input.component';
+import { ButtonComponent } from '../../../core/components/button/button.component';
+import { SelectComponent } from '../../../core/components/select/select.component';
+import { SelectInputModel } from '../../../core/components/select/select-input.model';
 
 // Servis ve Modeller
 import { FirmaCihazService } from '../../../core/services/modules/firmacihaz.service';
@@ -27,8 +31,7 @@ import { KodDto } from '../../../core/models/KodDto';
   selector: 'app-firmacihaz',
   templateUrl: './firmacihaz.component.html',
   styleUrls: ['./firmacihaz.component.scss'],
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -39,15 +42,21 @@ import { KodDto } from '../../../core/models/KodDto';
     DropdownModule,
     DataGridComponent,
     ModalComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    TextInputComponent,
+    ButtonComponent,
+    SelectComponent
   ]
 })
-export class FirmaCihazComponent implements OnInit {
-  // Firma cihaz listesi
+export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   firmaCihazList: FirmaCihazDto[] = [];
   loading: boolean = false;
   firmaList: FirmaDto[] = [];
   cihazTipleri: KodDto[] = [];
+  
+  // Select component için BehaviorSubject'ler
+  firmaListDto$ = new BehaviorSubject<SelectInputModel[]>([]);
+  cihazTipleriListDto$ = new BehaviorSubject<SelectInputModel[]>([]);
 
   // Seçilen firma cihaz
   selectedFirmaCihaz: FirmaCihazDto | null = null;
@@ -89,7 +98,6 @@ export class FirmaCihazComponent implements OnInit {
     private firmaCihazService: FirmaCihazService,
     private firmaService: FirmaService
   ) { }
-
   ngOnInit(): void {
     this.loadFirmaList();
     this.loadFirmaCihazList();
@@ -99,16 +107,20 @@ export class FirmaCihazComponent implements OnInit {
       { id: 2, tipId: 1, kod: 'PARMAK', kisaAd: 'Parmak İzi', sira: 2, digerUygEnumAd: '', digerUygEnumDeger: 0 },
       { id: 3, tipId: 1, kod: 'YUZ', kisaAd: 'Yüz Tanıma', sira: 3, digerUygEnumAd: '', digerUygEnumDeger: 0 }
     ];
+    
+    // SelectInputModel verilerini hazırla
+    this.prepareSelectData();
   }
 
   /**
    * Firma listesini yükler
-   */
-  loadFirmaList(): void {
+   */  loadFirmaList(): void {
     this.firmaService.getAllFirmaList()
       .subscribe({
         next: (data) => {
           this.firmaList = data;
+          // Firma listesi yüklendikten sonra SelectInputModel'leri güncelle
+          this.prepareSelectData();
         },
         error: (err) => {
           console.error('Firma listesi yüklenirken hata oluştu', err);
@@ -250,10 +262,37 @@ export class FirmaCihazComponent implements OnInit {
 
   /**
    * Firma değiştiğinde çağrılır
-   */
-  onFirmaChange(event: any): void {
-    this.selectedFirma = event.value;
+   */  onFirmaChange(firmaId: string): void {
+    // firmaId kullanarak firma nesnesini bul
+    this.selectedFirma = this.firmaList.find(firma => firma.eid === firmaId) || null;
     this.loadFirmaCihazList();
+  }
+
+  /**
+   * Modal içindeki firma seçimi değiştiğinde çağrılır
+   */
+  onModalFirmaChange(firmaId: string): void {
+    const selectedFirma = this.firmaList.find(firma => firma.eid === firmaId);
+    if (selectedFirma) {
+      this.firmaCihazModel.firmaDto = selectedFirma;
+    }
+  }
+
+  /**
+   * Modal içindeki cihaz tipi seçimi değiştiğinde çağrılır
+   */
+  onModalCihazTipChange(cihazTipId: number): void {
+    const selectedTip = this.cihazTipleri.find(tip => tip.id === cihazTipId);
+    if (selectedTip) {
+      this.firmaCihazModel.firmaCihazTipKodDto = selectedTip;
+    }
+  }
+
+  /**
+   * Sayısal değerleri işlemek için yardımcı metot
+   */
+  parseFloat(value: string): number {
+    return value ? parseFloat(value) : 0;
   }
 
   /**
@@ -261,5 +300,21 @@ export class FirmaCihazComponent implements OnInit {
    */
   onFirmaCihazModalClosed(): void {
     this.firmaCihazModel = {} as FirmaCihazDto;
+  }
+
+  /**
+   * Select bileşenleri için veri hazırlar
+   */  prepareSelectData(): void {
+    // Firma listesi için SelectInputModel nesneleri oluştur
+    const firmaSelectItems = this.firmaList.map(firma => 
+      new SelectInputModel(firma.eid, firma.ad)
+    );
+    this.firmaListDto$.next(firmaSelectItems);
+    
+    // Cihaz tipleri için SelectInputModel nesneleri oluştur
+    const cihazTipSelectItems = this.cihazTipleri.map(tip => 
+      new SelectInputModel(tip.id, tip.kisaAd)
+    );
+    this.cihazTipleriListDto$.next(cihazTipSelectItems);
   }
 }

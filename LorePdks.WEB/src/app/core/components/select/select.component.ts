@@ -22,6 +22,7 @@ import { SelectInputModel } from './select-input.model';
 })
 export class SelectComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() class: string = '';
+  @Input() title: string = ''; // Eklenen başlık alanı
   @Input() placeholder: string = 'Seçiniz';
   @Input() isDisabled: boolean = false;
   @Input() isRequired: boolean = false;

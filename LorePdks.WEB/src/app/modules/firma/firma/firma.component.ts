@@ -15,6 +15,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
 import { DataGridComponent, ActionButtonConfig } from '../../../core/components/data-grid/data-grid.component';
 import { ModalComponent } from '../../../core/components/modal/modal.component';
+import { TextInputComponent } from '../../../core/components/text-input/text-input.component';
+import { ButtonComponent } from '../../../core/components/button/button.component';
 
 // Servis ve Modeller
 import { FirmaService } from '../../../core/services/modules/firma.service';
@@ -24,8 +26,7 @@ import { FirmaDto } from '../../../core/models/FirmaDto';
   selector: 'app-firma',
   templateUrl: './firma.component.html',
   styleUrls: ['./firma.component.scss'],
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -36,7 +37,9 @@ import { FirmaDto } from '../../../core/models/FirmaDto';
     InputNumberModule,
     DataGridComponent,
     ModalComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    TextInputComponent,
+    ButtonComponent
   ]
 })
 export class FirmaListeComponent implements OnInit {
@@ -81,6 +84,19 @@ export class FirmaListeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFirmaList();
+  }
+
+  // TextInput için onChange metodu
+  onChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input) {
+      this.firmaModel[input.id] = input.value;
+    }
+  }
+
+  // Sayısal değerleri işlemek için yardımcı metot
+  parseFloat(value: string): number {
+    return value ? parseFloat(value) : 0;
   }
 
   /**

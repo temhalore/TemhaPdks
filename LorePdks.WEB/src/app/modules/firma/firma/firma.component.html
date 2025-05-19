@@ -1,14 +1,11 @@
-<div class="firma-container">
-  <div class="firma-header">
+<div class="firma-container">  <div class="firma-header">
     <h1>Firma Yönetimi</h1>
-    <button 
-      pButton 
-      type="button" 
-      label="Yeni Firma" 
-      icon="pi pi-plus" 
-      class="p-button-sm" 
-      (click)="openAddFirmaModal()">
-    </button>
+    <app-button
+      name="Yeni Firma"
+      icon="pi pi-plus"
+      class="p-button-sm"
+      (onClick)="openAddFirmaModal()">
+    </app-button>
   </div>
   
   <div class="firma-content" style="width: 100%;">
@@ -31,110 +28,73 @@
     [width]="'500px'"
     (save)="saveFirma()"
     (visibleChange)="!firmaModalVisible && onFirmaModalClosed()">
-    <div class="firma-form">
-      <div class="form-group">
-        <label for="firmaAdi">Firma Adı</label>
-        <input 
-          id="firmaAdi" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="firmaModel.ad" 
-          class="form-control" 
-          placeholder="Firma adını giriniz" 
-          required>
-      </div>
+    <div class="firma-form">      <app-text-input
+        title="Firma Adı"
+        [value]="firmaModel.ad"
+        (valueChange)="firmaModel.ad = $event"
+        placeholder="Firma adını giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="firmaKodu">Firma Kodu</label>
-        <input 
-          id="firmaKodu" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="firmaModel.kod" 
-          class="form-control" 
-          placeholder="Firma kodunu giriniz" 
-          required>
-      </div>
+      <app-text-input
+        title="Firma Kodu"
+        [value]="firmaModel.kod"
+        (valueChange)="firmaModel.kod = $event"
+        placeholder="Firma kodunu giriniz"
+        [isRequired]="true">
+      </app-text-input>
+        <app-text-input
+        title="Adres"
+        [value]="firmaModel.adres"
+        (valueChange)="firmaModel.adres = $event"
+        placeholder="Adres giriniz">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="adres">Adres</label>
-        <textarea 
-          id="adres" 
-          pInputTextarea
-          [(ngModel)]="firmaModel.adres" 
-          class="form-control" 
-          placeholder="Adres giriniz">
-        </textarea>
-      </div>
-      
-      <div class="form-group">
-        <label for="aciklama">Açıklama</label>
-        <textarea 
-          id="aciklama" 
-          pInputTextarea
-          [(ngModel)]="firmaModel.aciklama" 
-          class="form-control" 
-          placeholder="Açıklama giriniz">
-        </textarea>
-      </div>
-      
-      <div class="form-row">
+      <app-text-input
+        title="Açıklama"
+        [value]="firmaModel.aciklama"
+        (valueChange)="firmaModel.aciklama = $event"
+        placeholder="Açıklama giriniz">
+      </app-text-input>
+        <div class="form-row">
         <div class="form-group col-md-6">
-          <label for="mesaiSaat">Mesai Saati</label>
-          <p-inputNumber 
-            id="mesaiSaat" 
-            [(ngModel)]="firmaModel.mesaiSaat" 
-            [showButtons]="false" 
-            [min]="0" 
-            [max]="24" 
-            placeholder="Mesai saati" 
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2">
-          </p-inputNumber>
+          <app-text-input
+            title="Mesai Saati"
+            type="number"
+            [value]="firmaModel.mesaiSaat?.toString()"
+            (valueChange)="firmaModel.mesaiSaat = parseFloat($event)"
+            placeholder="Mesai saati">
+          </app-text-input>
         </div>
         
         <div class="form-group col-md-6">
-          <label for="molaSaat">Mola Saati</label>
-          <p-inputNumber 
-            id="molaSaat" 
-            [(ngModel)]="firmaModel.molaSaat" 
-            [showButtons]="false" 
-            [min]="0" 
-            [max]="24" 
-            placeholder="Mola saati" 
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2">
-          </p-inputNumber>
+          <app-text-input
+            title="Mola Saati"
+            type="number"
+            [value]="firmaModel.molaSaat?.toString()"
+            (valueChange)="firmaModel.molaSaat = parseFloat($event)"
+            placeholder="Mola saati">
+          </app-text-input>
         </div>
-      </div>
-
-      <div class="form-row">
+      </div>      <div class="form-row">
         <div class="form-group col-md-6">
-          <label for="cumartesiMesaiSaat">Cumartesi Mesai Saati</label>
-          <p-inputNumber 
-            id="cumartesiMesaiSaat" 
-            [(ngModel)]="firmaModel.cumartesiMesaiSaat" 
-            [showButtons]="false" 
-            [min]="0" 
-            [max]="24" 
-            placeholder="Cumartesi mesai saati" 
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2">
-          </p-inputNumber>
+          <app-text-input
+            title="Cumartesi Mesai Saati"
+            type="number"
+            [value]="firmaModel.cumartesiMesaiSaat?.toString()"
+            (valueChange)="firmaModel.cumartesiMesaiSaat = parseFloat($event)"
+            placeholder="Cumartesi mesai saati">
+          </app-text-input>
         </div>
         
         <div class="form-group col-md-6">
-          <label for="cumartesiMolaSaat">Cumartesi Mola Saati</label>
-          <p-inputNumber 
-            id="cumartesiMolaSaat" 
-            [(ngModel)]="firmaModel.cumartesiMolaSaat" 
-            [showButtons]="false" 
-            [min]="0" 
-            [max]="24" 
-            placeholder="Cumartesi mola saati" 
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2">
-          </p-inputNumber>
+          <app-text-input
+            title="Cumartesi Mola Saati"
+            type="number"
+            [value]="firmaModel.cumartesiMolaSaat?.toString()"
+            (valueChange)="firmaModel.cumartesiMolaSaat = parseFloat($event)"
+            placeholder="Cumartesi mola saati">
+          </app-text-input>
         </div>
       </div>
     </div>

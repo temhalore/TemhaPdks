@@ -1,25 +1,21 @@
-<div class="firmacihaz-container">
-  <div class="firmacihaz-header">
+<div class="firmacihaz-container">  <div class="firmacihaz-header">
     <h1>Firma Cihaz Yönetimi</h1>
-    <div class="firmacihaz-actions">
-      <div class="firma-filter">
-        <p-dropdown 
-          [options]="firmaList" 
-          [(ngModel)]="selectedFirma" 
-          optionLabel="ad"
+    <div class="firmacihaz-actions">      <div class="firma-filter">
+        <app-select
+          title="Firma"
+          [itemListDto$]="firmaListDto$"
+          [selectedValue]="selectedFirma?.eid"
           placeholder="Firmaya Göre Filtrele"
-          (onChange)="onFirmaChange($event)">
-        </p-dropdown>
+          (selectionChange)="onFirmaChange($event)">
+        </app-select>
       </div>
       
-      <button 
-        pButton 
-        type="button" 
-        label="Yeni Cihaz" 
-        icon="pi pi-plus" 
-        class="p-button-sm" 
-        (click)="openAddFirmaCihazModal()">
-      </button>
+      <app-button
+        name="Yeni Cihaz"
+        icon="pi pi-plus"
+        class="p-button-sm"
+        (onClick)="openAddFirmaCihazModal()">
+      </app-button>
     </div>
   </div>
   
@@ -42,68 +38,51 @@
     [title]="firmaCihazModel.eid ? 'Cihaz Düzenle' : 'Yeni Cihaz'"
     [width]="'500px'"
     (save)="saveFirmaCihaz()"
-    (visibleChange)="!firmaCihazModalVisible && onFirmaCihazModalClosed()">
-    <div class="firmacihaz-form">
+    (visibleChange)="!firmaCihazModalVisible && onFirmaCihazModalClosed()">    <div class="firmacihaz-form">
       <div class="form-group">
-        <label for="firma">Firma</label>
-        <p-dropdown 
-          id="firma" 
-          [options]="firmaList" 
-          [(ngModel)]="firmaCihazModel.firmaDto" 
-          optionLabel="ad" 
+        <app-select
+          title="Firma"
+          [itemListDto$]="firmaListDto$"
+          [selectedValue]="firmaCihazModel.firmaDto?.eid"
           placeholder="Firma seçiniz"
-          [showClear]="true"
-          [required]="true">
-        </p-dropdown>
+          [isRequired]="true"
+          (selectionChange)="onModalFirmaChange($event)">
+        </app-select>
       </div>
       
       <div class="form-group">
-        <label for="cihazTip">Cihaz Tipi</label>
-        <p-dropdown 
-          id="cihazTip" 
-          [options]="cihazTipleri" 
-          [(ngModel)]="firmaCihazModel.firmaCihazTipKodDto" 
-          optionLabel="kisaAd" 
+        <app-select
+          title="Cihaz Tipi"
+          [itemListDto$]="cihazTipleriListDto$"
+          [selectedValue]="firmaCihazModel.firmaCihazTipKodDto?.id"
           placeholder="Cihaz tipi seçiniz"
-          [showClear]="true"
-          [required]="true">
-        </p-dropdown>
+          [isRequired]="true"
+          (selectionChange)="onModalCihazTipChange($event)">
+        </app-select>
       </div>
       
-      <div class="form-group">
-        <label for="cihazAdi">Cihaz Adı</label>
-        <input 
-          id="cihazAdi" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="firmaCihazModel.ad" 
-          class="form-control" 
-          placeholder="Cihaz adını giriniz" 
-          required>
-      </div>
+      <app-text-input
+        title="Cihaz Adı"
+        [value]="firmaCihazModel.ad"
+        (valueChange)="firmaCihazModel.ad = $event"
+        placeholder="Cihaz adını giriniz"
+        [isRequired]="true">
+      </app-text-input>
+        <app-text-input
+        title="Cihaz ID"
+        type="number"
+        [value]="firmaCihazModel.cihazMakineGercekId?.toString()"
+        (valueChange)="firmaCihazModel.cihazMakineGercekId = parseFloat($event)"
+        placeholder="Cihaz ID'sini giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="cihazId">Cihaz ID</label>
-        <input 
-          id="cihazId" 
-          type="number" 
-          pInputText 
-          [(ngModel)]="firmaCihazModel.cihazMakineGercekId" 
-          class="form-control" 
-          placeholder="Cihaz ID'sini giriniz" 
-          required>
-      </div>
-      
-      <div class="form-group">
-        <label for="aciklama">Açıklama</label>
-        <textarea 
-          id="aciklama" 
-          pInputTextarea
-          [(ngModel)]="firmaCihazModel.aciklama" 
-          class="form-control" 
-          placeholder="Açıklama giriniz">
-        </textarea>
-      </div>
+      <app-text-input
+        title="Açıklama"
+        [value]="firmaCihazModel.aciklama"
+        (valueChange)="firmaCihazModel.aciklama = $event"
+        placeholder="Açıklama giriniz">
+      </app-text-input>
     </div>
   </app-modal>
     <!-- Silme Onay Dialogu -->
