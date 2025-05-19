@@ -193,7 +193,7 @@ export class KodListComponent implements OnInit {
     
     this.kodModalVisible = true;
   }
-    /**
+  /**
    * Yeni tip ekleme modalını açar
    */
   openAddTipModal(): void {
@@ -207,6 +207,14 @@ export class KodListComponent implements OnInit {
     
     // Tip ID'si her zaman 0 olacak
     this.tipModel.tipId = 0;
+    
+    // ID için son kullanılan tip ID'sinden sonraki değeri öner
+    let nextId = 1000; // Varsayılan başlangıç değeri
+    if (this.kodTipleri.length > 0) {
+      const maxId = Math.max(...this.kodTipleri.map(k => k.id || 0));
+      nextId = maxId + 1;
+    }
+    this.tipModel.id = nextId;
     
     // Son eklenen tipin sırasını bul ve bir artır
     let maxSira = 0;
@@ -251,17 +259,30 @@ export class KodListComponent implements OnInit {
     this.selectedKod = kod;
     this.confirmDialog.show();
   }
-  
-  /**
+    /**
    * Tip kaydeder
    */
   saveTip(): void {
+    // Gerekli kontroller
+    if (!this.tipModel.id) {
+      alert('Tip ID değeri boş olamaz!');
+      return;
+    }
+    
     // Tip ID'si her zaman 0 olmalı
     this.tipModel.tipId = 0;
+    
+    // ID değerinin numeric olduğundan emin ol
+    if (typeof this.tipModel.id === 'string') {
+      this.tipModel.id = parseInt(this.tipModel.id);
+    }
+    
+    console.log('Kaydedilecek tip:', this.tipModel);
     
     this.kodService.saveKod(this.tipModel)
       .subscribe({
         next: (savedTip) => {
+          console.log('Tip başarıyla kaydedildi:', savedTip);
           this.tipModalVisible = false;
           this.loadKodList();
         },

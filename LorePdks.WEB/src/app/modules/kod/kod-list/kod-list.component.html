@@ -27,8 +27,7 @@
       </button>    
     </div>  
   </div>
-  
-  <div class="kod-filters mb-3">
+    <div class="kod-filters mb-3">
     <div class="row">
       <div class="col-md-4">
         <app-select
@@ -36,6 +35,7 @@
           [itemListDto$]="tipListDto$"
           [selectedValue]="selectedTipId"
           placeholder="Kod tipi seçiniz"
+          [class]="'z-3'"
           (selectionChange)="onTipFilterChange($event)">
         </app-select>
       </div>
@@ -61,14 +61,14 @@
     [width]="'600px'"
     (save)="saveKod()"
     (visibleChange)="!kodModalVisible && onKodModalClosed()">    
-    <div class="kod-form">
-      <div class="form-group">
+    <div class="kod-form">      <div class="form-group">
         <label for="tipId">Tip ID</label>
         <app-select
           [itemListDto$]="tipListDto$"
           [selectedValue]="kodModel.tipId"
           placeholder="Tip ID seçiniz"
           [isRequired]="true"
+          [class]="'z-3'"
           (selectionChange)="kodModel.tipId = $event">
         </app-select>
       </div>
@@ -126,15 +126,21 @@
     header="Kod Silme"
     message="Bu kodu silmek istediğinize emin misiniz?"
     (confirmed)="deleteKod()">  </app-confirm-dialog>
-  
-  <!-- Tip Ekleme/Düzenleme Modalı -->
+    <!-- Tip Ekleme/Düzenleme Modalı -->
   <app-modal
     [(visible)]="tipModalVisible"
     [title]="tipModel.id ? 'Tip Düzenle' : 'Yeni Tip'"
     [width]="'600px'"
     (save)="saveTip()"
     (visibleChange)="!tipModalVisible && onTipModalClosed()">    
-    <div class="kod-form">
+    <div class="kod-form">      <app-text-input
+        title="ID"
+        [value]="tipModel.id?.toString() || ''"
+        (valueChange)="tipModel.id = $event ? +$event : null"
+        placeholder="Tip ID değerini giriniz"
+        [isRequired]="true">
+      </app-text-input>
+    
       <app-text-input
         title="Kod"
         [value]="tipModel.kod || ''"

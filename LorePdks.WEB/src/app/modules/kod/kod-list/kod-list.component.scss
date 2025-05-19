@@ -29,6 +29,8 @@
   gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
+  position: relative;
+  z-index: 10;
   
   .kod-filter-item {
     display: flex;
@@ -40,6 +42,17 @@
       font-weight: 500;
       font-size: 0.875rem;
       margin-right: 0.5rem;
+    }
+  }
+  
+  ::ng-deep {
+    .p-dropdown, .p-multiselect {
+      min-width: 250px;
+      width: 100%;
+    }
+    
+    .p-dropdown-panel, .p-multiselect-panel {
+      z-index: 1000 !important;
     }
   }
 }
@@ -65,6 +78,16 @@
     
     input, textarea {
       width: 100%;
+    }
+  }
+  
+  ::ng-deep {
+    .p-dropdown, .p-multiselect {
+      width: 100%;
+    }
+    
+    .p-dropdown-panel, .p-multiselect-panel {
+      z-index: 1100 !important;
     }
   }
 }

@@ -50,19 +50,20 @@ namespace LorePdks.BAL.Managers.Common.Kod
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"{kodDTO.id} id'li kod sistemde bulunamadı");
             }
 
-            // Validation - Kod kaydedilebilir mi kontrolleri
-            checkKodDtoKayitEdilebilirMi(kodDTO);
+           
 
             t_kod kod = _mapper.Map<t_kod>(kodDTO);
 
             // Repository otomatik olarak tarihleri ve ISDELETED değerini yönetiyor
 
             if (isGuncelleniyor)
-            {
+            { // Validation - Kod kaydedilebilir mi kontrolleri
+                checkKodDtoKayitEdilebilirMi_guncelelme(kodDTO);
                 _repoKod.Save(kod);
             }
             else
-            {
+            { // Validation - Kod kaydedilebilir mi kontrolleri
+                checkKodDtoKayitEdilebilirMi_yenikayıt(kodDTO);
                 _repoKod.Insert(kod);
             }
             
@@ -95,13 +96,29 @@ namespace LorePdks.BAL.Managers.Common.Kod
         /// Kod kaydedilebilir mi kontrol eder
         /// </summary>
         /// <param name="kodDTO">Kontrol edilecek KodDTO</param>
-        private void checkKodDtoKayitEdilebilirMi(KodDTO kodDTO)
+        private void checkKodDtoKayitEdilebilirMi_guncelelme(KodDTO kodDTO)
         {
             if (string.IsNullOrEmpty(kodDTO.kod))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Kod alanı boş olamaz");
             
           
            
+            // Kod benzersizlik kontrolü
+            var allKodList = _repoKod.GetList("ID <> @id", new { id = kodDTO.id });
+
+            if (allKodList.Any(x => x.KOD.Equals(kodDTO.kod, StringComparison.OrdinalIgnoreCase) && x.TIP_ID == kodDTO.tipId))
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"'{kodDTO.kod}' kodlu başka bir kayıt zaten mevcut");
+            }
+        }
+
+        private void checkKodDtoKayitEdilebilirMi_yenikayıt(KodDTO kodDTO)
+        {
+            if (string.IsNullOrEmpty(kodDTO.kod))
+                throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Kod alanı boş olamaz");
+
+
+
             // Kod benzersizlik kontrolü
             var allKodList = _repoKod.GetList("ID <> @id", new { id = kodDTO.id });
 
