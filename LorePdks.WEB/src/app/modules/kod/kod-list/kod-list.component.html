@@ -1,11 +1,10 @@
-<div class="kod-container">
-  <div class="kod-header">
+<div class="kod-container">  <div class="kod-header">
     <h1>Kod Yönetimi</h1>
     <div class="kod-header-actions">
       <button 
         pButton 
         type="button" 
-        label="Kod Ekle" 
+        label="Yeni Kod" 
         icon="pi pi-plus" 
         class="p-button-sm mr-2" 
         (click)="openAddKodModal()">
@@ -13,9 +12,9 @@
       <button 
         pButton 
         type="button" 
-        label="Tip Ekle" 
-        icon="pi pi-plus-circle" 
-        class="p-button-sm mr-2 p-button-success"
+        label="Yeni Tip" 
+        icon="pi pi-tag" 
+        class="p-button-sm p-button-success mr-2" 
         (click)="openAddTipModal()">
       </button>
       <button 
@@ -25,69 +24,69 @@
         icon="pi pi-refresh" 
         class="p-button-sm p-button-info" 
         (click)="refreshCache()">
-      </button>
+      </button>    
+    </div>  
+  </div>
+  
+  <div class="kod-filters mb-3">
+    <div class="row">
+      <div class="col-md-4">
+        <app-select
+          title="Tip Filtresi"
+          [itemListDto$]="tipListDto$"
+          [selectedValue]="selectedTipId"
+          placeholder="Kod tipi seçiniz"
+          (selectionChange)="onTipFilterChange($event)">
+        </app-select>
+      </div>
     </div>
   </div>
   
   <div class="kod-content" style="width: 100%;">
     <app-data-grid
-      [data]="kodList"
+      [data]="filteredKodList"
       [columns]="columns"
       [loading]="loading"
       headerTitle="Kod Listesi"
       [responsive]="true"
       [tableStyle]="{'width': '100%', 'min-width': '800px'}"
       [actionButtons]="actionButtons"
-      (rowAction)="onRowAction($event)"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[5,10,25,50]">
+      (rowAction)="onRowAction($event)">
     </app-data-grid>
   </div>
-  
   <!-- Kod Ekleme/Düzenleme Modalı -->
   <app-modal
     [(visible)]="kodModalVisible"
     [title]="kodModel.id ? 'Kod Düzenle' : 'Yeni Kod'"
     [width]="'600px'"
     (save)="saveKod()"
-    (visibleChange)="!kodModalVisible && onKodModalClosed()">    <div class="kod-form">
+    (visibleChange)="!kodModalVisible && onKodModalClosed()">    
+    <div class="kod-form">
       <div class="form-group">
-        <label for="tipId">Tip</label>
-        <p-dropdown
-          id="tipId"
-          [(ngModel)]="kodModel.tipId"
-          [options]="tipDropdownOptions"
-          placeholder="Tip seçiniz"
-          [style]="{'width':'100%'}"
-          optionLabel="label"
-          optionValue="value">
-        </p-dropdown>
+        <label for="tipId">Tip ID</label>
+        <app-select
+          [itemListDto$]="tipListDto$"
+          [selectedValue]="kodModel.tipId"
+          placeholder="Tip ID seçiniz"
+          [isRequired]="true"
+          (selectionChange)="kodModel.tipId = $event">
+        </app-select>
       </div>
+        <app-text-input
+        title="Kod"
+        [value]="kodModel.kod || ''"
+        (valueChange)="kodModel.kod = $event"
+        placeholder="Kod değerini giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="kod">Kod</label>
-        <input 
-          id="kod" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="kodModel.kod" 
-          class="form-control" 
-          placeholder="Kod değerini giriniz" 
-          required>
-      </div>
-      
-      <div class="form-group">
-        <label for="kisaAd">Kısa Ad</label>
-        <input 
-          id="kisaAd" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="kodModel.kisaAd" 
-          class="form-control" 
-          placeholder="Kısa ad giriniz" 
-          required>
-      </div>
+      <app-text-input
+        title="Kısa Ad"
+        [value]="kodModel.kisaAd || ''"
+        (valueChange)="kodModel.kisaAd = $event"
+        placeholder="Kısa ad giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
       <div class="form-group">
         <label for="sira">Sıra</label>
@@ -100,17 +99,12 @@
           [style]="{'width':'100%'}">
         </p-inputNumber>
       </div>
-      
-      <div class="form-group">
-        <label for="digerUygEnumAd">Diğer Uygulama Enum Adı</label>
-        <input 
-          id="digerUygEnumAd" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="kodModel.digerUygEnumAd" 
-          class="form-control" 
-          placeholder="Diğer uygulama enum adı">
-      </div>
+        <app-text-input
+        title="Diğer Uygulama Enum Adı"
+        [value]="kodModel.digerUygEnumAd || ''"
+        (valueChange)="kodModel.digerUygEnumAd = $event"
+        placeholder="Diğer uygulama enum adı">
+      </app-text-input>
       
       <div class="form-group">
         <label for="digerUygEnumDeger">Diğer Uygulama Enum Değeri</label>
@@ -126,48 +120,36 @@
     </div>
   </app-modal>
   
+  <!-- Silme Onay Modalı -->
+  <app-confirm-dialog
+    #confirmDialog
+    header="Kod Silme"
+    message="Bu kodu silmek istediğinize emin misiniz?"
+    (confirmed)="deleteKod()">  </app-confirm-dialog>
+  
   <!-- Tip Ekleme/Düzenleme Modalı -->
   <app-modal
     [(visible)]="tipModalVisible"
     [title]="tipModel.id ? 'Tip Düzenle' : 'Yeni Tip'"
     [width]="'600px'"
     (save)="saveTip()"
-    (visibleChange)="!tipModalVisible && onTipModalClosed()">    <div class="tip-form">
-      <div class="form-group">
-        <label for="tipId">Tip ID</label>
-        <p-inputNumber 
-          id="tipId" 
-          [(ngModel)]="tipModel.id" 
-          [showButtons]="false" 
-          placeholder="Tip ID değerini giriniz" 
-          [min]="0"
-          [style]="{'width':'100%'}">
-        </p-inputNumber>
-      </div>
+    (visibleChange)="!tipModalVisible && onTipModalClosed()">    
+    <div class="kod-form">
+      <app-text-input
+        title="Kod"
+        [value]="tipModel.kod || ''"
+        (valueChange)="tipModel.kod = $event"
+        placeholder="Tip kodu giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
-      <div class="form-group">
-        <label for="tipKod">Tip Kodu</label>
-        <input 
-          id="tipKod" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="tipModel.kod" 
-          class="form-control" 
-          placeholder="Tip kodu giriniz" 
-          required>
-      </div>
-      
-      <div class="form-group">
-        <label for="tipKisaAd">Kısa Ad</label>
-        <input 
-          id="tipKisaAd" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="tipModel.kisaAd" 
-          class="form-control" 
-          placeholder="Kısa ad giriniz" 
-          required>
-      </div>
+      <app-text-input
+        title="Kısa Ad"
+        [value]="tipModel.kisaAd || ''"
+        (valueChange)="tipModel.kisaAd = $event"
+        placeholder="Tip adı giriniz"
+        [isRequired]="true">
+      </app-text-input>
       
       <div class="form-group">
         <label for="tipSira">Sıra</label>
@@ -180,37 +162,6 @@
           [style]="{'width':'100%'}">
         </p-inputNumber>
       </div>
-      
-      <div class="form-group">
-        <label for="tipDigerUygEnumAd">Diğer Uygulama Enum Adı</label>
-        <input 
-          id="tipDigerUygEnumAd" 
-          type="text" 
-          pInputText 
-          [(ngModel)]="tipModel.digerUygEnumAd" 
-          class="form-control" 
-          placeholder="Diğer uygulama enum adı">
-      </div>
-      
-      <div class="form-group">
-        <label for="tipDigerUygEnumDeger">Diğer Uygulama Enum Değeri</label>
-        <p-inputNumber 
-          id="tipDigerUygEnumDeger" 
-          [(ngModel)]="tipModel.digerUygEnumDeger" 
-          [showButtons]="false" 
-          placeholder="Diğer uygulama enum değeri" 
-          [min]="0"
-          [style]="{'width':'100%'}">
-        </p-inputNumber>
-      </div>
     </div>
   </app-modal>
-  
-  <!-- Silme Onay Modalı -->
-  <app-confirm-dialog
-    #confirmDialog
-    header="Kod Silme"
-    message="Bu kodu silmek istediğinize emin misiniz?"
-    (confirmed)="deleteKod()">
-  </app-confirm-dialog>
 </div>
