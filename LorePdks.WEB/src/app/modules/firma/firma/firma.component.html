@@ -1,0 +1,146 @@
+<div class="firma-container">
+  <div class="firma-header">
+    <h1>Firma Yönetimi</h1>
+    <button 
+      pButton 
+      type="button" 
+      label="Yeni Firma" 
+      icon="pi pi-plus" 
+      class="p-button-sm" 
+      (click)="openAddFirmaModal()">
+    </button>
+  </div>
+  
+  <div class="firma-content" style="width: 100%;">
+    <app-data-grid
+      [data]="firmaList"
+      [columns]="columns"
+      [loading]="loading"
+      headerTitle="Firma Listesi"
+      [responsive]="true"
+      [tableStyle]="{'width': '100%', 'min-width': '800px'}"
+      [actionButtons]="actionButtons"
+      (rowAction)="onRowAction($event)">
+    </app-data-grid>
+  </div>
+  
+  <!-- Firma Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="firmaModalVisible"
+    [title]="firmaModel.eid ? 'Firma Düzenle' : 'Yeni Firma'"
+    [width]="'500px'"
+    (save)="saveFirma()"
+    (visibleChange)="!firmaModalVisible && onFirmaModalClosed()">
+    <div class="firma-form">
+      <div class="form-group">
+        <label for="firmaAdi">Firma Adı</label>
+        <input 
+          id="firmaAdi" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="firmaModel.ad" 
+          class="form-control" 
+          placeholder="Firma adını giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="firmaKodu">Firma Kodu</label>
+        <input 
+          id="firmaKodu" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="firmaModel.kod" 
+          class="form-control" 
+          placeholder="Firma kodunu giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="adres">Adres</label>
+        <textarea 
+          id="adres" 
+          pInputTextarea
+          [(ngModel)]="firmaModel.adres" 
+          class="form-control" 
+          placeholder="Adres giriniz">
+        </textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="aciklama">Açıklama</label>
+        <textarea 
+          id="aciklama" 
+          pInputTextarea
+          [(ngModel)]="firmaModel.aciklama" 
+          class="form-control" 
+          placeholder="Açıklama giriniz">
+        </textarea>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="mesaiSaat">Mesai Saati</label>
+          <p-inputNumber 
+            id="mesaiSaat" 
+            [(ngModel)]="firmaModel.mesaiSaat" 
+            [showButtons]="false" 
+            [min]="0" 
+            [max]="24" 
+            placeholder="Mesai saati" 
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2">
+          </p-inputNumber>
+        </div>
+        
+        <div class="form-group col-md-6">
+          <label for="molaSaat">Mola Saati</label>
+          <p-inputNumber 
+            id="molaSaat" 
+            [(ngModel)]="firmaModel.molaSaat" 
+            [showButtons]="false" 
+            [min]="0" 
+            [max]="24" 
+            placeholder="Mola saati" 
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2">
+          </p-inputNumber>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="cumartesiMesaiSaat">Cumartesi Mesai Saati</label>
+          <p-inputNumber 
+            id="cumartesiMesaiSaat" 
+            [(ngModel)]="firmaModel.cumartesiMesaiSaat" 
+            [showButtons]="false" 
+            [min]="0" 
+            [max]="24" 
+            placeholder="Cumartesi mesai saati" 
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2">
+          </p-inputNumber>
+        </div>
+        
+        <div class="form-group col-md-6">
+          <label for="cumartesiMolaSaat">Cumartesi Mola Saati</label>
+          <p-inputNumber 
+            id="cumartesiMolaSaat" 
+            [(ngModel)]="firmaModel.cumartesiMolaSaat" 
+            [showButtons]="false" 
+            [min]="0" 
+            [max]="24" 
+            placeholder="Cumartesi mola saati" 
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2">
+          </p-inputNumber>
+        </div>
+      </div>
+    </div>
+  </app-modal>
+    <!-- Silme Onay Dialogu -->
+  <app-confirm-dialog
+    (confirmed)="deleteFirma()">
+  </app-confirm-dialog>
+</div>

@@ -400,6 +400,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
             routerLink: ['/secure/kisi/liste']
           }
         ]
+      },
+      {
+        label: 'Firma Yönetimi',
+        icon: 'pi pi-building',
+        children: [
+          {
+            label: 'Firma Listesi',
+            icon: 'pi pi-list',
+            route: '/secure/firma/liste',
+            routerLink: ['/secure/firma/liste']
+          },
+          {
+            label: 'Firma Cihazları',
+            icon: 'pi pi-mobile',
+            route: '/secure/firma/cihaz',
+            routerLink: ['/secure/firma/cihaz']
+          }
+        ]
       },      {
         label: 'Kod Yönetimi',
         icon: 'pi pi-list-ol',

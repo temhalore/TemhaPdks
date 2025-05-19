@@ -1,0 +1,113 @@
+<div class="firmacihaz-container">
+  <div class="firmacihaz-header">
+    <h1>Firma Cihaz Yönetimi</h1>
+    <div class="firmacihaz-actions">
+      <div class="firma-filter">
+        <p-dropdown 
+          [options]="firmaList" 
+          [(ngModel)]="selectedFirma" 
+          optionLabel="ad"
+          placeholder="Firmaya Göre Filtrele"
+          (onChange)="onFirmaChange($event)">
+        </p-dropdown>
+      </div>
+      
+      <button 
+        pButton 
+        type="button" 
+        label="Yeni Cihaz" 
+        icon="pi pi-plus" 
+        class="p-button-sm" 
+        (click)="openAddFirmaCihazModal()">
+      </button>
+    </div>
+  </div>
+  
+  <div class="firmacihaz-content" style="width: 100%;">
+    <app-data-grid
+      [data]="firmaCihazList"
+      [columns]="columns"
+      [loading]="loading"
+      headerTitle="Firma Cihaz Listesi"
+      [responsive]="true"
+      [tableStyle]="{'width': '100%', 'min-width': '800px'}"
+      [actionButtons]="actionButtons"
+      (rowAction)="onRowAction($event)">
+    </app-data-grid>
+  </div>
+  
+  <!-- Firma Cihaz Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="firmaCihazModalVisible"
+    [title]="firmaCihazModel.eid ? 'Cihaz Düzenle' : 'Yeni Cihaz'"
+    [width]="'500px'"
+    (save)="saveFirmaCihaz()"
+    (visibleChange)="!firmaCihazModalVisible && onFirmaCihazModalClosed()">
+    <div class="firmacihaz-form">
+      <div class="form-group">
+        <label for="firma">Firma</label>
+        <p-dropdown 
+          id="firma" 
+          [options]="firmaList" 
+          [(ngModel)]="firmaCihazModel.firmaDto" 
+          optionLabel="ad" 
+          placeholder="Firma seçiniz"
+          [showClear]="true"
+          [required]="true">
+        </p-dropdown>
+      </div>
+      
+      <div class="form-group">
+        <label for="cihazTip">Cihaz Tipi</label>
+        <p-dropdown 
+          id="cihazTip" 
+          [options]="cihazTipleri" 
+          [(ngModel)]="firmaCihazModel.firmaCihazTipKodDto" 
+          optionLabel="kisaAd" 
+          placeholder="Cihaz tipi seçiniz"
+          [showClear]="true"
+          [required]="true">
+        </p-dropdown>
+      </div>
+      
+      <div class="form-group">
+        <label for="cihazAdi">Cihaz Adı</label>
+        <input 
+          id="cihazAdi" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="firmaCihazModel.ad" 
+          class="form-control" 
+          placeholder="Cihaz adını giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="cihazId">Cihaz ID</label>
+        <input 
+          id="cihazId" 
+          type="number" 
+          pInputText 
+          [(ngModel)]="firmaCihazModel.cihazMakineGercekId" 
+          class="form-control" 
+          placeholder="Cihaz ID'sini giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="aciklama">Açıklama</label>
+        <textarea 
+          id="aciklama" 
+          pInputTextarea
+          [(ngModel)]="firmaCihazModel.aciklama" 
+          class="form-control" 
+          placeholder="Açıklama giriniz">
+        </textarea>
+      </div>
+    </div>
+  </app-modal>
+    <!-- Silme Onay Dialogu -->
+  <app-confirm-dialog
+    (confirmed)="deleteFirmaCihaz()">
+  </app-confirm-dialog>
+</div>
