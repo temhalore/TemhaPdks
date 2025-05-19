@@ -117,10 +117,9 @@ export class KodListComponent implements OnInit {
   filtreleVeHazirla(data: KodDto[]): void {
     // Tip ID'si 0 olanları kodTipleri listesine ekle
     this.kodTipleri = data.filter(item => item.tipId === 0);
-    
-    // Dropdown için tipDropdownOptions listesini oluştur
+      // Dropdown için tipDropdownOptions listesini oluştur
     this.tipDropdownOptions = this.kodTipleri.map(tip => 
-      new SelectInputModel(tip.id, `${tip.kisaAd} (${tip.id})`)
+      new SelectInputModel(tip.id, `${tip.kod || ''}  (${tip.id || ''})`)
     );
     
     // Tüm seçeneği ekle
