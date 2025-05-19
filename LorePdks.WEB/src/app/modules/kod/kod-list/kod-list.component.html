@@ -5,10 +5,18 @@
       <button 
         pButton 
         type="button" 
-        label="Yeni Kod" 
+        label="Kod Ekle" 
         icon="pi pi-plus" 
         class="p-button-sm mr-2" 
         (click)="openAddKodModal()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Tip Ekle" 
+        icon="pi pi-plus-circle" 
+        class="p-button-sm mr-2 p-button-success"
+        (click)="openAddTipModal()">
       </button>
       <button 
         pButton 
@@ -17,7 +25,9 @@
         icon="pi pi-refresh" 
         class="p-button-sm p-button-info" 
         (click)="refreshCache()">
-      </button>    </div>  </div>
+      </button>
+    </div>
+  </div>
   
   <div class="kod-content" style="width: 100%;">
     <app-data-grid
@@ -28,27 +38,31 @@
       [responsive]="true"
       [tableStyle]="{'width': '100%', 'min-width': '800px'}"
       [actionButtons]="actionButtons"
-      (rowAction)="onRowAction($event)">
+      (rowAction)="onRowAction($event)"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5,10,25,50]">
     </app-data-grid>
   </div>
   
   <!-- Kod Ekleme/Düzenleme Modalı -->
   <app-modal
     [(visible)]="kodModalVisible"
-    [title]="kodModel.eid ? 'Kod Düzenle' : 'Yeni Kod'"
+    [title]="kodModel.id ? 'Kod Düzenle' : 'Yeni Kod'"
     [width]="'600px'"
     (save)="saveKod()"
     (visibleChange)="!kodModalVisible && onKodModalClosed()">    <div class="kod-form">
       <div class="form-group">
-        <label for="tipId">Tip ID</label>
-        <p-inputNumber 
-          id="tipId" 
-          [(ngModel)]="kodModel.tipId" 
-          [showButtons]="false" 
-          placeholder="Tip ID değerini giriniz" 
-          [min]="0"
-          [style]="{'width':'100%'}">
-        </p-inputNumber>
+        <label for="tipId">Tip</label>
+        <p-dropdown
+          id="tipId"
+          [(ngModel)]="kodModel.tipId"
+          [options]="tipDropdownOptions"
+          placeholder="Tip seçiniz"
+          [style]="{'width':'100%'}"
+          optionLabel="label"
+          optionValue="value">
+        </p-dropdown>
       </div>
       
       <div class="form-group">
@@ -103,6 +117,86 @@
         <p-inputNumber 
           id="digerUygEnumDeger" 
           [(ngModel)]="kodModel.digerUygEnumDeger" 
+          [showButtons]="false" 
+          placeholder="Diğer uygulama enum değeri" 
+          [min]="0"
+          [style]="{'width':'100%'}">
+        </p-inputNumber>
+      </div>
+    </div>
+  </app-modal>
+  
+  <!-- Tip Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="tipModalVisible"
+    [title]="tipModel.id ? 'Tip Düzenle' : 'Yeni Tip'"
+    [width]="'600px'"
+    (save)="saveTip()"
+    (visibleChange)="!tipModalVisible && onTipModalClosed()">    <div class="tip-form">
+      <div class="form-group">
+        <label for="tipId">Tip ID</label>
+        <p-inputNumber 
+          id="tipId" 
+          [(ngModel)]="tipModel.id" 
+          [showButtons]="false" 
+          placeholder="Tip ID değerini giriniz" 
+          [min]="0"
+          [style]="{'width':'100%'}">
+        </p-inputNumber>
+      </div>
+      
+      <div class="form-group">
+        <label for="tipKod">Tip Kodu</label>
+        <input 
+          id="tipKod" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="tipModel.kod" 
+          class="form-control" 
+          placeholder="Tip kodu giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="tipKisaAd">Kısa Ad</label>
+        <input 
+          id="tipKisaAd" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="tipModel.kisaAd" 
+          class="form-control" 
+          placeholder="Kısa ad giriniz" 
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label for="tipSira">Sıra</label>
+        <p-inputNumber 
+          id="tipSira" 
+          [(ngModel)]="tipModel.sira" 
+          [showButtons]="false" 
+          placeholder="Sıra numarası" 
+          [min]="0"
+          [style]="{'width':'100%'}">
+        </p-inputNumber>
+      </div>
+      
+      <div class="form-group">
+        <label for="tipDigerUygEnumAd">Diğer Uygulama Enum Adı</label>
+        <input 
+          id="tipDigerUygEnumAd" 
+          type="text" 
+          pInputText 
+          [(ngModel)]="tipModel.digerUygEnumAd" 
+          class="form-control" 
+          placeholder="Diğer uygulama enum adı">
+      </div>
+      
+      <div class="form-group">
+        <label for="tipDigerUygEnumDeger">Diğer Uygulama Enum Değeri</label>
+        <p-inputNumber 
+          id="tipDigerUygEnumDeger" 
+          [(ngModel)]="tipModel.digerUygEnumDeger" 
           [showButtons]="false" 
           placeholder="Diğer uygulama enum değeri" 
           [min]="0"

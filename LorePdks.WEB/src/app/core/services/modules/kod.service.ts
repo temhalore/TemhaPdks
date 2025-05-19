@@ -45,6 +45,15 @@ export class KodService {
    */  getKodDtoListAll(): Observable<KodDto[]> {
     return this.apiService.post<KodDto[]>(`${this.endpoint}/getKodDtoListAll`, {});
   }
+  
+  /**
+   * Kod siler
+   * @param kod Silinecek kod modeli
+   * @returns Observable<KodDto>
+   */
+  deleteKod(kod: KodDto): Observable<KodDto> {
+    return this.apiService.post<KodDto>(`${this.endpoint}/deleteKodByKodDto`, kod);
+  }
 
   /**
    * Kod cache'ini yeniler

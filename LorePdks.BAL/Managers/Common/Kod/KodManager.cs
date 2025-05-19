@@ -37,7 +37,11 @@ namespace LorePdks.BAL.Managers.Common.Kod
         {
             bool isGuncelleniyor = false;
 
-            if (kodDTO.id > 0) isGuncelleniyor = true;
+            var Varmi = getAllKodDtoList.Where(x => x.id == kodDTO.id).FirstOrDefault();
+            if (Varmi != null)
+            {
+                isGuncelleniyor = true;
+            }
 
             var dbKod = _repoKod.Get(kodDTO.id);
 
@@ -50,10 +54,20 @@ namespace LorePdks.BAL.Managers.Common.Kod
             checkKodDtoKayitEdilebilirMi(kodDTO);
 
             t_kod kod = _mapper.Map<t_kod>(kodDTO);
-            
+
             // Repository otomatik olarak tarihleri ve ISDELETED değerini yönetiyor
 
-            _repoKod.Save(kod);
+            if (isGuncelleniyor)
+            {
+                _repoKod.Save(kod);
+            }
+            else
+            {
+                _repoKod.Insert(kod);
+            }
+            
+
+            //id dışarıdan sebeple atraksyon yapıyoruz repoyu bozmamamk için
             
             // Kod cache'ini yenile
             refreshKodListCache();
@@ -89,9 +103,7 @@ namespace LorePdks.BAL.Managers.Common.Kod
             if (string.IsNullOrEmpty(kodDTO.kisaAd))
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Kısa ad alanı boş olamaz");
             
-            if (kodDTO.tipId <= 0)
-                throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Tip ID geçerli bir değer olmalıdır");
-
+           
             // Kod benzersizlik kontrolü
             var allKodList = _repoKod.GetList("ID <> @id", new { id = kodDTO.id });
 

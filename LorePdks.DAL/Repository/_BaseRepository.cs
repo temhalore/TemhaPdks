@@ -498,6 +498,13 @@ namespace LorePdks.DAL.Repository
                 var sequenceVal = GetSequenceNextVal(type.Name);  // save den önce al
                 int queryResult = con.Execute(sql, propertyDict);
 
+                if (sequenceVal<=0)
+                {
+                    //burada eğer entty nin id propertysi dolu ise onu yazalım dışarıdan gelmiş olabilir.
+                    var manuelID = Convert.ToInt64(typeof(T).GetProperty(_idField).GetValue(entity, null));
+                    if (manuelID > 0)
+                        sequenceVal = Convert.ToInt32( manuelID);
+                }
                 //   log.Info(SerializerHelper.SeserializeObject(new LogCRUDInfo() { ID = sequenceVal, Oper = "Insert", Type = type.Name, Entity = entity }));
                 typeof(T).GetProperty(_idField).SetValue(entity, sequenceVal, null);
                 con.Close();
@@ -780,8 +787,9 @@ namespace LorePdks.DAL.Repository
 
 
                 //Auto_increment lı versiyo o tablo için sıradaki id değerini verir
-                string select = string.Format("SELECT Auto_increment FROM information_schema.tables WHERE table_name = '{0}' ", tabloName);
-                var selectResult = con.Query<int>(select).Single();
+                string select = string.Format("SELECT NVL(Auto_increment,0) FROM information_schema.tables WHERE table_name = '{0}' ", tabloName);
+              
+                var selectResult = con.Query<int>(select).SingleOrDefault();
 
                 //TABLOYA İLK KAYDI MANULE OLARAK AT SQL DEN SONRASINDA BU KOD İŞLEYECEKTİR YOKSA İŞLEMEZ
 
