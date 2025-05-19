@@ -163,7 +163,7 @@ export class KodListComponent implements OnInit {
       console.log('Filtrelenmiş kayıt sayısı:', this.filteredKodList.length);
     }
   }
-    /**
+  /**
    * Yeni kod ekleme modalını açar
    */
   openAddKodModal(): void {
@@ -175,22 +175,49 @@ export class KodListComponent implements OnInit {
     this.kodModel.digerUygEnumAd = '';
     this.kodModel.digerUygEnumDeger = 0;
     
-    // Son eklenen kodun sırasını bul ve bir artır
-    const existingCodes = this.kodList.filter(k => k.tipId !== 0);
-    let maxSira = 0;
-    if (existingCodes.length > 0) {
-      maxSira = Math.max(...existingCodes.map(k => k.sira || 0));
-    }
-    
-    // Yeni kodun sırasını ayarla
-    this.kodModel.sira = maxSira + 1;
-    
     // İlk tipi varsayılan olarak seç (eğer varsa)
     if (this.tipDropdownOptions.length > 1) { // İlk eleman "Tümünü Göster" olduğu için > 1
-      this.kodModel.tipId = this.tipDropdownOptions[1].key;
+      // Tip ID'yi ata
+      const tipId = this.tipDropdownOptions[1].key;
+      this.kodModel.tipId = tipId;
+      
+      // Seçilen tipe ait maksimum sıra numarasını bul
+      this.updateSiraForTip(tipId);
     }
     
     this.kodModalVisible = true;
+  }
+  
+  /**
+   * Kod eklerken tip değiştiğinde çalışır ve sıra numarasını günceller
+   */
+  onKodTipChange(tipId: number): void {
+    // Tip ID'yi modele ata
+    this.kodModel.tipId = tipId;
+    
+    // Seçilen tipe göre sıra numarasını güncelle
+    this.updateSiraForTip(tipId);
+  }
+  
+  /**
+   * Seçilen tipe göre maksimum sıra numarasını bulur ve bir fazlasını atar
+   */
+  updateSiraForTip(tipId: number): void {
+    if (!tipId) return;
+    
+    // Seçilen tipe ait kodları filtrele
+    const tipeAitKodlar = this.kodList.filter(k => k.tipId === tipId);
+    
+    // Maksimum sıra numarasını bul
+    let maxSira = 0;
+    if (tipeAitKodlar.length > 0) {
+      maxSira = Math.max(...tipeAitKodlar.map(k => k.sira || 0));
+    }
+    
+    // Yeni kodun sırasını bir artırarak ayarla
+    this.kodModel.sira = maxSira + 1;
+    
+    console.log(`Tip ID ${tipId} için maksimum sıra: ${maxSira}, yeni sıra: ${this.kodModel.sira}`);
   }
   /**
    * Yeni tip ekleme modalını açar
@@ -225,13 +252,21 @@ export class KodListComponent implements OnInit {
     this.tipModel.sira = maxSira + 1;
     this.tipModalVisible = true;
   }
-  
-  /**
+    /**
    * Kod düzenleme modalını açar
    * @param kod Düzenlenecek kod
    */
   openEditKodModal(kod: KodDto): void {
+    // Derin kopya oluştur
     this.kodModel = { ...kod };
+    
+    // Undefined değerler için varsayılan değerler ata
+    if (this.kodModel.kod === undefined) this.kodModel.kod = '';
+    if (this.kodModel.kisaAd === undefined) this.kodModel.kisaAd = '';
+    if (this.kodModel.digerUygEnumAd === undefined) this.kodModel.digerUygEnumAd = '';
+    if (this.kodModel.digerUygEnumDeger === undefined) this.kodModel.digerUygEnumDeger = 0;
+    if (this.kodModel.sira === undefined) this.kodModel.sira = 0;
+    
     this.kodModalVisible = true;
   }
   

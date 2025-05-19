@@ -69,7 +69,7 @@
           placeholder="Tip ID seçiniz"
           [isRequired]="true"
           [class]="'z-3'"
-          (selectionChange)="kodModel.tipId = $event">
+          (selectionChange)="onKodTipChange($event)">
         </app-select>
       </div>
         <app-text-input
