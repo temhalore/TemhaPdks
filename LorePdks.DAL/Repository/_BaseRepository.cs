@@ -82,7 +82,8 @@ namespace LorePdks.DAL.Repository
 
         static _BaseRepository()
         {
-            DapperExtensions.DapperExtensions.SqlDialect = new OracleDialect();
+            //DapperExtensions.DapperExtensions.SqlDialect = new OracleDialect();
+            DapperExtensions.DapperExtensions.SqlDialect = new MySqlDialect();
             type = typeof(T);
         }
         public _BaseRepository()

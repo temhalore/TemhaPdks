@@ -349,19 +349,20 @@ export class KodListComponent implements OnInit {
         }
       });
   }
-    
-  /**
+      /**
    * Kod siler
    */
   deleteKod(): void {
     if (!this.selectedKod) return;
     
-    // Silme işlemi için model manipülasyonu (backend'de ISDELETED = true olarak işaretlenir)
+    // Silme işlemi için model manipülasyonu
     const deleteModel = { ...this.selectedKod };
     
-    this.kodService.saveKod(deleteModel)
+    // Doğru silme metodunu kullanıyoruz: saveKod yerine deleteKod
+    this.kodService.deleteKod(deleteModel)
       .subscribe({
         next: () => {
+          console.log('Kod başarıyla silindi:', this.selectedKod?.id);
           this.selectedKod = null;
           this.loadKodList();
         },
