@@ -10,7 +10,9 @@ namespace LorePdks.API.Controllers.Firma
     [ApiController]
     public class FirmaController(ILogger<FirmaController> _logger, IFirmaManager _firmaManager) : ControllerBase
     {
-
+        /// <summary>
+        /// Firma kaydeder veya günceller
+        /// </summary>
         [HttpPost]
         [Route("saveFirmaByFirmaDto")]
         public IActionResult saveFirmaByFirmaDto(FirmaDTO request)
@@ -18,18 +20,29 @@ namespace LorePdks.API.Controllers.Firma
             var response = new ServiceResponse<FirmaDTO>();
             var dto = _firmaManager.saveFirma(request);
             response.data = dto;
+            response.messageType = ServiceResponseMessageType.Success;
+            response.message = "Kayıt İşlemi Başarılı";
             return Ok(response);
         }
 
+        /// <summary>
+        /// Firmayı siler
+        /// </summary>
         [HttpPost]
         [Route("deleteFirmaByEIdDto")]
         public IActionResult deleteFirmaByEIdDto(EIdDTO request)
         {
-            var response = new ServiceResponse<FirmaDTO>();
+            var response = new ServiceResponse<bool>();
             _firmaManager.deleteFirmaByFirmaId(request.id);
+            response.messageType = ServiceResponseMessageType.Success;
+            response.message = "Silme İşlemi Başarılı";
+            response.data = true;
             return Ok(response);
         }
 
+        /// <summary>
+        /// ID'ye göre firma bilgisini getirir
+        /// </summary>
         [HttpPost]
         [Route("getFirmaDtoByEIdDto")]
         public IActionResult getFirmaDtoByEIdDto(EIdDTO request)
@@ -40,7 +53,9 @@ namespace LorePdks.API.Controllers.Firma
             return Ok(response);
         }
 
-        // bir user a tanımlı firma listler
+        /// <summary>
+        /// Tüm firmaları listeler
+        /// </summary>
         [HttpPost]
         [Route("getAllFirmaListDto")]
         public IActionResult getAllFirmaListDto()
