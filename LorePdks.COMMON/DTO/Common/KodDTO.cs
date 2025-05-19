@@ -9,9 +9,9 @@ namespace LorePdks.COMMON.DTO.Common
 {
 
 
-    public class KodDTO:BaseDTO
+    public class KodDTO
     {
-        //public int id { get; set; }
+        public int id { get; set; }
         public int tipId { get; set; }
         public string kod { get; set; }
         public string kisaAd { get; set; }

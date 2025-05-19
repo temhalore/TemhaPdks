@@ -3,7 +3,8 @@ import { baseDto } from "./baseDto";
 /**
  * Kod bilgisini temsil eden model
  */
-export class KodDto extends baseDto {
+export class KodDto  {
+  id: number;
   tipId: number;
   kod: string;
   kisaAd: string;

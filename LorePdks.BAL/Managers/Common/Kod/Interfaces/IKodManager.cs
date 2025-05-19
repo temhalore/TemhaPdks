@@ -9,6 +9,7 @@ namespace LorePdks.BAL.Managers.Common.Kod.Interfaces
         string refreshKodListCache();
         KodDTO GetKodDtoByKodId(int kodId);
         KodDTO saveKod(KodDTO kodDTO);
+        public void deleteKod(KodDTO kodDTO);
 
         public List<KodDTO> allKodDtoList(bool cacheYenilensinMi = false);
 

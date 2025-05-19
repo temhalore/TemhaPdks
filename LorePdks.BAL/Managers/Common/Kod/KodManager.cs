@@ -61,6 +61,22 @@ namespace LorePdks.BAL.Managers.Common.Kod
             return _mapper.Map<KodDTO>(kod);
         }
 
+        public void deleteKod(KodDTO kodDTO)
+        {
+            var dbKod = _repoKod.Get(kodDTO.id);
+
+            if (dbKod == null)
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"{kodDTO.id} id'li kod sistemde bulunamadı");
+            }
+
+            _repoKod.Delete(dbKod);
+
+            // Kod cache'ini yenile
+            refreshKodListCache();
+
+        }
+
         /// <summary>
         /// Kod kaydedilebilir mi kontrol eder
         /// </summary>

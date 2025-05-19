@@ -32,6 +32,16 @@ namespace LorePdks.API.Controllers.Kod
             return Ok(response);
         }
 
+        [HttpPost]
+        [Route("deleteKodByKodDto")]
+        public IActionResult deleteKodByKodDto(KodDTO request)
+        {
+            var response = new ServiceResponse<KodDTO>();
+            _kodManager.deleteKod(request);
+        
+            return Ok(response);
+        }
+
         /// <summary>
         /// Kod ID'ye göre kod bilgisini getirir
         /// </summary>
