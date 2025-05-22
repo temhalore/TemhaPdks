@@ -10,6 +10,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { PaginatorModule } from 'primeng/paginator';
 import { DropdownModule } from 'primeng/dropdown';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 // Ortak Bileşenler
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
@@ -19,6 +20,7 @@ import { TextInputComponent } from '../../../core/components/text-input/text-inp
 import { ButtonComponent } from '../../../core/components/button/button.component';
 import { SelectComponent } from '../../../core/components/select/select.component';
 import { SelectInputModel } from '../../../core/components/select/select-input.model';
+import { AutoCompleteComponent } from '../../../core/components/auto-complete';
 
 // Servis ve Modeller
 import { FirmaKisiService } from '../../../core/services/modules/firmaKisi.service';
@@ -34,8 +36,7 @@ import { KodDto } from '../../../core/models/KodDto';
   selector: 'app-firmakisi',
   templateUrl: './firmakisi.component.html',
   styleUrls: ['./firmakisi.component.scss'],
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -44,11 +45,13 @@ import { KodDto } from '../../../core/models/KodDto';
     TooltipModule,
     PaginatorModule,
     DropdownModule,
+    InputSwitchModule,
     DataGridComponent,
     ModalComponent,
     ConfirmDialogComponent,
     TextInputComponent,
     ButtonComponent,
+    AutoCompleteComponent,
     SelectComponent
   ]
 })
@@ -76,6 +79,12 @@ export class FirmaKisiComponent implements OnInit {
   
   // Yeni kişi eklendiğinde kullanılacak flag
   isNewKisi: boolean = false;
+
+  // Kişi arama için gerekli değişkenler
+  isSelectExistingPerson: boolean = false;
+  filteredKisiList: KisiDto[] = [];
+  selectedSearchKisi: KisiDto | null = null;
+  
   // DataGrid kolonları
   columns: any[] = [
     { field: 'kisiDto.ad', header: 'Ad' },
@@ -361,13 +370,85 @@ export class FirmaKisiComponent implements OnInit {
       kisiTip.id > 0
     );
   }
-
   /**
    * Firma kişi modalı kapandığında çağrılır
    */
   onFirmaKisiModalClosed(): void {
     this.firmaKisiModel = {} as FirmaKisiDto;
     this.isNewKisi = false;
+    this.isSelectExistingPerson = false;  // Toggle varsayılan duruma çevir
+    this.selectedSearchKisi = null;
+    this.filteredKisiList = [];
+  }
+  
+  /**
+   * Kişi araması gerçekleştirir
+   * @param event Arama olayı
+   */  searchKisi(event: any): void {
+    const query = typeof event === 'string' ? event : (event.query || event.target?.value);
+    
+    if (!query || query.length < 2) {
+      this.filteredKisiList = [];
+      return;
+    }
+    
+    this.kisiService.getKisiListByAramaText(query)
+      .subscribe({
+        next: (data) => {
+          this.filteredKisiList = data;
+        },
+        error: (err) => {
+          console.error('Kişi araması yapılırken hata oluştu:', err);
+          this.filteredKisiList = [];
+        }
+      });
+  }
+    /**
+   * Var olan bir kişinin seçilmesi durumunda çağrılır
+   */
+  onSelectExistingPerson(): void {
+    if (!this.selectedSearchKisi) return;
+    
+    // Seçilen kişiyi model'e ata
+    this.firmaKisiModel.kisiDto = { ...this.selectedSearchKisi };
+    
+    // Arama sonuçlarını temizle
+    this.filteredKisiList = [];
+  }
+    /**
+   * Ekleme/düzenleme modunu değiştirir
+   * @param event Toggle olayı
+   */  togglePersonSelectionMode(event: any): void {
+    // Event değerini doğru şekilde kontrol et 
+    let value: boolean;
+    
+    if (typeof event === 'boolean') {
+      value = event;
+    } else if (event && typeof event.checked !== 'undefined') {
+      value = event.checked;
+    } else {
+      // Toggle değerini tersine çevir
+      value = !this.isSelectExistingPerson;
+    }
+    
+    this.isSelectExistingPerson = value;
+    
+    // Seçilen kişiyi ve kişi arama sonuçlarını temizle
+    this.selectedSearchKisi = null;
+    this.filteredKisiList = [];
+    
+    // Eğer var olan kişi seçme modundan çıkılıyorsa, yeni bir kişi nesnesi oluştur
+    if (!value) {
+      // Yeni bir kişi nesnesi oluştur
+      this.firmaKisiModel.kisiDto = {
+        ad: '',
+        soyad: '',
+        tc: '',
+        loginName: '',
+        cepTel: '',
+        email: ''
+      } as KisiDto;
+    }
   }
 
   /**
@@ -389,5 +470,25 @@ export class FirmaKisiComponent implements OnInit {
       );
       this.kisiTipleriListDto$.next(kisiTipSelectItems);
     }
+  }
+  // Kişi araması gerçekleştirir fonksiyonu yukarıda tanımlandı
+  /**
+   * Seçilen mevcut kişiyi ayarlar
+   * @param kisi Seçilen kişi
+   */
+  selectExistingKisi(kisi: KisiDto): void {
+    this.selectedSearchKisi = kisi;
+    
+    // Seçilen kişiyi firmaKisiModel'e ata
+    this.firmaKisiModel.kisiDto = { ...kisi };
+    // Kullanıcının kendisinin seçmesi için otomatik değer atama işlemleri kaldırıldı
+  }
+
+  /**
+   * Mevcut kişi seçimini temizler
+   */
+  clearSelectedKisi(): void {
+    this.selectedSearchKisi = null;
+    this.firmaKisiModel.kisiDto = {} as KisiDto;
   }
 }

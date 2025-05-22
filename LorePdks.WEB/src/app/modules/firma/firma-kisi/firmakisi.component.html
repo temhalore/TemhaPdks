@@ -33,8 +33,7 @@
       (rowAction)="onRowAction($event)">
     </app-data-grid>
   </div>
-  
-  <!-- Firma Kişi Ekleme/Düzenleme Modalı -->
+    <!-- Firma Kişi Ekleme/Düzenleme Modalı -->
   <app-modal
     [(visible)]="firmaKisiModalVisible"
     [title]="firmaKisiModel.eid ? 'Kişi Düzenle' : 'Yeni Kişi'"
@@ -65,45 +64,100 @@
           (selectionChange)="onModalKisiTipChange($event)">
         </app-select>
       </div>
-      
-      <div class="form-row">
-        <app-text-input
-          title="Ad"
-          [value]="firmaKisiModel.kisiDto?.ad || ''"
-          (valueChange)="firmaKisiModel.kisiDto.ad = $event"
-          placeholder="Kişi adını giriniz"
-          [isRequired]="true">
-        </app-text-input>
-        
-        <app-text-input
-          title="Soyad"
-          [value]="firmaKisiModel.kisiDto?.soyad || ''"
-          (valueChange)="firmaKisiModel.kisiDto.soyad = $event"
-          placeholder="Kişi soyadını giriniz"
-          [isRequired]="true">
-        </app-text-input>
+        <!-- Kişi Modu Seçimi -->      <div class="form-group mb-3 border-bottom pb-3">
+        <div class="d-flex align-items-center toggle-container" (click)="togglePersonSelectionMode(null)">
+          <span class="me-2">Var olan kişiyi seç:</span>
+          <p-inputSwitch [(ngModel)]="isSelectExistingPerson" (onChange)="togglePersonSelectionMode($event)" (click)="$event.stopPropagation()"></p-inputSwitch>
+        </div>
       </div>
-        <app-text-input
-        title="TC Kimlik No"
-        [value]="firmaKisiModel.kisiDto?.tc || ''"
-        (valueChange)="firmaKisiModel.kisiDto.tc = $event"
-        placeholder="TC Kimlik No giriniz"
-        [maxLength]="11">
-      </app-text-input>
+        <!-- Kişi Arama - Eğer var olan kişi seçilecekse -->
+      <div class="form-group mb-3" *ngIf="isSelectExistingPerson">
+        <app-auto-complete
+          title="Kişi Ara"
+          placeholder="Ad, soyad veya TC ile arama yapın..."
+          [suggestions]="filteredKisiList"
+          field="ad"
+          [showEmptyMessage]="true"
+          emptyMessage="Kişi bulunamadı"
+          [(selectedItem)]="selectedSearchKisi"
+          (search)="searchKisi($event)"
+          (selectedItemChange)="onSelectExistingPerson()">
+          <ng-template #itemTemplate let-item>
+            <div class="suggestion-item">
+              <div><strong>{{ item.ad }} {{ item.soyad }}</strong></div>
+              <div *ngIf="item.tc" class="small text-muted">TC: {{ item.tc }}</div>
+              <div *ngIf="item.email" class="small text-muted">{{ item.email }}</div>
+            </div>
+          </ng-template>
+        </app-auto-complete>
+      </div>
+        <!-- Kişi Bilgileri Formu -->
+      <div *ngIf="!isSelectExistingPerson || (isSelectExistingPerson && selectedSearchKisi)">
         <div class="form-row">
-        <app-text-input
-          title="Telefon"
-          [value]="firmaKisiModel.kisiDto?.cepTel || ''"
-          (valueChange)="firmaKisiModel.kisiDto.cepTel = $event"
-          placeholder="Telefon numarası giriniz">
-        </app-text-input>
+          <app-text-input
+            title="Ad"
+            [value]="firmaKisiModel.kisiDto?.ad || ''"
+            (valueChange)="firmaKisiModel.kisiDto.ad = $event"
+            placeholder="Kişi adını giriniz"
+            [isDisabled]="isSelectExistingPerson"
+            [isRequired]="true">
+          </app-text-input>
+          
+          <app-text-input
+            title="Soyad"
+            [value]="firmaKisiModel.kisiDto?.soyad || ''"
+            (valueChange)="firmaKisiModel.kisiDto.soyad = $event"
+            placeholder="Kişi soyadını giriniz"
+            [isDisabled]="isSelectExistingPerson"
+            [isRequired]="true">
+          </app-text-input>
+        </div>
         
         <app-text-input
-          title="E-Posta"
-          [value]="firmaKisiModel.kisiDto?.email || ''"
-          (valueChange)="firmaKisiModel.kisiDto.email = $event"
-          placeholder="E-posta adresi giriniz">
+          title="TC Kimlik No"
+          [value]="firmaKisiModel.kisiDto?.tc || ''"
+          (valueChange)="firmaKisiModel.kisiDto.tc = $event"
+          placeholder="TC Kimlik No giriniz"
+          [isDisabled]="isSelectExistingPerson"
+          [maxLength]="11">
         </app-text-input>
+        
+        <div class="form-row">
+          <app-text-input
+            title="Telefon"
+            [value]="firmaKisiModel.kisiDto?.cepTel || ''"
+            (valueChange)="firmaKisiModel.kisiDto.cepTel = $event"
+            placeholder="Telefon numarası giriniz"
+            [isDisabled]="isSelectExistingPerson">
+          </app-text-input>
+          
+          <app-text-input
+            title="E-Posta"
+            [value]="firmaKisiModel.kisiDto?.email || ''"
+            (valueChange)="firmaKisiModel.kisiDto.email = $event"
+            placeholder="E-posta adresi giriniz"
+            [isDisabled]="isSelectExistingPerson">
+          </app-text-input>
+        </div>
+          <!-- Kullanıcı Adı alanı (hem yeni kişi hem var olan kişi için gösterilir) -->
+        <div>
+          <app-text-input
+            title="Kullanıcı Adı"
+            [value]="firmaKisiModel.kisiDto?.loginName || ''"
+            (valueChange)="firmaKisiModel.kisiDto.loginName = $event"
+            placeholder="Kullanıcı adını giriniz"
+            [isDisabled]="isSelectExistingPerson">
+          </app-text-input>
+          
+          <!-- Şifre alanı isteğe bağlı eklenebilir -->
+          <!-- <app-text-input
+            title="Şifre"
+            [value]="firmaKisiModel.kisiDto?.sifre || ''"
+            (valueChange)="firmaKisiModel.kisiDto.sifre = $event"
+            type="password"
+            placeholder="Şifre giriniz">
+          </app-text-input> -->
+        </div>
       </div>
     </div>
   </app-modal>

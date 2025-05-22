@@ -1,0 +1,118 @@
+<div class="firmakisi-container">
+  <div class="firmakisi-header">
+    <h1>Firma Kişi Yönetimi</h1>
+    <div class="firmakisi-actions">
+      <div class="firma-filter">
+        <app-select
+          title="Firma"
+          [itemListDto$]="firmaListDto$"
+          [selectedValue]="selectedFirma?.eid"
+          placeholder="Firmaya Göre Filtrele"
+          (selectionChange)="onFirmaChange($event)">
+        </app-select>
+      </div>
+      
+      <app-button
+        name="Yeni Kişi"
+        icon="pi pi-plus"
+        class="p-button-sm"
+        (onClick)="openAddFirmaKisiModal()">
+      </app-button>
+    </div>
+  </div>
+  
+  <div class="firmakisi-content" style="width: 100%;">
+    <app-data-grid
+      [data]="firmaKisiList"
+      [columns]="columns"
+      [loading]="loading"
+      headerTitle="Firma Kişi Listesi"
+      [responsive]="true"
+      [tableStyle]="{'width': '100%', 'min-width': '800px'}"
+      [actionButtons]="actionButtons"
+      (rowAction)="onRowAction($event)">
+    </app-data-grid>
+  </div>
+  
+  <!-- Firma Kişi Ekleme/Düzenleme Modalı -->
+  <app-modal
+    [(visible)]="firmaKisiModalVisible"
+    [title]="firmaKisiModel.eid ? 'Kişi Düzenle' : 'Yeni Kişi'"
+    [width]="'600px'"
+    (save)="saveFirmaKisi()"
+    (visibleChange)="!firmaKisiModalVisible && onFirmaKisiModalClosed()">
+    <div class="firmakisi-form">
+      <div class="form-group">
+        <app-select
+          title="Firma"
+          [itemListDto$]="firmaListDto$"
+          [selectedValue]="firmaKisiModel.firmaDto?.eid"
+          placeholder="Firma seçiniz"
+          [isRequired]="true"
+          [class]="'z-3'"
+          (selectionChange)="onModalFirmaChange($event)">
+        </app-select>
+      </div>
+      
+      <div class="form-group">
+        <app-select
+          title="Kişi Tipi"
+          [itemListDto$]="kisiTipleriListDto$"
+          [selectedValue]="firmaKisiModel.firmaKisiTipKodDto?.id"
+          placeholder="Kişi tipi seçiniz"
+          [isRequired]="true"
+          [class]="'z-2'"
+          (selectionChange)="onModalKisiTipChange($event)">
+        </app-select>
+      </div>
+      
+      <div class="form-row">
+        <app-text-input
+          title="Ad"
+          [value]="firmaKisiModel.kisiDto?.ad || ''"
+          (valueChange)="firmaKisiModel.kisiDto.ad = $event"
+          placeholder="Kişi adını giriniz"
+          [isRequired]="true">
+        </app-text-input>
+        
+        <app-text-input
+          title="Soyad"
+          [value]="firmaKisiModel.kisiDto?.soyad || ''"
+          (valueChange)="firmaKisiModel.kisiDto.soyad = $event"
+          placeholder="Kişi soyadını giriniz"
+          [isRequired]="true">
+        </app-text-input>
+      </div>
+      
+      <app-text-input
+        title="TC Kimlik No"
+        [value]="firmaKisiModel.kisiDto?.tcKimlikNo || ''"
+        (valueChange)="firmaKisiModel.kisiDto.tcKimlikNo = $event"
+        placeholder="TC Kimlik No giriniz"
+        [maxLength]="11">
+      </app-text-input>
+      
+      <div class="form-row">
+        <app-text-input
+          title="Telefon"
+          [value]="firmaKisiModel.kisiDto?.telefon || ''"
+          (valueChange)="firmaKisiModel.kisiDto.telefon = $event"
+          placeholder="Telefon numarası giriniz">
+        </app-text-input>
+        
+        <app-text-input
+          title="E-Posta"
+          [value]="firmaKisiModel.kisiDto?.eposta || ''"
+          (valueChange)="firmaKisiModel.kisiDto.eposta = $event"
+          placeholder="E-posta adresi giriniz">
+        </app-text-input>
+      </div>
+    </div>
+  </app-modal>
+  
+  <!-- Silme Onay Dialogu -->
+  <app-confirm-dialog
+    #confirmDialog
+    (confirm)="deleteFirmaKisi()">
+  </app-confirm-dialog>
+</div>
