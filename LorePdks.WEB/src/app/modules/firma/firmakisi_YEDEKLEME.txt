@@ -1,0 +1,12 @@
+Yedekleme: 22.05.2025
+Bu klasör, silinen firmakisi/ klasörünün yedeğidir.
+
+İçerik:
+- firmakisi.component.ts
+- firmakisi.component.html
+- firmakisi.component.scss
+
+Orijinal konum:
+d:\Development\ozel\TemhaPdks\LorePdks.WEB\src\app\modules\firma\firmakisi\
+
+Silme işlemi sonrası geri yüklemek için bu dosyaları orijinal konuma kopyalayabilirsiniz.
