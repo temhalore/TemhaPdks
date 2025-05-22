@@ -118,6 +118,10 @@ namespace LorePdks.BAL.Managers.FirmaKisi
             var modelList = getFirmaKisiListByFirmaId(firmaId);
 
             var dtoList = _mapper.Map<List<t_firma_kisi>, List<FirmaKisiDTO>>(modelList);
+            foreach (var item in dtoList)
+            {
+                item.kisiDto.sifre = null;
+            }
             return dtoList;
 
         }
