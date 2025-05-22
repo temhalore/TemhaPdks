@@ -4,9 +4,7 @@
     <span *ngIf="isRequired" class="text-danger">*</span>
   </label>
 
-  <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">
-    <div class="p-inputgroup">
-      <input 
+  <ng-container *ngIf="!(isLoading$ | async); else loadingTemplate">    <div class="p-inputgroup">      <input 
         [type]="type"
         pInputText 
         [id]="'input-' + title"
@@ -15,6 +13,7 @@
         [disabled]="isDisabled"
         [ngClass]="class"
         [value]="value"
+        [attr.maxlength]="maxLength"
         (input)="onChange($event)"
         class="w-100">
     </div>

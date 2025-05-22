@@ -16,6 +16,7 @@ import { FirmaRoutingModule } from './firma-routing.module';
 import { FirmaComponent } from './firma.component';
 import { FirmaListeComponent } from './firma/firma.component';
 import { FirmaCihazComponent } from './firmacihaz/firmacihaz.component';
+import { FirmaKisiComponent } from './firma-kisi/firmakisi.component';
 
 @NgModule({
   declarations: [],
@@ -29,10 +30,10 @@ import { FirmaCihazComponent } from './firmacihaz/firmacihaz.component';
     TableModule,
     TooltipModule,
     InputNumberModule,
-    DropdownModule,
-    FirmaComponent,
+    DropdownModule,    FirmaComponent,
     FirmaListeComponent,
-    FirmaCihazComponent
+    FirmaCihazComponent,
+    FirmaKisiComponent
   ]
 })
 export class FirmaModule { }

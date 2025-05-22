@@ -400,8 +400,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             routerLink: ['/secure/kisi/liste']
           }
         ]
-      },
-      {
+      },      {
         label: 'Firma Yönetimi',
         icon: 'pi pi-building',
         children: [
@@ -416,6 +415,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
             icon: 'pi pi-mobile',
             route: '/secure/firma/cihaz',
             routerLink: ['/secure/firma/cihaz']
+          },
+          {
+            label: 'Firma Kişileri',
+            icon: 'pi pi-users',
+            route: '/secure/firma/kisi',
+            routerLink: ['/secure/firma/kisi']
           }
         ]
       },      {

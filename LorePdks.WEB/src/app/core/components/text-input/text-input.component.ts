@@ -24,6 +24,7 @@ export class TextInputComponent implements OnInit {
   @Input() isRequired: boolean = false;
   @Input() isDisabled: boolean = false;
   @Input() isLoading$: Observable<boolean> = of(false);
+  @Input() maxLength?: number;
   
   // İki yönlü veri bağlaması için set/get kullanımı
   private _value: string = '';
