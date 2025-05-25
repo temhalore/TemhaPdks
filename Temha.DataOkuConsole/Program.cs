@@ -13,8 +13,9 @@ using Temha.DataOkuConsole.DTO.configModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Windows.Forms;
-using System.Drawing;
+// .NET 8'de tam namespace kullanmamız gerekiyor
+using System.Windows.Forms; // Microsoft.Windows.Compatibility paketi içinden gelecek
+using System.Drawing; // Microsoft.Windows.Compatibility paketi içinden gelecek
 
 namespace Temha.DataOkuConsole
 {

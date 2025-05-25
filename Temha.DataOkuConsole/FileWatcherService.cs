@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Windows.Forms;
+// .NET 8'de tam namespace kullanmamız gerekiyor
+using System.Windows.Forms; // Microsoft.Windows.Compatibility paketi içinden gelecek
+using System.Drawing; // NotifyIcon için gerekli
 
 namespace Temha.DataOkuConsole
 {
