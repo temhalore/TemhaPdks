@@ -39,7 +39,8 @@ class Program
     private static string configFilePath;
     private static string sifirlamaKod = "df@ABb9bdNGgSvs62v6f9";
 
-
+    private static string hareketUrl_local = "https://localhost:44374/Api/Hareket/saveHareketByHareketDto";
+    private static string hareketUrl_prod = "https://localhost:44374/Api/Hareket/saveHareketByHareketDto";
 
 
 
