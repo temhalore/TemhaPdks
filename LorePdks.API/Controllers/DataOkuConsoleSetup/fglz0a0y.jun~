@@ -65,7 +65,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 }
                 
                 // Firma için DataOkuConsole versiyon bilgisini getir
-                // TODO: Gerçek uygulamada firma veya genel versiyon bilgisi veritabanından alınabilir bunu indirince firma için firma tablosuna yazacağız
+                // TODO: Gerçek uygulamada firma veya genel versiyon bilgisi veritabanından alınabilir
                 // Şimdilik config dosyasından okuyalım
                 string version = _configuration["DataOkuConsole:CurrentVersion"] ?? "1.0.0";
                 
@@ -73,8 +73,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 {
                     Success = true,
                     Message = "Başarılı",
-                    //Version = version
-                     Version = "0.0.9"
+                    Version = version
                 };
                 
                 _logger.LogInformation($"getFirmaDataOkuVersiyon başarılı. FirmaKodu: {firmaKodu}, Versiyon: {version}");

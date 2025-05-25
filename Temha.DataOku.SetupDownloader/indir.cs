@@ -17,24 +17,25 @@ namespace Temha.DataOku.SetupDownloader
 {
     public partial class indir : Form
     {
-        private const string ApiBaseUrl = "https://api.yourserver.com/"; // API base URL'iniz
+        private const string ApiBaseUrl_prod = "https://api.yourserver.com/"; // API base URL'iniz
+        private const string ApiBaseUrl_local = "https://localhost:44374/"; // API base URL'iniz
         private string setupUrl;
         private static readonly HttpClient httpClient = new HttpClient()
         {
-            BaseAddress = new Uri(ApiBaseUrl)
+            BaseAddress = new Uri(ApiBaseUrl_local)
         };        // API'den dönecek versiyon bilgisi için modeller
         public class FirmaVersiyon
         {
             public bool Success { get; set; }
             public string Message { get; set; }
             public string Version { get; set; }
-        }
-
-        public class SetupVersiyon
+        }        public class SetupVersiyon
         {
             public string Version { get; set; }
             public string SetupUrl { get; set; }
             public string ReleaseNotes { get; set; }
+            public string DefaultInstallPath { get; set; }
+            public string ExecutablePath { get; set; }
         }
         
         // API yanıtları için ServiceResponse modeli
@@ -198,26 +199,55 @@ namespace Temha.DataOku.SetupDownloader
             {
                 throw new Exception("Versiyon karşılaştırması yapılamadı. Geçersiz versiyon formatı.");
             }
-        }
-
-        private void DownloadSetupFile()
+        }        private void DownloadSetupFile()
         {
-            using (var webClient = new WebClient()) // Büyük dosyalar için WebClient kullanımı daha uygun
+            try
             {
-                webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
-                webClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
-
-                try
+                lblStatus.Text = "Güncelleme indiriliyor...";
+                string localFile;
+                
+                // Dosya uzantısını URL'den al
+                string extension = Path.GetExtension(setupUrl).ToLower();
+                localFile = extension == ".zip" ? "setup.zip" : 
+                           extension == ".rar" ? "setup.rar" : "setup.exe";
+                
+                // Web URL mi yoksa yerel dosya mı kontrolü yap
+                if (setupUrl.StartsWith("http://") || setupUrl.StartsWith("https://"))
                 {
-                    lblStatus.Text = "Güncelleme indiriliyor...";
-                    string localFile = "setup.exe";
-                    webClient.DownloadFileAsync(new Uri(setupUrl), localFile);
+                    // Web URL ise WebClient ile indir
+                    using (var webClient = new WebClient())
+                    {
+                        webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
+                        webClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
+                        webClient.DownloadFileAsync(new Uri(setupUrl), localFile);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"İndirme sırasında bir hata oluştu: {ex.Message}",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Yerel dosya ise kopyala
+                    if (File.Exists(setupUrl))
+                    {
+                        // Önce indirme tamamlandı göstergesi
+                        progressBar.Value = 100;
+                        lblStatus.Text = "Yerel dosya kopyalanıyor...";
+                        
+                        // Dosyayı kopyala
+                        string targetFile = Path.Combine(Application.StartupPath, localFile);
+                        File.Copy(setupUrl, targetFile, true);
+                        
+                        // İndirme tamamlandı olayını manuel tetikle
+                        WebClient_DownloadFileCompleted(null, new AsyncCompletedEventArgs(null, false, null));
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException($"Belirtilen dosya bulunamadı: {setupUrl}");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İndirme sırasında bir hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -225,51 +255,144 @@ namespace Temha.DataOku.SetupDownloader
         {
             progressBar.Value = e.ProgressPercentage;
             lblStatus.Text = $"İndiriliyor: {e.ProgressPercentage}%";
-        }        private void WebClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        }        private string installPath;
+        private string executablePath;
+        
+        private void WebClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            if (e.Error != null)
+            if (e != null)
             {
-                MessageBox.Show($"İndirme tamamlanamadı: {e.Error.Message}",
-                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+                if (e.Error != null)
+                {
+                    MessageBox.Show($"İndirme tamamlanamadı: {e.Error.Message}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-            if (e.Cancelled)
-            {
-                MessageBox.Show("İndirme işlemi iptal edildi.",
-                    "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (e.Cancelled)
+                {
+                    MessageBox.Show("İndirme işlemi iptal edildi.",
+                        "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
             }
 
             lblStatus.Text = "İndirme tamamlandı. Kurulum hazırlanıyor...";
             
             try
             {
-                // Setup dosyasını geçici klasöre çıkart ve uygulama verilerini ayarla
-                string setupFilePath = Path.Combine(Application.StartupPath, "setup.exe");
-                string tempExtractPath = Path.Combine(Path.GetTempPath(), "TemhaPdksSetupTemp");
-                string configTargetDirectory = string.Empty;
+                // İndirilen dosyanın yolunu belirle
+                string downloadedFilePath = Path.Combine(Application.StartupPath, 
+                    Path.GetExtension(setupUrl).ToLower() == ".zip" ? "setup.zip" : 
+                    Path.GetExtension(setupUrl).ToLower() == ".rar" ? "setup.rar" : "setup.exe");
                 
-                // Kurulum klasörünü belirle - kullanıcının seçeceği klasör olabilir
-                // Şimdilik standart bir yol belirleyelim: C:\\TemhaPdks\\
-                configTargetDirectory = "C:\\TemhaPdks\\";
+                // Kurulum klasörünü seçme işlevi
+                var setupVersiyon = GetSetupVersiyon(tx_firmaKod.Text.Trim());
+                installPath = setupVersiyon.DefaultInstallPath ?? "C:\\loreSoft\\";
+                executablePath = setupVersiyon.ExecutablePath ?? "Temha.DataOkuConsole.exe";
                 
-                // Yapılandırma klasörünü oluştur
-                Directory.CreateDirectory(configTargetDirectory);
+                // Kullanıcıya kurulum konumunu sor
+                using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
+                {
+                    folderBrowser.Description = "DataOkuConsole için kurulum klasörünü seçin:";
+                    folderBrowser.InitialDirectory = installPath;
+                    folderBrowser.ShowNewFolderButton = true;
+                    
+                    DialogResult result = folderBrowser.ShowDialog();
+                    
+                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowser.SelectedPath))
+                    {
+                        installPath = folderBrowser.SelectedPath;
+                    }
+                    else if (result == DialogResult.Cancel)
+                    {
+                        MessageBox.Show("Kurulum iptal edildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                }
                 
-                // Yapılandırma dosyasını oluştur
-                CreateConfigurationJson(configTargetDirectory);
+                // Klasörün sonunda '\' karakteri olduğundan emin ol
+                if (!installPath.EndsWith("\\"))
+                {
+                    installPath += "\\";
+                }
                 
-                // Setup'ı başlat
-                lblStatus.Text = "Kurulum başlatılıyor...";
-                
-                // setup.exe'yi yönetici olarak çalıştır
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.FileName = setupFilePath;
-                startInfo.Verb = "runas"; // Yönetici olarak çalıştır
-                
-                Process.Start(startInfo);
-                Application.Exit();
+                lblStatus.Text = $"Dosyalar {installPath} konumuna açılıyor...";
+                  // İndirilen dosyanın bir arşiv olup olmadığını kontrol et
+                string extension = Path.GetExtension(downloadedFilePath).ToLower();
+                if (extension == ".zip" || extension == ".rar")
+                {
+                    try
+                    {
+                        lblStatus.Text = $"Dosyalar {installPath} konumuna açılıyor...";
+                        
+                        // Kurulum klasörünü oluştur
+                        Directory.CreateDirectory(installPath);
+                        
+                        // Arşiv dosyasını kur (ZIP veya RAR)
+                        FileUtils.ExtractArchiveToDirectory(downloadedFilePath, installPath);
+                        
+                        // Yapılandırma dosyasını oluştur
+                        CreateConfigurationJson(installPath);
+                        
+                        // Kurulum tamamlandı mesajı
+                        lblStatus.Text = "Kurulum tamamlandı. Uygulama başlatılıyor...";
+                        
+                        // Kurulumdan sonra exe'yi çalıştır
+                        string exePath = Path.Combine(installPath, executablePath);
+                        
+                        if (File.Exists(exePath))
+                        {
+                            ProcessStartInfo startInfo = new ProcessStartInfo();
+                            startInfo.FileName = exePath;
+                            startInfo.WorkingDirectory = installPath;
+                            
+                            Process.Start(startInfo);
+                            Application.Exit();
+                        }
+                        else
+                        {
+                            // Console uygulamasını ara
+                            string[] exeFiles = Directory.GetFiles(installPath, "*.exe", SearchOption.AllDirectories);
+                            if (exeFiles.Length > 0)
+                            {
+                                string foundExe = exeFiles[0]; // İlk .exe dosyasını al
+                                MessageBox.Show($"Belirtilen uygulama dosyası bulunamadı ({executablePath}), ancak {Path.GetFileName(foundExe)} bulundu ve çalıştırılacak.",
+                                    "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
+                                ProcessStartInfo startInfo = new ProcessStartInfo();
+                                startInfo.FileName = foundExe;
+                                startInfo.WorkingDirectory = Path.GetDirectoryName(foundExe);
+                                
+                                Process.Start(startInfo);
+                                Application.Exit();
+                            }
+                            else
+                            {
+                                MessageBox.Show($"Kurulum tamamlandı, ancak uygulama çalıştırılamadı. Kurulum dizini: {installPath}",
+                                    "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                // Kurulum klasörünü aç
+                                Process.Start("explorer.exe", installPath);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Arşiv dosyası açılırken hata oluştu: {ex.Message}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    // Arşiv değil normal bir exe ise doğrudan çalıştır
+                    lblStatus.Text = "Kurulum dosyası başlatılıyor...";
+                    ProcessStartInfo startInfo = new ProcessStartInfo();
+                    startInfo.FileName = downloadedFilePath;
+                    startInfo.Verb = "runas"; // Yönetici olarak çalıştır
+                    
+                    Process.Start(startInfo);
+                    Application.Exit();
+                }
             }
             catch (Exception ex)
             {
@@ -290,9 +413,7 @@ namespace Temha.DataOku.SetupDownloader
                     tx_izlenecekDosya.Text = openFileDialog.FileName;
                 }
             }
-        }
-
-        // Yapılandırma JSON dosyasını oluştur
+        }        // Yapılandırma JSON dosyasını oluştur
         private void CreateConfigurationJson(string installPath)
         {
             try
@@ -308,7 +429,7 @@ namespace Temha.DataOku.SetupDownloader
                     },
                     CoreSettings = new
                     {
-                        HataliDosya = "C:\\TemhaPdks\\hatali\\"
+                        HataliDosya = Path.Combine(installPath, "hatali\\")
                     }
                 };
 
@@ -322,6 +443,9 @@ namespace Temha.DataOku.SetupDownloader
                 string configPath = Path.Combine(installPath, "application.json");
                 File.WriteAllText(configPath, jsonConfig);
 
+                // Hatalı dosyalar klasörünü oluştur
+                Directory.CreateDirectory(Path.Combine(installPath, "hatali"));
+                
                 lblStatus.Text = "Yapılandırma dosyası başarıyla oluşturuldu.";
             }
             catch (Exception ex)

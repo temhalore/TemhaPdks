@@ -26,8 +26,7 @@ namespace LorePdks.COMMON.DTO.DataOkuConsole
         /// </summary>
         public string Version { get; set; }
     }
-    
-    /// <summary>
+      /// <summary>
     /// DataOkuConsole Setup versiyonu ve indirme bilgileri için kullanılan DTO sınıfı
     /// </summary>
     public class DataOkuSetupVersiyon
@@ -46,5 +45,15 @@ namespace LorePdks.COMMON.DTO.DataOkuConsole
         /// Sürüm notları
         /// </summary>
         public string ReleaseNotes { get; set; }
+
+        /// <summary>
+        /// Varsayılan kurulum yolu
+        /// </summary>
+        public string DefaultInstallPath { get; set; }
+
+        /// <summary>
+        /// Çalıştırılacak uygulamanın exe dosya adı
+        /// </summary>
+        public string ExecutablePath { get; set; }
     }
 }
