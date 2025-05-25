@@ -22,9 +22,7 @@ namespace Temha.DataOku.SetupDownloader
         private static readonly HttpClient httpClient = new HttpClient()
         {
             BaseAddress = new Uri(ApiBaseUrl)
-        };
-
-        // API'den dönecek versiyon bilgisi için modeller
+        };        // API'den dönecek versiyon bilgisi için modeller
         public class FirmaVersiyon
         {
             public bool Success { get; set; }
@@ -37,6 +35,15 @@ namespace Temha.DataOku.SetupDownloader
             public string Version { get; set; }
             public string SetupUrl { get; set; }
             public string ReleaseNotes { get; set; }
+        }
+        
+        // API yanıtları için ServiceResponse modeli
+        public class ServiceResponse<T>
+        {
+            public T data { get; set; }
+            public string messageType { get; set; }
+            public string message { get; set; }
+            public bool isSuccess { get; set; }
         }
 
      
@@ -123,16 +130,24 @@ namespace Temha.DataOku.SetupDownloader
             {
                 throw new Exception($"Versiyon kontrolü hatası: {ex.Message}");
             }
-        }
-
-        private FirmaVersiyon GetFirmaVersiyon(string firmaKodu)
+        }        private FirmaVersiyon GetFirmaVersiyon(string firmaKodu)
         {
             try
             {
-                var response = httpClient.GetStringAsync($"getFirmaDataOkuVersiyon?firmaKodu={firmaKodu}")
+                var response = httpClient.GetStringAsync($"Api/DataOkuConsoleSetup/getFirmaDataOkuVersiyon?firmaKodu={firmaKodu}")
                                        .GetAwaiter()
                                        .GetResult();
-                return JsonSerializer.Deserialize<FirmaVersiyon>(response);
+                
+                // JSON yanıtı önce ServiceResponse tipinde parse et, sonra data alanını al
+                var serviceResponse = JsonSerializer.Deserialize<ServiceResponse<FirmaVersiyon>>(response, 
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    
+                if (serviceResponse == null || serviceResponse.data == null)
+                {
+                    throw new Exception("Sunucudan geçerli yanıt alınamadı");
+                }
+                
+                return serviceResponse.data;
             }
             catch (HttpRequestException ex)
             {
@@ -142,16 +157,24 @@ namespace Temha.DataOku.SetupDownloader
             {
                 throw new Exception($"Firma versiyon bilgisi alınamadı: {ex.Message}");
             }
-        }
-
-        private SetupVersiyon GetSetupVersiyon(string firmaKodu)
+        }        private SetupVersiyon GetSetupVersiyon(string firmaKodu)
         {
             try
             {
-                var response = httpClient.GetStringAsync($"getGuncelDataOkuSetupVersiyon?firmaKodu={firmaKodu}")
+                var response = httpClient.GetStringAsync($"Api/DataOkuConsoleSetup/getGuncelDataOkuSetupVersiyon?firmaKodu={firmaKodu}")
                                        .GetAwaiter()
                                        .GetResult();
-                return JsonSerializer.Deserialize<SetupVersiyon>(response);
+                                       
+                // JSON yanıtı önce ServiceResponse tipinde parse et, sonra data alanını al
+                var serviceResponse = JsonSerializer.Deserialize<ServiceResponse<SetupVersiyon>>(response, 
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    
+                if (serviceResponse == null || serviceResponse.data == null)
+                {
+                    throw new Exception("Sunucudan geçerli yanıt alınamadı");
+                }
+                
+                return serviceResponse.data;
             }
             catch (HttpRequestException ex)
             {
