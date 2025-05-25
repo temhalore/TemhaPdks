@@ -20,7 +20,8 @@ public class FirmaKisiMapper : MappingProfile
         //var aa = firmaManager.Value.getFirmaDtoById(1);
         CreateMap<t_firma_kisi, FirmaKisiDTO>()
            .ForMember(x => x.id, y => y.MapFrom(z => z.ID))
-           .ForMember(x => x.firmaDto, y => y.MapFrom(z => new FirmaDTO() { id = z.FIRMA_ID }))
+           //.ForMember(x => x.firmaDto, y => y.MapFrom(z => new FirmaDTO() { id = z.FIRMA_ID }))
+           .ForMember(x => x.firmaDto, y => y.MapFrom(z => firmaManager.Value.getFirmaDtoById(z.FIRMA_ID, false)))
            .ForMember(x => x.kisiDto, y => y.MapFrom(z => kisiManager.Value.getKisiDtoById(z.KISI_ID, false)))
            .ForMember(x => x.firmaKisiTipKodDto, y => y.MapFrom(z => _kodManager.Value.GetKodDtoByKodId(Convert.ToInt32(z.FIRMA_KISI_TIP_KID))))
            .ReverseMap()
