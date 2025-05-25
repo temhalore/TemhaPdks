@@ -38,14 +38,14 @@ namespace Temha.DataOkuConsole
                     _logger.LogError(ex, "Konfigürasyon yüklenirken hata oluştu");
                 }
             }
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        }        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Windows servisi olarak çalıştığında
             try
             {
-                _logger.LogInformation("Temha DataOkuConsole servisi başlatılıyor");                // Program sınıfındaki metotları kullanarak konfigürasyonu yükle
+                _logger.LogInformation("Temha DataOkuConsole servisi başlatılıyor");
+                
+                // Program sınıfındaki metotları kullanarak konfigürasyonu yükle
                 Program.InitializeConfiguration();
                 Program.SetupConfigWatcher();
                 Program.SetupFileWatcher();
@@ -69,11 +69,24 @@ namespace Temha.DataOkuConsole
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Servis çalıştırılırken hata oluştu");
+                _logger.LogError(ex, "Servis çalıştırılırken hata oluştu: {Hata}", ex.Message);
             }
             finally
             {
-                _trayIcon?.Dispose();
+                // Kaynakları temizle
+                try
+                {
+                    if (_trayIcon != null)
+                    {
+                        _trayIcon.Visible = false;
+                        _trayIcon.Dispose();
+                        _trayIcon = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Tray icon kapatılırken hata oluştu: {Hata}", ex.Message);
+                }
             }
         }
 
@@ -128,11 +141,33 @@ namespace Temha.DataOkuConsole
                 {
                     try 
                     {
+                        // Özel bir ikon kullanmak için
+                        Icon appIcon = null;
+                        string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico");
+                        
+                        if (File.Exists(iconPath))
+                        {
+                            try
+                            {
+                                appIcon = new Icon(iconPath);
+                            }
+                            catch 
+                            {
+                                appIcon = SystemIcons.Application;
+                            }
+                        }
+                        else
+                        {
+                            appIcon = SystemIcons.Application;
+                        }
+                        
                         _trayIcon = new NotifyIcon
                         {
-                            Icon = System.Drawing.SystemIcons.Application,
+                            Icon = appIcon,
                             Text = "Temha Data Oku Konsol Servisi",
-                            Visible = true
+                            Visible = true,
+                            BalloonTipTitle = "Temha Data Oku Servisi",
+                            BalloonTipText = "Servis çalışıyor ve veriler izleniyor."
                         };
 
                         var contextMenuStrip = new ContextMenuStrip();
@@ -149,8 +184,7 @@ namespace Temha.DataOkuConsole
                                 _logger.LogError(ex, "Durum gösterilirken hata oluştu");
                             }
                         });
-                        
-                        contextMenuStrip.Items.Add("-"); // Ayırıcı
+                          contextMenuStrip.Items.Add("-"); // Ayırıcı
                         
                         // İzlenen dosyayı manuel işleme seçeneği
                         contextMenuStrip.Items.Add("Dosyayı Şimdi İşle", null, (s, e) =>
@@ -177,8 +211,14 @@ namespace Temha.DataOkuConsole
                                 if (MessageBox.Show("Servisi durdurmak istediğinize emin misiniz?", "Temha Data Oku", 
                                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                                 {
-                                    _trayIcon.Visible = false;
-                                    _trayIcon.Dispose();
+                                    // Tray icon temizleme
+                                    if (_trayIcon != null)
+                                    {
+                                        _trayIcon.Visible = false;
+                                        _trayIcon.Dispose();
+                                    }
+                                    
+                                    // Uygulamayı sonlandır
                                     Environment.Exit(0);
                                 }
                             }
@@ -191,8 +231,6 @@ namespace Temha.DataOkuConsole
                         _trayIcon.ContextMenuStrip = contextMenuStrip;
                         
                         // Baloncuk ipucu olayını ekle
-                        _trayIcon.BalloonTipTitle = "Temha Data Oku Servisi";
-                        _trayIcon.BalloonTipText = "Servis arka planda çalışıyor";
                         _trayIcon.ShowBalloonTip(3000);
                         
                         // STA thread'i canlı tutmak için mesaj döngüsünü başlat
@@ -200,10 +238,11 @@ namespace Temha.DataOkuConsole
                     }
                     catch (Exception threadEx)
                     {
-                        _logger.LogError(threadEx, "Tray icon thread'i sırasında hata");
+                        _logger.LogError(threadEx, "Tray icon thread'i sırasında hata: {Hata}", threadEx.Message);
                     }
                 });
                 
+                // Thread'i STA modunda ayarla - Windows Forms için gerekli
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.IsBackground = true;
                 thread.Start();
@@ -212,7 +251,7 @@ namespace Temha.DataOkuConsole
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Sistem tepsisi ikonu oluşturulurken hata oluştu");
+                _logger.LogError(ex, "Sistem tepsisi ikonu oluşturulurken hata oluştu: {Hata}", ex.Message);
             }
         }
     }

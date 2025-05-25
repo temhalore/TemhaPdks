@@ -29,12 +29,10 @@ namespace Temha.DataOkuConsole
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         [DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
-
-        // ShowWindow için sabitler
+        private static extern IntPtr GetConsoleWindow();        // ShowWindow için sabitler
         private const int SW_HIDE = 0; // Konsolu gizle
         private const int SW_SHOW = 5; // Konsolu göster
-
+        
         private static bool _isKonsolPenceresiAcik = false;
 
         private static string appName = "TemhaDosyaOkuYaz";
@@ -42,7 +40,8 @@ namespace Temha.DataOkuConsole
         private static FileSystemWatcher configWatcher;
         private static bool isProcessing = false;
         private static readonly object lockObject = new object();
-        private static Mutex mutex = new Mutex(true, "FileWatcherServiceUniqueMutex");
+        private static Mutex mutex;
+        private const string mutexName = "FileWatcherServiceUniqueMutex";
         private static AppConfiguration _configuration;
         private static string configFilePath;
         private static string sifirlamaKod = "df@ABb9bdNGgSvs62v6f9";
@@ -61,14 +60,28 @@ namespace Temha.DataOkuConsole
                     case "install":
                         // Kurulum modunu başlat
                         RunInstallMode();
-                        return;
-
-                    case "service-install":
+                        return;                    case "service-install":
+                        // Önce mevcut servisi kaldır (varsa)
+                        Console.WriteLine("Var olan servis kontrol ediliyor ve kaldırılıyor...");
+                        
+                        // Servisi kaldır
+                        if (ServiceInstaller.Uninstall())
+                        {
+                            Console.WriteLine("Eski servis kaldırıldı veya zaten mevcut değildi.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Eski servis kaldırılırken bir sorun oluştu, yeni kuruluma devam ediliyor.");
+                        }
+                        
+                        // Servis işlemlerinin sonlanmasını bekle
+                        Thread.Sleep(2000);
+                        
                         // Windows servisi olarak yükle
                         if (ServiceInstaller.Install())
                         {
                             Console.WriteLine("Windows servisi başarıyla yüklendi.");
-                            Console.WriteLine("Servisi başlatmak için: 'sc start TemhaDataOkuConsole' komutunu kullanabilirsiniz.");
+                            Console.WriteLine("Servis otomatik olarak başlatılacak.");
                         }
                         else
                         {
@@ -88,10 +101,38 @@ namespace Temha.DataOkuConsole
                         }
                         return;
                 }
+            }            // Tek örnek (instance) kontrolü yap - mutex kullanarak
+            bool mutexCreated = false;
+            
+            try
+            {
+                // Mutex'i oluştur, eğer aynı isimli başka bir mutex varsa mutexCreated false olur
+                mutex = new Mutex(true, mutexName, out mutexCreated);
+                
+                if (!mutexCreated)
+                {
+                    // Başka bir örnek zaten çalışıyor
+                    Console.WriteLine("Uygulama zaten çalışıyor. Yeni instance kapatılıyor.");
+                    return;
+                }
+                
+                // Tek örnek olarak çalışıyoruz, servisi veya uygulamayı başlat
+                await CreateHostBuilder(args).Build().RunAsync();
             }
-
-            // Servis olarak veya normal uygulama olarak çalıştır
-            await CreateHostBuilder(args).Build().RunAsync();
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Uygulama başlatılırken bir hata oluştu: {ex.Message}");
+            }
+            finally
+            {
+                // Bu kısım genellikle çalışmaz çünkü RunAsync zaten bir while döngüsü içindedir
+                // Ancak mutex'i temiz bir şekilde kapatmak için burada bulunuyor
+                if (mutexCreated && mutex != null)
+                {
+                    mutex.ReleaseMutex();
+                    mutex.Dispose();
+                }
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -206,23 +247,91 @@ namespace Temha.DataOkuConsole
             {
                 mutex.ReleaseMutex();
             }
+        }        private static void InitializeTrayIcon()
+        {
+            try
+            {
+                // UI thread'inde çalıştırılmalı - sistem tepsisi için önemli
+                Thread staThread = new Thread(() =>
+                {
+                    try
+                    {
+                        // Eğer daha önce oluşturulmuşsa temizle
+                        if (trayIcon != null)
+                        {
+                            trayIcon.Visible = false;
+                            trayIcon.Dispose();
+                            trayIcon = null;
+                        }
+
+                        // Özel bir ikon kullanmak için
+                        Icon appIcon = null;
+                        string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico");
+                        
+                        if (File.Exists(iconPath))
+                        {
+                            try
+                            {
+                                appIcon = new Icon(iconPath);
+                            }
+                            catch 
+                            {
+                                appIcon = SystemIcons.Application;
+                            }
+                        }
+                        else
+                        {
+                            appIcon = SystemIcons.Application;
+                        }
+
+                        // NotifyIcon oluştur
+                        trayIcon = new NotifyIcon
+                        {
+                            Icon = appIcon,
+                            Text = "Temha Data Oku Servisi",
+                            Visible = true,
+                            BalloonTipTitle = "Temha Data Oku Servisi",
+                            BalloonTipText = "Servis çalışıyor ve veri dosyanız izleniyor."
+                        };
+
+                        // Context menu oluştur
+                        var contextMenu = new ContextMenuStrip();
+                        contextMenu.Items.Add("Durum", null, (s, e) => ShowNotification("Servis durumu", "Servis aktif olarak çalışıyor ve veri dosyanız izleniyor."));
+                        contextMenu.Items.Add("Göster", null, ShowForm_Click);
+                        contextMenu.Items.Add("Çıkış", null, Exit_Click);
+                        trayIcon.ContextMenuStrip = contextMenu;
+                        trayIcon.DoubleClick += ShowForm_Click;
+                        
+                        // Başlangıçta bildirim göster
+                        trayIcon.ShowBalloonTip(3000);
+                        
+                        // Message loop çalıştır - tray ikon için gerekli
+                        Application.Run();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Sistem tepsisi ikonu oluşturulurken hata: {ex.Message}");
+                    }
+                });
+                
+                staThread.SetApartmentState(ApartmentState.STA);
+                staThread.IsBackground = true;
+                staThread.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Tray icon başlatılamadı: {ex.Message}");
+            }
         }
 
-        private static void InitializeTrayIcon()
+        private static void ShowNotification(string title, string message)
         {
-            trayIcon = new NotifyIcon
+            if (trayIcon != null)
             {
-                Icon = SystemIcons.Application, // Varsayılan sistem simgesi
-                Text = "Temha Data Oku Konsolu",
-                Visible = true
-            };
-
-            // Context menu oluştur
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add("Göster", null, ShowForm_Click);
-            contextMenu.Items.Add("Çıkış", null, Exit_Click);
-            trayIcon.ContextMenuStrip = contextMenu;
-            trayIcon.DoubleClick += ShowForm_Click;
+                trayIcon.BalloonTipTitle = title;
+                trayIcon.BalloonTipText = message;
+                trayIcon.ShowBalloonTip(3000);
+            }
         }
 
         private static void ShowForm_Click(object sender, EventArgs e)
@@ -234,10 +343,32 @@ namespace Temha.DataOkuConsole
 
         private static void Exit_Click(object sender, EventArgs e)
         {
-            // Uygulamayı sonlandır
-            trayIcon.Visible = false;
-            trayIcon.Dispose();
-            Environment.Exit(0);
+            try
+            {
+                // Uygulamayı sonlandır
+                if (trayIcon != null)
+                {
+                    trayIcon.Visible = false;
+                    trayIcon.Dispose();
+                    trayIcon = null;
+                }
+                
+                // Mutex'i serbest bırak
+                try { mutex?.ReleaseMutex(); } catch { }
+                mutex?.Dispose();
+                
+                // Dosya izleyicileri kapat
+                try { watcher?.Dispose(); } catch { }
+                try { configWatcher?.Dispose(); } catch { }
+                
+                // Uygulamayı sonlandır
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Uygulama kapatılırken hata: {ex.Message}");
+                Environment.Exit(1);
+            }
         }
 
         public static void InitializeConfiguration()
