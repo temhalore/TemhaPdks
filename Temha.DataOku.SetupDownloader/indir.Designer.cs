@@ -106,11 +106,60 @@
             tx_firmaKod.Size = new Size(516, 34);
             tx_firmaKod.TabIndex = 7;
             // 
+            // checkbox debug mode
+            // 
+            chk_debugMode = new CheckBox();
+            chk_debugMode.AutoSize = true;
+            chk_debugMode.Location = new Point(213, 213);
+            chk_debugMode.Name = "chk_debugMode";
+            chk_debugMode.Size = new Size(150, 25);
+            chk_debugMode.TabIndex = 10;
+            chk_debugMode.Text = "Debug Modu";
+            chk_debugMode.Font = new Font("Segoe UI", 12F);
+            chk_debugMode.UseVisualStyleBackColor = true;
+            
+            // label izlenecek dosya
+            //
+            lblIzlenecekDosya = new Label();
+            lblIzlenecekDosya.AutoSize = true;
+            lblIzlenecekDosya.Font = new Font("Segoe UI", 15F);
+            lblIzlenecekDosya.Location = new Point(54, 213);
+            lblIzlenecekDosya.Name = "lblIzlenecekDosya";
+            lblIzlenecekDosya.Size = new Size(153, 28);
+            lblIzlenecekDosya.TabIndex = 8;
+            lblIzlenecekDosya.Text = "İzlenecek Dosya:";
+            
+            // dosya yolu textbox
+            //
+            tx_izlenecekDosya = new TextBox();
+            tx_izlenecekDosya.Font = new Font("Segoe UI", 15F);
+            tx_izlenecekDosya.Location = new Point(213, 213);
+            tx_izlenecekDosya.Name = "tx_izlenecekDosya";
+            tx_izlenecekDosya.Size = new Size(420, 34);
+            tx_izlenecekDosya.TabIndex = 9;
+            tx_izlenecekDosya.Text = "C:\\TemhaPdks\\data.txt";
+            
+            // dosya seç butonu
+            //
+            btnDosyaSec = new Button();
+            btnDosyaSec.Location = new Point(640, 213);
+            btnDosyaSec.Name = "btnDosyaSec";
+            btnDosyaSec.Size = new Size(89, 34);
+            btnDosyaSec.TabIndex = 11;
+            btnDosyaSec.Text = "Dosya Seç";
+            btnDosyaSec.UseVisualStyleBackColor = true;
+            btnDosyaSec.Click += btnDosyaSec_Click;
+            
+            // 
             // indir
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 500);
+            Controls.Add(btnDosyaSec);
+            Controls.Add(tx_izlenecekDosya);
+            Controls.Add(lblIzlenecekDosya);
+            Controls.Add(chk_debugMode);
             Controls.Add(tx_firmaKod);
             Controls.Add(label3);
             Controls.Add(btn_kontrolEt);
@@ -124,8 +173,7 @@
             Load += indir_Load;
             ResumeLayout(false);
             PerformLayout();
-        }
-
+        }       
         #endregion
 
         private ProgressBar progressBar;
@@ -135,5 +183,9 @@
         private Button btn_kontrolEt;
         private Label label3;
         private TextBox tx_firmaKod;
+        private Label lblIzlenecekDosya;
+        private TextBox tx_izlenecekDosya;
+        private Button btnDosyaSec;
+        private CheckBox chk_debugMode;
     }
 }

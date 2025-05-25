@@ -121,27 +121,31 @@ class Program
         {
             mutex.ReleaseMutex();
         }
-    }
-
-    private static void InitializeConfiguration()
+    }    private static void InitializeConfiguration()
     {
+        // Önce standart kurulum klasöründen dosyayı ara
+        configFilePath = "C:\\TemhaPdks\\application.json";
 
-        //KENDİ LOKASYONUNDAN BAKMA KODU
-        configFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-            "application.json");
-        //kurulum olunca nereye kurulursa oradan alsın
-        
-        //configFilePath = ("C:\\TemhaPdks\\config\\application.json");
-
+        // Eğer standart konumda yoksa kendi lokasyonuna bak
+        if (!File.Exists(configFilePath))
+        {
+            configFilePath = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "application.json");
+            
+            LogYaz($"Yapılandırma dosyası standart konumda bulunamadı, şuradan deneniyor: {configFilePath}");
+        }
 
         if (!File.Exists(configFilePath))
         {
-            //throw new Exception("application.json dosyası bulunamadı!");
-            LogYaz("Config dosyası bulunamadı!");
+            LogYaz("Config dosyası bulunamadı! Uygulama başlatılamıyor.");
+            Console.WriteLine("Yapılandırma dosyası bulunamadı. Devam etmek için bir tuşa basın.");
+            Console.ReadKey();
+            Environment.Exit(1);
             return;
         }
 
+        LogYaz($"Yapılandırma dosyası bulundu: {configFilePath}");
         LoadConfiguration();
     }
 

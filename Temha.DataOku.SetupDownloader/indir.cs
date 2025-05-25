@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
@@ -46,12 +47,12 @@ namespace Temha.DataOku.SetupDownloader
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
-        }
-
-        // Load event metodunu ekleyin
+        }        // Load event metodunu ekleyin
         private void indir_Load(object sender, EventArgs e)
         {
-            // Form yüklenirken yapılacak işlemler (varsa)
+            // Form yüklendiğinde arayüz elemanlarını varsayılan değerlerle doldur
+            tx_izlenecekDosya.Text = "C:\\TemhaPdks\\data.txt";
+            chk_debugMode.Checked = false;
         }
 
         private void btn_kontrolEt_Click(object sender, EventArgs e)
@@ -201,9 +202,7 @@ namespace Temha.DataOku.SetupDownloader
         {
             progressBar.Value = e.ProgressPercentage;
             lblStatus.Text = $"İndiriliyor: {e.ProgressPercentage}%";
-        }
-
-        private void WebClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        }        private void WebClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             if (e.Error != null)
             {
@@ -219,10 +218,34 @@ namespace Temha.DataOku.SetupDownloader
                 return;
             }
 
-            lblStatus.Text = "İndirme tamamlandı. Kurulum başlatılıyor...";
+            lblStatus.Text = "İndirme tamamlandı. Kurulum hazırlanıyor...";
+            
             try
             {
-                Process.Start("setup.exe");
+                // Setup dosyasını geçici klasöre çıkart ve uygulama verilerini ayarla
+                string setupFilePath = Path.Combine(Application.StartupPath, "setup.exe");
+                string tempExtractPath = Path.Combine(Path.GetTempPath(), "TemhaPdksSetupTemp");
+                string configTargetDirectory = string.Empty;
+                
+                // Kurulum klasörünü belirle - kullanıcının seçeceği klasör olabilir
+                // Şimdilik standart bir yol belirleyelim: C:\\TemhaPdks\\
+                configTargetDirectory = "C:\\TemhaPdks\\";
+                
+                // Yapılandırma klasörünü oluştur
+                Directory.CreateDirectory(configTargetDirectory);
+                
+                // Yapılandırma dosyasını oluştur
+                CreateConfigurationJson(configTargetDirectory);
+                
+                // Setup'ı başlat
+                lblStatus.Text = "Kurulum başlatılıyor...";
+                
+                // setup.exe'yi yönetici olarak çalıştır
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = setupFilePath;
+                startInfo.Verb = "runas"; // Yönetici olarak çalıştır
+                
+                Process.Start(startInfo);
                 Application.Exit();
             }
             catch (Exception ex)
@@ -232,7 +255,58 @@ namespace Temha.DataOku.SetupDownloader
             }
         }
 
+        private void btnDosyaSec_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Metin Dosyaları (*.txt)|*.txt|Tüm Dosyalar (*.*)|*.*";
+                openFileDialog.Title = "İzlenecek Dosyayı Seçin";
 
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    tx_izlenecekDosya.Text = openFileDialog.FileName;
+                }
+            }
+        }
+
+        // Yapılandırma JSON dosyasını oluştur
+        private void CreateConfigurationJson(string installPath)
+        {
+            try
+            {
+                // Kullanıcının girdiği değerlere göre JSON oluştur
+                var configObject = new
+                {
+                    AppSettings = new
+                    {
+                        FirmaKod = tx_firmaKod.Text.Trim(),
+                        IzlenecekDosya = tx_izlenecekDosya.Text.Trim(),
+                        IsDebugMode = chk_debugMode.Checked
+                    },
+                    CoreSettings = new
+                    {
+                        HataliDosya = "C:\\TemhaPdks\\hatali\\"
+                    }
+                };
+
+                // JSON formatına çevir
+                string jsonConfig = JsonSerializer.Serialize(configObject, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                // Kurulum klasörüne application.json dosyasını oluştur
+                string configPath = Path.Combine(installPath, "application.json");
+                File.WriteAllText(configPath, jsonConfig);
+
+                lblStatus.Text = "Yapılandırma dosyası başarıyla oluşturuldu.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Yapılandırma dosyası oluşturulurken hata: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void label1_Click(object sender, EventArgs e)
         {
