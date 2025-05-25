@@ -10,4 +10,5 @@ export class FirmaKisiDto extends baseDto {
   firmaDto: FirmaDto;
   kisiDto: KisiDto;
   firmaKisiTipKodDto: KodDto;
+  firma_kisi_cihaz_kod?: string;
 }

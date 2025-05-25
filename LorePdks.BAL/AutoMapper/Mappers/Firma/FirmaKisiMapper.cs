@@ -17,18 +17,20 @@ public class FirmaKisiMapper : MappingProfile
     {
         var kisiManager = ServiceProviderHelper.ServiceProvider.GetService<Lazy<IKisiManager>>();
         var firmaManager = ServiceProviderHelper.ServiceProvider.GetService<Lazy<IFirmaManager>>();
-        //var aa = firmaManager.Value.getFirmaDtoById(1);
+        //var aa = firmaManager.Value.getFirmaDtoById(1);        CreateMap<t_firma_kisi, FirmaKisiDTO>()
         CreateMap<t_firma_kisi, FirmaKisiDTO>()
-           .ForMember(x => x.id, y => y.MapFrom(z => z.ID))
+        .ForMember(x => x.id, y => y.MapFrom(z => z.ID))
            //.ForMember(x => x.firmaDto, y => y.MapFrom(z => new FirmaDTO() { id = z.FIRMA_ID }))
            .ForMember(x => x.firmaDto, y => y.MapFrom(z => firmaManager.Value.getFirmaDtoById(z.FIRMA_ID, false)))
            .ForMember(x => x.kisiDto, y => y.MapFrom(z => kisiManager.Value.getKisiDtoById(z.KISI_ID, false)))
            .ForMember(x => x.firmaKisiTipKodDto, y => y.MapFrom(z => _kodManager.Value.GetKodDtoByKodId(Convert.ToInt32(z.FIRMA_KISI_TIP_KID))))
+           .ForMember(x => x.firma_kisi_cihaz_kod, y => y.MapFrom(z => z.FIRMA_KISI_CIHAZ_KOD))
            .ReverseMap()
            .ForMember(x => x.ID, y => y.MapFrom(z => z.id))
            .ForMember(x => x.KISI_ID, y => y.MapFrom(z => z.kisiDto.id))
            .ForMember(x => x.FIRMA_ID, y => y.MapFrom(z => z.firmaDto.id))
            .ForMember(x => x.FIRMA_KISI_TIP_KID, y => y.MapFrom(z => z.firmaKisiTipKodDto.id))
+           .ForMember(x => x.FIRMA_KISI_CIHAZ_KOD, y => y.MapFrom(z => z.firma_kisi_cihaz_kod))
            ;
     }
 }

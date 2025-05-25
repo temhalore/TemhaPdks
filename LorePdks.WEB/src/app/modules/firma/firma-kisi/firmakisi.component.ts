@@ -79,18 +79,19 @@ export class FirmaKisiComponent implements OnInit {
   
   // Yeni kişi eklendiğinde kullanılacak flag
   isNewKisi: boolean = false;
-
   // Kişi arama için gerekli değişkenler
   isSelectExistingPerson: boolean = false;
   filteredKisiList: KisiDto[] = [];
   selectedSearchKisi: KisiDto | null = null;
-    // DataGrid kolonları
+    
+  // DataGrid kolonları
   columns: any[] = [
     { field: 'kisiDto.ad', header: 'Ad' },
     { field: 'kisiDto.soyad', header: 'Soyad' },
     { field: 'kisiDto.tc', header: 'TC Kimlik No' },
     { field: 'firmaDto.ad', header: 'Firma Adı' },
-    { field: 'firmaKisiTipKodDto.kod', header: 'Kişi Tipi' }
+    { field: 'firmaKisiTipKodDto.kod', header: 'Kişi Tipi' },
+    { field: 'firma_kisi_cihaz_kod', header: 'Cihaz Kodu' }
   ];
   
   // DataGrid aksiyon butonları
@@ -216,8 +217,8 @@ export class FirmaKisiComponent implements OnInit {
 
   /**
    * Yeni firma kişi eklemek için modal açar
-   */  openAddFirmaKisiModal(): void {
-    this.isNewKisi = true;    this.firmaKisiModel = {
+   */  openAddFirmaKisiModal(): void {    this.isNewKisi = true;
+    this.firmaKisiModel = {
       kisiDto: {
         ad: '',
         soyad: '',
@@ -228,7 +229,8 @@ export class FirmaKisiComponent implements OnInit {
         sifre: '' // Şifre alanını boş başlat
       } as KisiDto,
       firmaDto: null,
-      firmaKisiTipKodDto: null
+      firmaKisiTipKodDto: null,
+      firma_kisi_cihaz_kod: '' // Cihaz kod alanını boş başlat
     } as FirmaKisiDto;
     
     // Eğer bir firma seçiliyse, yeni kişiyi o firmaya atamak için

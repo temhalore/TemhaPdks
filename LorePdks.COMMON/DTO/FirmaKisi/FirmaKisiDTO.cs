@@ -17,5 +17,6 @@ namespace LorePdks.COMMON.DTO.FirmaKisi
         public FirmaDTO firmaDto { get; set; }
         public KisiDTO kisiDto { get; set; }
         public KodDTO firmaKisiTipKodDto { get; set; }
+        public string firma_kisi_cihaz_kod { get; set; }
     }
 }

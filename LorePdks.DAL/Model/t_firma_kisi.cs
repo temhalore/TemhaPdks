@@ -31,6 +31,7 @@ namespace LorePdks.DAL.Model
         [Required]
         public int KISI_ID { get; set;}
         public int? FIRMA_KISI_TIP_KID { get; set;}
+        public string FIRMA_KISI_CIHAZ_KOD { get; set; }
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -44,6 +45,7 @@ namespace LorePdks.DAL.Model
 		FIRMA_ID,
 		KISI_ID,
 		FIRMA_KISI_TIP_KID,
+		FIRMA_KISI_CIHAZ_KOD,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

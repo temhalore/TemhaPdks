@@ -138,8 +138,7 @@
             placeholder="E-posta adresi giriniz"
             [isDisabled]="isSelectExistingPerson">
           </app-text-input>
-        </div>
-          <!-- Kullanıcı Adı alanı (hem yeni kişi hem var olan kişi için gösterilir) -->        <div>          <app-text-input
+        </div>          <!-- Kullanıcı Adı alanı (hem yeni kişi hem var olan kişi için gösterilir) -->        <div>          <app-text-input
             title="Kullanıcı Adı"
             [value]="firmaKisiModel.kisiDto?.loginName || ''"
             (valueChange)="firmaKisiModel.kisiDto.loginName = $event"
@@ -154,6 +153,15 @@
             type="password"
             placeholder="Kişinin giriş yapabilmesi için güvenli bir şifre belirleyiniz"
             [isRequired]="true">
+          </app-text-input>
+          
+          <!-- Cihaz Kodu alanı -->
+          <app-text-input
+            title="Cihaz Kodu"
+            [value]="firmaKisiModel.firma_kisi_cihaz_kod || ''"
+            (valueChange)="firmaKisiModel.firma_kisi_cihaz_kod = $event"
+            placeholder="Cihazda kullanılacak kodu giriniz"
+            tooltip="Cihazdan cihaza farklılık gösterebilir, genelde sayısal ancak bazı cihazlarda alfa-nümerik olabilir.">
           </app-text-input>
         </div>
       </div>
