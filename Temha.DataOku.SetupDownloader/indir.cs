@@ -485,33 +485,63 @@ namespace Temha.DataOku.SetupDownloader
                     startInfo.RedirectStandardOutput = true;
                     startInfo.UseShellExecute = false;
                     startInfo.CreateNoWindow = true;
-                    
-                    try 
+                      try 
                     {
-                        using (Process process = Process.Start(startInfo))
+                        // Önce eski servisi kaldırmayı dene
+                        ProcessStartInfo stopServiceInfo = new ProcessStartInfo();
+                        stopServiceInfo.FileName = downloadedFilePath;
+                        stopServiceInfo.Arguments = "service-uninstall"; 
+                        stopServiceInfo.UseShellExecute = true;
+                        stopServiceInfo.Verb = "runas"; // Yönetici olarak çalıştır
+                        stopServiceInfo.CreateNoWindow = false;
+                        
+                        try
                         {
-                            string output = process.StandardOutput.ReadToEnd();
-                            process.WaitForExit();
+                            // Eski servisi kaldırma işlemini çalıştır
+                            Process stopProcess = Process.Start(stopServiceInfo);
+                            stopProcess?.WaitForExit();
+                            // Servis işlemlerinin tamamlanması için bekle
+                            Thread.Sleep(3000);
+                        }
+                        catch (Exception stopEx)
+                        {
+                            // Servis durdurulurken hata oluştu, devam et
+                            lblStatus.Text = "Eski servis kaldırılırken hata oluştu, devam ediliyor...";
+                        }
+                        
+                        // Şimdi servisi yeniden kur
+                        ProcessStartInfo installServiceInfo = new ProcessStartInfo();
+                        installServiceInfo.FileName = downloadedFilePath;
+                        installServiceInfo.Arguments = "service-install";
+                        installServiceInfo.UseShellExecute = true;
+                        installServiceInfo.Verb = "runas"; // Yönetici olarak çalıştır
+                        installServiceInfo.CreateNoWindow = false;
+                        
+                        Process installProcess = Process.Start(installServiceInfo);
+                        if (installProcess != null)
+                        {
+                            lblStatus.Text = "Servis kuruluyor, lütfen bekleyin...";
+                            installProcess.WaitForExit();
                             
-                            if (process.ExitCode == 0)
+                            // Servis kurulduktan sonra bekle
+                            Thread.Sleep(2000);
+                            
+                            // Servisin durumunu kontrol et
+                            if (CheckServiceStatus("TemhaDataOkuConsole"))
                             {
-                                // Servisin durumunu kontrol et
-                                if (CheckServiceStatus("TemhaDataOkuConsole"))
-                                {
-                                    MessageBox.Show("Windows servisi başarıyla kuruldu ve başlatıldı.", 
-                                        "Kurulum Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Windows servisi kuruldu fakat otomatik başlatılamadı. Servisleri açarak manuel başlatabilirsiniz.", 
-                                        "Kurulum Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                }
+                                MessageBox.Show("Windows servisi başarıyla kuruldu ve başlatıldı.", 
+                                    "Kurulum Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
-                                MessageBox.Show($"Servis kurulurken bir hata oluştu. Uygulamayı yönetici haklarıyla çalıştırmayı deneyin.\n\nDetay: {output}", 
-                                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                MessageBox.Show("Windows servisi kuruldu fakat otomatik başlatılamadı. Servisleri açarak manuel başlatabilirsiniz.", 
+                                    "Kurulum Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Servis kurulumu başlatılamadı. Lütfen uygulamayı yönetici olarak çalıştırdığınızdan emin olun.", 
+                                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                     catch (Exception ex)
