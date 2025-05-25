@@ -139,24 +139,22 @@
             [isDisabled]="isSelectExistingPerson">
           </app-text-input>
         </div>
-          <!-- Kullanıcı Adı alanı (hem yeni kişi hem var olan kişi için gösterilir) -->
-        <div>
-          <app-text-input
+          <!-- Kullanıcı Adı alanı (hem yeni kişi hem var olan kişi için gösterilir) -->        <div>          <app-text-input
             title="Kullanıcı Adı"
             [value]="firmaKisiModel.kisiDto?.loginName || ''"
             (valueChange)="firmaKisiModel.kisiDto.loginName = $event"
             placeholder="Kullanıcı adını giriniz"
             [isDisabled]="isSelectExistingPerson">
-          </app-text-input>
-          
-          <!-- Şifre alanı isteğe bağlı eklenebilir -->
-          <!-- <app-text-input
+          </app-text-input>          <!-- Şifre alanı sadece yeni kişi eklenirken ve var olan kişi seçilmediğinde gösterilir -->
+          <app-text-input
+            *ngIf="isNewKisi && !isSelectExistingPerson"
             title="Şifre"
             [value]="firmaKisiModel.kisiDto?.sifre || ''"
             (valueChange)="firmaKisiModel.kisiDto.sifre = $event"
             type="password"
-            placeholder="Şifre giriniz">
-          </app-text-input> -->
+            placeholder="Kişinin giriş yapabilmesi için güvenli bir şifre belirleyiniz"
+            [isRequired]="true">
+          </app-text-input>
         </div>
       </div>
     </div>

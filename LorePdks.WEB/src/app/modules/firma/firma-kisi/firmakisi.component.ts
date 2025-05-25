@@ -217,15 +217,15 @@ export class FirmaKisiComponent implements OnInit {
   /**
    * Yeni firma kişi eklemek için modal açar
    */  openAddFirmaKisiModal(): void {
-    this.isNewKisi = true;
-    this.firmaKisiModel = {
+    this.isNewKisi = true;    this.firmaKisiModel = {
       kisiDto: {
         ad: '',
         soyad: '',
         tc: '',
         loginName: '',
         cepTel: '',
-        email: ''
+        email: '',
+        sifre: '' // Şifre alanını boş başlat
       } as KisiDto,
       firmaDto: null,
       firmaKisiTipKodDto: null
@@ -302,7 +302,6 @@ export class FirmaKisiComponent implements OnInit {
         }
       });
   }
-
   /**
    * Firma kişi kaydeder veya günceller
    */
@@ -311,14 +310,16 @@ export class FirmaKisiComponent implements OnInit {
     this.firmaKisiService.saveFirmaKisi(this.firmaKisiModel)
       .pipe(finalize(() => {
         this.loading = false;
-        this.firmaKisiModalVisible = false;
       }))
       .subscribe({
         next: () => {
           this.loadFirmaKisiList();
+          // Sadece başarılı olduğunda modalı kapat
+          this.firmaKisiModalVisible = false;
         },
         error: (err) => {
           console.error('Firma kişi kaydedilirken hata oluştu', err);
+          // Hata durumunda modal açık kalır
         }
       });
   }
@@ -354,15 +355,15 @@ export class FirmaKisiComponent implements OnInit {
   /**
    * Form validasyonunu kontrol eder
    * @returns Boolean - Form geçerli mi?
-   */
-  isFormValid(): boolean {
+   */  isFormValid(): boolean {
     if (!this.firmaKisiModel) return false;
     
     const kisi = this.firmaKisiModel.kisiDto;
     const firma = this.firmaKisiModel.firmaDto;
     const kisiTip = this.firmaKisiModel.firmaKisiTipKodDto;
     
-    return !!(
+    // Temel doğrulama
+    const baseValidation = !!(
       kisi && 
       kisi.ad && 
       kisi.soyad && 
@@ -371,6 +372,13 @@ export class FirmaKisiComponent implements OnInit {
       kisiTip && 
       kisiTip.id > 0
     );
+    
+    // Eğer yeni kişi ekleniyorsa ve var olan bir kişi seçilmiyorsa şifre zorunlu
+    if (this.isNewKisi && !this.isSelectExistingPerson) {
+      return baseValidation && !!kisi.sifre;
+    }
+    
+    return baseValidation;
   }
   /**
    * Firma kişi modalı kapandığında çağrılır
@@ -438,8 +446,7 @@ export class FirmaKisiComponent implements OnInit {
     // Seçilen kişiyi ve kişi arama sonuçlarını temizle
     this.selectedSearchKisi = null;
     this.filteredKisiList = [];
-    
-    // Eğer var olan kişi seçme modundan çıkılıyorsa, yeni bir kişi nesnesi oluştur
+      // Eğer var olan kişi seçme modundan çıkılıyorsa, yeni bir kişi nesnesi oluştur
     if (!value) {
       // Yeni bir kişi nesnesi oluştur
       this.firmaKisiModel.kisiDto = {
@@ -448,7 +455,8 @@ export class FirmaKisiComponent implements OnInit {
         tc: '',
         loginName: '',
         cepTel: '',
-        email: ''
+        email: '',
+        sifre: '' // Şifre alanını boş başlat
       } as KisiDto;
     }
   }
