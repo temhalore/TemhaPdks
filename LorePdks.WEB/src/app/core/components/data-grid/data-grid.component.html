@@ -63,10 +63,9 @@
               direction="right"              
               (buttonClick)="onAction($event.action, $event.data)">
             </app-islem-buttons>
-          </td>
-          <td *ngFor="let col of columns">
+          </td>          <td *ngFor="let col of columns">
             <ng-container *ngIf="!col.template">
-              {{ col.format ? col.format(rowData[col.field], rowData) : rowData[col.field] }}
+              {{ col.format ? col.format(getNestedProperty(rowData, col.field), rowData) : getNestedProperty(rowData, col.field) }}
             </ng-container>
             <ng-container *ngIf="col.template">
               <ng-container *ngTemplateOutlet="col.template; context: {$implicit: rowData, field: col.field}"></ng-container>

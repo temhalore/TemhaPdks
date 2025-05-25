@@ -130,7 +130,6 @@ export class DataGridComponent implements OnInit {
   onRowUnselect(event: any): void {
     this.rowUnselect.emit(event.data);
   }
-
   /**
    * Satır üzerinde bir aksiyon gerçekleştiğinde tetiklenir
    * @param action Aksiyon adı (edit, delete vb.)
@@ -138,5 +137,19 @@ export class DataGridComponent implements OnInit {
    */
   onAction(action: string, data: any): void {
     this.rowAction.emit({ action, data });
+  }
+
+  /**
+   * Nested property erişimi için yardımcı fonksiyon
+   * @param obj Erişilecek nesne
+   * @param path Nokta ile ayrılmış property yolu (örn: 'kisiDto.ad')
+   * @returns Property değeri veya undefined
+   */
+  getNestedProperty(obj: any, path: string): any {
+    if (!obj || !path) return undefined;
+    
+    return path.split('.').reduce((current, property) => {
+      return current && current[property] !== undefined ? current[property] : undefined;
+    }, obj);
   }
 }

@@ -84,14 +84,13 @@ export class FirmaKisiComponent implements OnInit {
   isSelectExistingPerson: boolean = false;
   filteredKisiList: KisiDto[] = [];
   selectedSearchKisi: KisiDto | null = null;
-  
-  // DataGrid kolonları
+    // DataGrid kolonları
   columns: any[] = [
     { field: 'kisiDto.ad', header: 'Ad' },
     { field: 'kisiDto.soyad', header: 'Soyad' },
     { field: 'kisiDto.tc', header: 'TC Kimlik No' },
     { field: 'firmaDto.ad', header: 'Firma Adı' },
-    { field: 'firmaKisiTipKodDto.kisaAd', header: 'Kişi Tipi' }
+    { field: 'firmaKisiTipKodDto.kod', header: 'Kişi Tipi' }
   ];
   
   // DataGrid aksiyon butonları
@@ -182,6 +181,8 @@ export class FirmaKisiComponent implements OnInit {
         .pipe(finalize(() => this.loading = false))
         .subscribe({
           next: (data) => {
+            console.log('API\'den dönen firma kişi verileri:', data);
+            console.log('İlk veri örneği:', data?.[0]);
             this.firmaKisiList = data;
           },
           error: (err) => {
@@ -200,6 +201,7 @@ export class FirmaKisiComponent implements OnInit {
             this.firmaKisiService.getFirmaKisiListByFirmaId(firma.eid)
               .subscribe({
                 next: (data) => {
+                  console.log(`${firma.ad} firması için API'den dönen veriler:`, data);
                   this.firmaKisiList = [...this.firmaKisiList, ...data];
                 },
                 error: (err) => {

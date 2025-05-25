@@ -55,8 +55,22 @@ export class DataCardComponent {
   formatField(field: string, row: any): any {
     const column = this.columns.find(col => col.field === field);
     if (column && column.format) {
-      return column.format(row[field], row);
+      return column.format(this.getNestedProperty(row, field), row);
     }
-    return row[field];
+    return this.getNestedProperty(row, field);
+  }
+
+  /**
+   * İç içe (nested) objelerdeki değerlere erişim sağlar
+   * @param obj Veri objesi
+   * @param path Nokta notasyonu ile belirtilen erişim yolu (örn: "kisiDto.ad")
+   * @returns Path ile belirtilen değer
+   */
+  getNestedProperty(obj: any, path: string): any {
+    if (!obj || !path) return undefined;
+    
+    return path.split('.').reduce((current, property) => {
+      return current && current[property] !== undefined ? current[property] : undefined;
+    }, obj);
   }
 }
