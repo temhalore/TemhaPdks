@@ -4,19 +4,20 @@ using System.Text;
 using System.Text.Json;
 
 namespace Lore.SetupAndDosyaOku.Helpers
-{
-    public class ApiHelper
+{    public class ApiHelper
     {        private readonly HttpClient _httpClient;
         private readonly ConfigHelper _configHelper;
         private readonly Logger _logger;
         private string _baseUrl;
-        
-        public ApiHelper(ConfigHelper configHelper, Logger logger)
+          public ApiHelper(ConfigHelper configHelper, Logger logger)
         {
             _httpClient = new HttpClient();
             _configHelper = configHelper;
             _logger = logger;
-            _baseUrl = _configHelper.GetSettings().ApiEndpoint.TrimEnd('/');
+            
+            // API ayarlarını almak için GetConfig kullan
+            var config = _configHelper.GetConfig();
+            _baseUrl = config.ApiSettings.BaseUrl.TrimEnd('/');
             
             // Bağlantı zaman aşımını 30 saniye olarak ayarla
             _httpClient.Timeout = TimeSpan.FromSeconds(30);

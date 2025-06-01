@@ -57,11 +57,12 @@ public static class Program
             _firstRun = string.IsNullOrEmpty(appSettings.FirmaKod) ||
                         string.IsNullOrEmpty(appSettings.PdksKayitDosyaYolu) ||
                         string.IsNullOrEmpty(appSettings.AlarmKayitDosyaYolu) ||
-                        string.IsNullOrEmpty(appSettings.KameraLogDosyaYolu);
-
-            // Initialize logging
+                        string.IsNullOrEmpty(appSettings.KameraLogDosyaYolu);            // Initialize logging
             var logger = _host.Services.GetRequiredService<Logger>();
             logger.Info("Application starting");
+            
+            // Check for updates on startup
+            await CheckForUpdatesOnStartupAsync();
             
             // If first run or settings incomplete, show setup form
             if (_firstRun)
@@ -128,15 +129,19 @@ public static class Program
                 configApp.SetBasePath(Directory.GetCurrentDirectory());
                 configApp.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                 configApp.AddEnvironmentVariables();
-            })
-            .ConfigureServices((hostContext, services) =>
+            })            .ConfigureServices((hostContext, services) =>
             {
+                // Register HttpClient
+                services.AddHttpClient();
+                
                 // Register your services here
                 services.AddSingleton<Logger>();
                 services.AddSingleton<ConfigHelper>();
                 services.AddSingleton<ApiHelper>();
                 services.AddSingleton<FileHelper>();
                 services.AddSingleton<StartupHelper>();
+                services.AddSingleton<UpdateService>();
+                services.AddSingleton<LogSenderService>();
                 
                 // Register forms
                 services.AddTransient<SetupForm>();
@@ -261,7 +266,54 @@ public static class Program
                 var uptime = logger.GetUptime();
                 uptimeMenuItem.Text = $"Çalışma Süresi: {uptime.Days} gün, {uptime.Hours} saat, {uptime.Minutes} dakika";
             }
-        };
-        timer.Start();
+        };        timer.Start();
+    }
+      private static async Task CheckForUpdatesOnStartupAsync()
+    {
+        try
+        {
+            if (_host == null) return;
+            
+            var logger = _host.Services.GetRequiredService<Logger>();
+            var updateService = _host.Services.GetRequiredService<UpdateService>();
+            var configHelper = _host.Services.GetRequiredService<ConfigHelper>();
+            
+            logger.Info("Checking for updates on startup...");
+            
+            // Get required parameters from configuration
+            var appSettings = configHelper.GetSettings();
+            var firmaKod = appSettings.FirmaKod;
+            var currentVersion = appSettings.Version;
+            
+            if (string.IsNullOrWhiteSpace(firmaKod))
+            {
+                logger.Warning("FirmaKod is not configured, skipping update check.");
+                return;
+            }
+            
+            var updateResult = await updateService.CheckForUpdatesAsync(firmaKod, currentVersion);
+            if (updateResult?.UpdateAvailable == true)
+            {
+                logger.Info($"Update available: Version {updateResult.LatestVersion}");
+                
+                // Show notification in system tray if available
+                if (_notifyIcon != null)
+                {
+                    _notifyIcon.BalloonTipTitle = "Güncelleme Mevcut";
+                    _notifyIcon.BalloonTipText = $"Yeni versiyon mevcut: {updateResult.LatestVersion}";
+                    _notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
+                    _notifyIcon.ShowBalloonTip(5000);
+                }
+            }
+            else
+            {
+                logger.Info("Application is up to date");
+            }
+        }
+        catch (Exception ex)
+        {
+            var logger = _host?.Services.GetRequiredService<Logger>();
+            logger?.Warning($"Failed to check for updates on startup: {ex.Message}");
+        }
     }
 }

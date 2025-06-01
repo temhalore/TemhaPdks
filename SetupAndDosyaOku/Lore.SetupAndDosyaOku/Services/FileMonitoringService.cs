@@ -16,6 +16,8 @@ namespace Lore.SetupAndDosyaOku.Services
         private readonly ConfigHelper _configHelper;
         private readonly FileHelper _fileHelper;
         private readonly ApiHelper _apiHelper;
+        private readonly LogSenderService _logSenderService;
+        private readonly UpdateService _updateService;
         
         private bool _isFirstRun = true;
         private FileSystemWatcher? _pdksWatcher;
@@ -26,12 +28,16 @@ namespace Lore.SetupAndDosyaOku.Services
             Logger logger,
             ConfigHelper configHelper,
             FileHelper fileHelper,
-            ApiHelper apiHelper)
+            ApiHelper apiHelper,
+            LogSenderService logSenderService,
+            UpdateService updateService)
         {
             _logger = logger;
             _configHelper = configHelper;
             _fileHelper = fileHelper;
             _apiHelper = apiHelper;
+            _logSenderService = logSenderService;
+            _updateService = updateService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -194,9 +200,7 @@ namespace Lore.SetupAndDosyaOku.Services
                 _kameraWatcher.Dispose();
                 _kameraWatcher = null;
             }
-        }
-
-        private async void OnPdksFileChanged(object sender, FileSystemEventArgs e, string filePath)
+        }        private async void OnPdksFileChanged(object sender, FileSystemEventArgs e, string filePath)
         {
             try
             {
@@ -210,14 +214,27 @@ namespace Lore.SetupAndDosyaOku.Services
                     // Create a backup of the file
                     await _fileHelper.CreateBackupFileAsync(filePath, content);
                     
-                    // Send file content to API
-                    bool success = await _apiHelper.SendFileContentAsync("PDKS", content);
-                    
-                    // Clear the source file if successful
-                    if (success)
+                    // Get firma kod from settings
+                    var settings = _configHelper.GetSettings();
+                    if (settings != null && !string.IsNullOrEmpty(settings.FirmaKod))
                     {
-                        await _fileHelper.ClearFileAsync(filePath);
-                        _logger.Info("PDKS file successfully processed and cleared");
+                        // Send log data to API using new LogSenderService
+                        bool success = await _logSenderService.SendPdksLogAsync(settings.FirmaKod, content);
+                        
+                        // Clear the source file if successful
+                        if (success)
+                        {
+                            await _fileHelper.ClearFileAsync(filePath);
+                            _logger.Info("PDKS file successfully processed and cleared");
+                        }
+                        else
+                        {
+                            _logger.Warning("Failed to send PDKS log data to API");
+                        }
+                    }
+                    else
+                    {
+                        _logger.Warning("FirmaKod not found in settings, cannot send PDKS log data");
                     }
                 }
             }
@@ -225,9 +242,7 @@ namespace Lore.SetupAndDosyaOku.Services
             {
                 _logger.Error($"Error processing PDKS file: {ex.Message}");
             }
-        }
-
-        private async void OnAlarmFileChanged(object sender, FileSystemEventArgs e, string filePath)
+        }        private async void OnAlarmFileChanged(object sender, FileSystemEventArgs e, string filePath)
         {
             try
             {
@@ -241,14 +256,27 @@ namespace Lore.SetupAndDosyaOku.Services
                     // Create a backup of the file
                     await _fileHelper.CreateBackupFileAsync(filePath, content);
                     
-                    // Send file content to API
-                    bool success = await _apiHelper.SendFileContentAsync("Alarm", content);
-                    
-                    // Clear the source file if successful
-                    if (success)
+                    // Get firma kod from settings
+                    var settings = _configHelper.GetSettings();
+                    if (settings != null && !string.IsNullOrEmpty(settings.FirmaKod))
                     {
-                        await _fileHelper.ClearFileAsync(filePath);
-                        _logger.Info("Alarm file successfully processed and cleared");
+                        // Send log data to API using new LogSenderService
+                        bool success = await _logSenderService.SendAlarmLogAsync(settings.FirmaKod, content);
+                        
+                        // Clear the source file if successful
+                        if (success)
+                        {
+                            await _fileHelper.ClearFileAsync(filePath);
+                            _logger.Info("Alarm file successfully processed and cleared");
+                        }
+                        else
+                        {
+                            _logger.Warning("Failed to send Alarm log data to API");
+                        }
+                    }
+                    else
+                    {
+                        _logger.Warning("FirmaKod not found in settings, cannot send Alarm log data");
                     }
                 }
             }
@@ -256,9 +284,7 @@ namespace Lore.SetupAndDosyaOku.Services
             {
                 _logger.Error($"Error processing Alarm file: {ex.Message}");
             }
-        }
-
-        private async void OnKameraFileChanged(object sender, FileSystemEventArgs e, string filePath)
+        }        private async void OnKameraFileChanged(object sender, FileSystemEventArgs e, string filePath)
         {
             try
             {
@@ -272,14 +298,27 @@ namespace Lore.SetupAndDosyaOku.Services
                     // Create a backup of the file
                     await _fileHelper.CreateBackupFileAsync(filePath, content);
                     
-                    // Send file content to API
-                    bool success = await _apiHelper.SendFileContentAsync("KameraLog", content);
-                    
-                    // Clear the source file if successful
-                    if (success)
+                    // Get firma kod from settings
+                    var settings = _configHelper.GetSettings();
+                    if (settings != null && !string.IsNullOrEmpty(settings.FirmaKod))
                     {
-                        await _fileHelper.ClearFileAsync(filePath);
-                        _logger.Info("Kamera log file successfully processed and cleared");
+                        // Send log data to API using new LogSenderService
+                        bool success = await _logSenderService.SendKameraLogAsync(settings.FirmaKod, content);
+                        
+                        // Clear the source file if successful
+                        if (success)
+                        {
+                            await _fileHelper.ClearFileAsync(filePath);
+                            _logger.Info("Kamera log file successfully processed and cleared");
+                        }
+                        else
+                        {
+                            _logger.Warning("Failed to send Kamera log data to API");
+                        }
+                    }
+                    else
+                    {
+                        _logger.Warning("FirmaKod not found in settings, cannot send Kamera log data");
                     }
                 }
             }
@@ -287,8 +326,7 @@ namespace Lore.SetupAndDosyaOku.Services
             {
                 _logger.Error($"Error processing Kamera log file: {ex.Message}");
             }
-        }
-          private async Task CheckApiConnectivityAsync()
+        }        private async Task CheckApiConnectivityAsync()
         {
             try
             {
@@ -297,20 +335,37 @@ namespace Lore.SetupAndDosyaOku.Services
                 if (isConnected)
                 {
                     _logger.Debug("API connection successful");
-                    
-                    // Check for updates when connected
-                    string currentVersion = typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0.0";
-                    string? downloadUrl = await _apiHelper.CheckForUpdatesAsync(currentVersion);
-                    
-                    if (!string.IsNullOrEmpty(downloadUrl))
+                      // Check for updates using the new UpdateService
+                    try
                     {
-                        _logger.Info($"Update available. Download URL: {downloadUrl}");
-                        
-                        // TODO: Implement update download and installation logic
-                        // Example: 
-                        // string updatePath = Path.Combine(Path.GetTempPath(), "LoreUpdate.exe");
-                        // await _apiHelper.DownloadUpdateAsync(downloadUrl, updatePath);
-                        // Process.Start(updatePath, "/silent");
+                        var appSettings = _configHelper.GetSettings();
+                        var firmaKod = appSettings.FirmaKod;
+                        var currentVersion = appSettings.Version;
+                          if (!string.IsNullOrWhiteSpace(firmaKod))
+                        {
+                            var updateResult = await _updateService.CheckForUpdatesAsync(firmaKod, currentVersion);
+                            if (updateResult?.UpdateAvailable == true)
+                            {
+                                _logger.Info($"Update available. Version: {updateResult.LatestVersion}, Download URL: {updateResult.DownloadUrl}");
+                                
+                                // TODO: Implement update notification to user
+                                // For now just log the availability
+                                // In the future, you might want to show a notification in the system tray
+                                // or automatically download and install the update
+                            }
+                            else
+                            {
+                                _logger.Debug("Application is up to date");
+                            }
+                        }
+                        else
+                        {
+                            _logger.Warning("FirmaKod is not configured, skipping update check.");
+                        }
+                    }
+                    catch (Exception updateEx)
+                    {
+                        _logger.Warning($"Failed to check for updates: {updateEx.Message}");
                     }
                 }
                 else

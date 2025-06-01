@@ -5,9 +5,8 @@ namespace Lore.SetupAndDosyaOku.Models
         public string PdksKayitDosyaYolu { get; set; } = string.Empty;
         public string AlarmKayitDosyaYolu { get; set; } = string.Empty;
         public string KameraLogDosyaYolu { get; set; } = string.Empty;
-        public string ApiEndpoint { get; set; } = string.Empty;
-        public string InstallationPath { get; set; } = string.Empty;
         public bool IsDebugMode { get; set; } = false;
+        public string Version { get; set; } = "1.0.0";
     }
 
     public class LoggingSettings
@@ -26,5 +25,19 @@ namespace Lore.SetupAndDosyaOku.Models
     {
         public AppSettings AppSettings { get; set; } = new AppSettings();
         public LoggingSettings Logging { get; set; } = new LoggingSettings();
+        public ApiSettings ApiSettings { get; set; } = new ApiSettings();
+    }
+
+    public class ApiSettings
+    {
+        public string BaseUrl { get; set; } = string.Empty;
+        public ApiEndpoints Endpoints { get; set; } = new ApiEndpoints();
+    }
+
+    public class ApiEndpoints
+    {
+        public string SendLogData { get; set; } = "SendLogData";
+        public string CheckVersion { get; set; } = "CheckVersion";
+        public string DownloadUpdate { get; set; } = "DownloadUpdate";
     }
 }

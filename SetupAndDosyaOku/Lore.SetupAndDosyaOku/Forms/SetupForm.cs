@@ -17,8 +17,6 @@ namespace Lore.SetupAndDosyaOku.Forms
         private TextBox txtPdksKayitDosyaYolu;
         private TextBox txtAlarmKayitDosyaYolu;
         private TextBox txtKameraLogDosyaYolu;
-        private TextBox txtApiEndpoint;
-        private TextBox txtInstallationPath;
         private CheckBox chkStartWithWindows;
         private CheckBox chkCreateDesktopShortcut;
 
@@ -39,7 +37,7 @@ namespace Lore.SetupAndDosyaOku.Forms
             
             // Form settings
             this.Text = "Lore Dosya İzleyici - Kurulum";
-            this.ClientSize = new System.Drawing.Size(600, 420);
+            this.ClientSize = new System.Drawing.Size(600, 380);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -161,71 +159,35 @@ namespace Lore.SetupAndDosyaOku.Forms
             btnKameraBrowse.Click += (sender, e) => BrowseForFile(txtKameraLogDosyaYolu, "Kamera Log Dosyası (*.txt)|*.txt|Tüm Dosyalar (*.*)|*.*");
             this.Controls.Add(btnKameraBrowse);
 
-            // Create API endpoint label and textbox
-            var lblApiEndpoint = new Label
-            {
-                Text = "API Endpoint:",
-                Location = new System.Drawing.Point(20, 210),
-                Size = new System.Drawing.Size(150, 20),
-                TextAlign = System.Drawing.ContentAlignment.MiddleRight
-            };
-            this.Controls.Add(lblApiEndpoint);
-
-            txtApiEndpoint = new TextBox
-            {
-                Location = new System.Drawing.Point(180, 210),
-                Size = new System.Drawing.Size(250, 23)
-            };
-            this.Controls.Add(txtApiEndpoint);            // Create installation path label and textbox with browse button
-            var lblInstallationPath = new Label
-            {
-                Text = "Kurulum Dizini:",
-                Location = new System.Drawing.Point(20, 240),
-                Size = new System.Drawing.Size(150, 20),
-                TextAlign = System.Drawing.ContentAlignment.MiddleRight
-            };
-            this.Controls.Add(lblInstallationPath);
-
-            txtInstallationPath = new TextBox
-            {
-                Location = new System.Drawing.Point(180, 240),
-                Size = new System.Drawing.Size(250, 23),
-                Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "LoreBilisim")
-            };
-            this.Controls.Add(txtInstallationPath);
-
-            var btnInstallPathBrowse = new Button
-            {
-                Text = "...",
-                Location = new System.Drawing.Point(440, 240),
-                Size = new System.Drawing.Size(30, 23)
-            };
-            btnInstallPathBrowse.Click += (sender, e) => BrowseForFolder(txtInstallationPath);
-            this.Controls.Add(btnInstallPathBrowse);
-            
-            // Create startup options
+            // Create startup with Windows checkbox
             chkStartWithWindows = new CheckBox
             {
-                Text = "Windows ile başlat",
-                Location = new System.Drawing.Point(180, 270),
-                Size = new System.Drawing.Size(250, 20),
+                Text = "Windows ile birlikte başlat",
+                Location = new System.Drawing.Point(180, 220),
+                Size = new System.Drawing.Size(250, 23),
                 Checked = true
             };
             this.Controls.Add(chkStartWithWindows);
 
+            // Create desktop shortcut checkbox
             chkCreateDesktopShortcut = new CheckBox
             {
-                Text = "Masaüstüne kısayol oluştur",
-                Location = new System.Drawing.Point(180, 300),
-                Size = new System.Drawing.Size(250, 20),
+                Text = "Masaüstü kısayolu oluştur",
+                Location = new System.Drawing.Point(180, 250),
+                Size = new System.Drawing.Size(250, 23),
                 Checked = true
             };
-            this.Controls.Add(chkCreateDesktopShortcut);            // Create save and cancel buttons            
+            this.Controls.Add(chkCreateDesktopShortcut);
+
+            // Create buttons
             var btnSave = new Button
             {
-                Text = "Kaydet",
-                Location = new System.Drawing.Point(180, 350),
-                Size = new System.Drawing.Size(100, 30)
+                Text = "Kaydet ve Kapat",
+                Location = new System.Drawing.Point(400, 300),
+                Size = new System.Drawing.Size(120, 30),
+                BackColor = System.Drawing.Color.FromArgb(0, 122, 204),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnSave.Click += BtnSave_Click;
             this.Controls.Add(btnSave);
@@ -233,16 +195,15 @@ namespace Lore.SetupAndDosyaOku.Forms
             var btnCancel = new Button
             {
                 Text = "İptal",
-                Location = new System.Drawing.Point(300, 330),
-                Size = new System.Drawing.Size(100, 30)
+                Location = new System.Drawing.Point(270, 300),
+                Size = new System.Drawing.Size(120, 30)
             };
-            btnCancel.Click += BtnCancel_Click;
+            btnCancel.Click += (sender, e) => this.Close();
             this.Controls.Add(btnCancel);
 
             this.ResumeLayout(false);
-            this.PerformLayout();
-
-            // Load settings
+            
+            // Load existing settings
             LoadSettings();
         }
 
@@ -261,26 +222,8 @@ namespace Lore.SetupAndDosyaOku.Forms
                 }
             }
         }
-        
-        private void BrowseForFolder(TextBox textBox)
-        {
-            using (var folderDialog = new FolderBrowserDialog())
-            {
-                folderDialog.Description = "Kurulum yapılacak klasörü seçin";
-                folderDialog.UseDescriptionForTitle = true;
-                folderDialog.ShowNewFolderButton = true;
-                
-                if (!string.IsNullOrEmpty(textBox.Text) && Directory.Exists(textBox.Text))
-                {
-                    folderDialog.SelectedPath = textBox.Text;
-                }
-                
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    textBox.Text = folderDialog.SelectedPath;
-                }
-            }
-        }        private void LoadSettings()
+
+        private void LoadSettings()
         {
             try
             {
@@ -289,17 +232,6 @@ namespace Lore.SetupAndDosyaOku.Forms
                 txtPdksKayitDosyaYolu.Text = settings.PdksKayitDosyaYolu;
                 txtAlarmKayitDosyaYolu.Text = settings.AlarmKayitDosyaYolu;
                 txtKameraLogDosyaYolu.Text = settings.KameraLogDosyaYolu;
-                txtApiEndpoint.Text = settings.ApiEndpoint;
-                
-                // Kurulum yolunu ayarla
-                if (!string.IsNullOrEmpty(settings.InstallationPath))
-                {
-                    txtInstallationPath.Text = settings.InstallationPath;
-                }
-                else
-                {
-                    txtInstallationPath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "LoreBilisim");
-                }
             }
             catch (Exception ex)
             {
@@ -338,49 +270,40 @@ namespace Lore.SetupAndDosyaOku.Forms
                 txtKameraLogDosyaYolu.Focus();
                 return false;
             }
-            
-            if (string.IsNullOrWhiteSpace(txtApiEndpoint.Text))
-            {
-                MessageBox.Show("API endpoint boş bırakılamaz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtApiEndpoint.Focus();
-                return false;
-            }
 
             return true;
-        }        private void SaveSettings()
+        }
+
+        private void SaveSettings()
         {
             try
             {
-                // Update settings
+                // Update settings - API endpoint artık sabit
                 var settings = _configHelper.GetSettings();
                 settings.FirmaKod = txtFirmaKodu.Text;
                 settings.PdksKayitDosyaYolu = txtPdksKayitDosyaYolu.Text;
                 settings.AlarmKayitDosyaYolu = txtAlarmKayitDosyaYolu.Text;
                 settings.KameraLogDosyaYolu = txtKameraLogDosyaYolu.Text;
-                settings.ApiEndpoint = txtApiEndpoint.Text;
-                settings.InstallationPath = txtInstallationPath.Text;
+                // API endpoint artık appsettings.json'dan alınıyor
                 
                 // Save to file
                 _configHelper.SaveSettings(settings);
-                  // Configure startup options
+                
+                // Configure startup options - artık kurulum dizini yerine mevcut dizin kullanılıyor
+                var currentDir = AppContext.BaseDirectory;
                 if (chkStartWithWindows.Checked)
                 {
-                    _startupHelper.AddToStartup(txtInstallationPath.Text);
+                    _startupHelper.AddToStartup(currentDir);
                 }
                 else
                 {
                     _startupHelper.RemoveFromStartup();
                 }
-                  // Kurulum klasörü oluştur
-                if (!string.IsNullOrEmpty(txtInstallationPath.Text) && !Directory.Exists(txtInstallationPath.Text))
-                {
-                    Directory.CreateDirectory(txtInstallationPath.Text);
-                }
                 
                 // Create desktop shortcut if requested
                 if (chkCreateDesktopShortcut.Checked)
                 {
-                    _startupHelper.CreateDesktopShortcut(txtInstallationPath.Text);
+                    _startupHelper.CreateDesktopShortcut(currentDir);
                 }
                 
                 _logger.Info("Ayarlar başarıyla kaydedildi.");
@@ -403,12 +326,6 @@ namespace Lore.SetupAndDosyaOku.Forms
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
-        }
-
-        private void BtnCancel_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
         }
     }
 }
