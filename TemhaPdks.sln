@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LorePdks.API", "LorePdks.AP
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LorePdks.DataOku", "LorePdks.DataOku", "{F81B1119-2007-4666-BC24-D59E78DB2162}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lore.SetupAndDosyaOku", "SetupAndDosyaOku\Lore.SetupAndDosyaOku\Lore.SetupAndDosyaOku.csproj", "{D5BADB7E-34A9-169D-3F71-216678EB9517}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,14 @@ Global
 		{1077AEE6-491F-4365-A4A7-415FA39B531F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1077AEE6-491F-4365-A4A7-415FA39B531F}.Release|ARM32.ActiveCfg = Release|ARM32
 		{1077AEE6-491F-4365-A4A7-415FA39B531F}.Release|ARM32.Build.0 = Release|ARM32
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Debug|ARM32.ActiveCfg = Debug|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Debug|ARM32.Build.0 = Debug|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Release|ARM32.ActiveCfg = Release|Any CPU
+		{D5BADB7E-34A9-169D-3F71-216678EB9517}.Release|ARM32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
