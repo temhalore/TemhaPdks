@@ -5,7 +5,7 @@ using Lore.SetupAndDosyaOku.Helpers;
 using Lore.SetupAndDosyaOku.Models;
 
 namespace Lore.SetupAndDosyaOku.Forms
-{
+{    
     public partial class SetupForm : Form
     {
         private readonly ConfigHelper _configHelper;
@@ -18,6 +18,7 @@ namespace Lore.SetupAndDosyaOku.Forms
         private TextBox txtAlarmKayitDosyaYolu;
         private TextBox txtKameraLogDosyaYolu;
         private TextBox txtApiEndpoint;
+        private TextBox txtInstallationPath;
         private CheckBox chkStartWithWindows;
         private CheckBox chkCreateDesktopShortcut;
 
@@ -38,7 +39,7 @@ namespace Lore.SetupAndDosyaOku.Forms
             
             // Form settings
             this.Text = "Lore Dosya İzleyici - Kurulum";
-            this.ClientSize = new System.Drawing.Size(600, 400);
+            this.ClientSize = new System.Drawing.Size(600, 420);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -175,13 +176,38 @@ namespace Lore.SetupAndDosyaOku.Forms
                 Location = new System.Drawing.Point(180, 210),
                 Size = new System.Drawing.Size(250, 23)
             };
-            this.Controls.Add(txtApiEndpoint);
+            this.Controls.Add(txtApiEndpoint);            // Create installation path label and textbox with browse button
+            var lblInstallationPath = new Label
+            {
+                Text = "Kurulum Dizini:",
+                Location = new System.Drawing.Point(20, 240),
+                Size = new System.Drawing.Size(150, 20),
+                TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            };
+            this.Controls.Add(lblInstallationPath);
 
+            txtInstallationPath = new TextBox
+            {
+                Location = new System.Drawing.Point(180, 240),
+                Size = new System.Drawing.Size(250, 23),
+                Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "LoreBilisim")
+            };
+            this.Controls.Add(txtInstallationPath);
+
+            var btnInstallPathBrowse = new Button
+            {
+                Text = "...",
+                Location = new System.Drawing.Point(440, 240),
+                Size = new System.Drawing.Size(30, 23)
+            };
+            btnInstallPathBrowse.Click += (sender, e) => BrowseForFolder(txtInstallationPath);
+            this.Controls.Add(btnInstallPathBrowse);
+            
             // Create startup options
             chkStartWithWindows = new CheckBox
             {
                 Text = "Windows ile başlat",
-                Location = new System.Drawing.Point(180, 250),
+                Location = new System.Drawing.Point(180, 270),
                 Size = new System.Drawing.Size(250, 20),
                 Checked = true
             };
@@ -190,17 +216,15 @@ namespace Lore.SetupAndDosyaOku.Forms
             chkCreateDesktopShortcut = new CheckBox
             {
                 Text = "Masaüstüne kısayol oluştur",
-                Location = new System.Drawing.Point(180, 280),
+                Location = new System.Drawing.Point(180, 300),
                 Size = new System.Drawing.Size(250, 20),
                 Checked = true
             };
-            this.Controls.Add(chkCreateDesktopShortcut);
-
-            // Create save and cancel buttons
+            this.Controls.Add(chkCreateDesktopShortcut);            // Create save and cancel buttons            
             var btnSave = new Button
             {
                 Text = "Kaydet",
-                Location = new System.Drawing.Point(180, 330),
+                Location = new System.Drawing.Point(180, 350),
                 Size = new System.Drawing.Size(100, 30)
             };
             btnSave.Click += BtnSave_Click;
@@ -237,8 +261,26 @@ namespace Lore.SetupAndDosyaOku.Forms
                 }
             }
         }
-
-        private void LoadSettings()
+        
+        private void BrowseForFolder(TextBox textBox)
+        {
+            using (var folderDialog = new FolderBrowserDialog())
+            {
+                folderDialog.Description = "Kurulum yapılacak klasörü seçin";
+                folderDialog.UseDescriptionForTitle = true;
+                folderDialog.ShowNewFolderButton = true;
+                
+                if (!string.IsNullOrEmpty(textBox.Text) && Directory.Exists(textBox.Text))
+                {
+                    folderDialog.SelectedPath = textBox.Text;
+                }
+                
+                if (folderDialog.ShowDialog() == DialogResult.OK)
+                {
+                    textBox.Text = folderDialog.SelectedPath;
+                }
+            }
+        }        private void LoadSettings()
         {
             try
             {
@@ -248,6 +290,16 @@ namespace Lore.SetupAndDosyaOku.Forms
                 txtAlarmKayitDosyaYolu.Text = settings.AlarmKayitDosyaYolu;
                 txtKameraLogDosyaYolu.Text = settings.KameraLogDosyaYolu;
                 txtApiEndpoint.Text = settings.ApiEndpoint;
+                
+                // Kurulum yolunu ayarla
+                if (!string.IsNullOrEmpty(settings.InstallationPath))
+                {
+                    txtInstallationPath.Text = settings.InstallationPath;
+                }
+                else
+                {
+                    txtInstallationPath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "LoreBilisim");
+                }
             }
             catch (Exception ex)
             {
@@ -295,9 +347,7 @@ namespace Lore.SetupAndDosyaOku.Forms
             }
 
             return true;
-        }
-
-        private void SaveSettings()
+        }        private void SaveSettings()
         {
             try
             {
@@ -308,24 +358,29 @@ namespace Lore.SetupAndDosyaOku.Forms
                 settings.AlarmKayitDosyaYolu = txtAlarmKayitDosyaYolu.Text;
                 settings.KameraLogDosyaYolu = txtKameraLogDosyaYolu.Text;
                 settings.ApiEndpoint = txtApiEndpoint.Text;
+                settings.InstallationPath = txtInstallationPath.Text;
                 
                 // Save to file
                 _configHelper.SaveSettings(settings);
-                
-                // Configure startup options
+                  // Configure startup options
                 if (chkStartWithWindows.Checked)
                 {
-                    _startupHelper.AddToStartup();
+                    _startupHelper.AddToStartup(txtInstallationPath.Text);
                 }
                 else
                 {
                     _startupHelper.RemoveFromStartup();
                 }
+                  // Kurulum klasörü oluştur
+                if (!string.IsNullOrEmpty(txtInstallationPath.Text) && !Directory.Exists(txtInstallationPath.Text))
+                {
+                    Directory.CreateDirectory(txtInstallationPath.Text);
+                }
                 
                 // Create desktop shortcut if requested
                 if (chkCreateDesktopShortcut.Checked)
                 {
-                    _startupHelper.CreateDesktopShortcut();
+                    _startupHelper.CreateDesktopShortcut(txtInstallationPath.Text);
                 }
                 
                 _logger.Info("Ayarlar başarıyla kaydedildi.");

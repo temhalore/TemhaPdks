@@ -19,18 +19,26 @@ namespace Lore.SetupAndDosyaOku.Helpers
         {
             _logger = logger;
         }
-        
-        /// <summary>
+          /// <summary>
         /// Uygulamayı Windows başlangıcına ekler
         /// </summary>
-        public bool AddToStartup()
+        public bool AddToStartup(string installPath = "")
         {
             try
             {
                 _logger.Info("Uygulama Windows başlangıcına ekleniyor...");
+                  string appName = "LoreSetupAndDosyaOku";
+                string exePath;
                 
-                string appName = "LoreSetupAndDosyaOku";
-                string exePath = Assembly.GetExecutingAssembly().Location;
+                if (!string.IsNullOrEmpty(installPath) && Directory.Exists(installPath))
+                {
+                    exePath = Path.Combine(installPath, "LoreSetupAndDosyaOku.exe");
+                }
+                else
+                {
+                    // Assembly.Location tek dosyalı uygulamalarda boş string döndürür
+                    exePath = Path.Combine(AppContext.BaseDirectory, "LoreSetupAndDosyaOku.exe");
+                }
                 
                 // 1. Yöntem: Windows başlangıç klasörüne kısayol ekle
                 string startupFolderPath = GetSpecialFolderPath(CSIDL_STARTUP);
@@ -109,18 +117,45 @@ namespace Lore.SetupAndDosyaOku.Helpers
                 _logger.Error("Windows başlangıcından kaldırma işlemi sırasında hata oluştu", ex);
                 return false;
             }
-        }
-          /// <summary>
+        }        /// <summary>
         /// Masaüstüne kısayol oluşturur
         /// </summary>
-        public bool CreateDesktopShortcut()
+        public bool CreateDesktopShortcut(string installPath = "")
         {
             try
             {
                 _logger.Info("Masaüstüne kısayol oluşturuluyor...");
                 
                 string appName = "LoreSetupAndDosyaOku";
-                string exePath = Assembly.GetExecutingAssembly().Location;
+                string exePath;
+                
+                if (!string.IsNullOrEmpty(installPath) && Directory.Exists(installPath))
+                {
+                    // Kurulum yolu varsa, o dizindeki çalıştırılabilir dosyayı seç
+                    exePath = Path.Combine(installPath, "LoreSetupAndDosyaOku.exe");
+                    
+                    // Eğer kurulum dizininde exe yoksa, mevcut exe dosyasını kopyala
+                    if (!File.Exists(exePath))
+                    {                        // Assembly.Location tek dosyalı uygulamalarda boş string döndürür
+                        string currentDir = AppContext.BaseDirectory;
+                        string currentExe = Path.Combine(currentDir, "LoreSetupAndDosyaOku.exe");
+                        File.Copy(currentExe, exePath, true);
+                        
+                        // app.ico dosyasını da kopyala
+                        string iconSource = Path.Combine(currentDir, "app.ico");
+                        string iconTarget = Path.Combine(installPath, "app.ico");
+                        if (File.Exists(iconSource))
+                        {
+                            File.Copy(iconSource, iconTarget, true);
+                        }
+                    }
+                }
+                else
+                {                    // Kurulum yolu belirtilmemişse, mevcut exe konumunu kullan
+                    // Assembly.Location tek dosyalı uygulamalarda boş string döndürür
+                    exePath = Path.Combine(AppContext.BaseDirectory, "LoreSetupAndDosyaOku.exe");
+                }
+                
                 string desktopPath = GetSpecialFolderPath(CSIDL_DESKTOP);
                 string shortcutPath = Path.Combine(desktopPath, $"{appName}.lnk");
                 
@@ -147,6 +182,9 @@ namespace Lore.SetupAndDosyaOku.Helpers
             {
                 // Windows Script Host kullanarak kısayol oluştur
                 string tempVbsPath = Path.Combine(Path.GetTempPath(), "CreateShortcut.vbs");
+                  // Check if icon file exists
+                string iconPath = Path.Combine(Path.GetDirectoryName(targetPath) ?? "", "app.ico");
+                string iconPathParam = File.Exists(iconPath) ? $"objShortcut.IconLocation = \"{iconPath.Replace("\\", "\\\\")}\"\r\n" : "";
                 
                 // Windows Script Host komutu
                 string vbsContent = $@"
@@ -155,7 +193,7 @@ Set objShortcut = objWSH.CreateShortcut(""{shortcutPath.Replace("\\", "\\\\")}""
 objShortcut.TargetPath = ""{targetPath.Replace("\\", "\\\\")}"" 
 objShortcut.Description = ""{description}""
 objShortcut.WorkingDirectory = ""{Path.GetDirectoryName(targetPath).Replace("\\", "\\\\")}"" 
-objShortcut.Save
+{iconPathParam}objShortcut.Save
 ";
                 
                 File.WriteAllText(tempVbsPath, vbsContent);

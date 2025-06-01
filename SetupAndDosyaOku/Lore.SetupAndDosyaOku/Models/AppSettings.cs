@@ -1,12 +1,12 @@
 namespace Lore.SetupAndDosyaOku.Models
-{
-    public class AppSettings
+{    public class AppSettings
     {
         public string FirmaKod { get; set; } = string.Empty;
         public string PdksKayitDosyaYolu { get; set; } = string.Empty;
         public string AlarmKayitDosyaYolu { get; set; } = string.Empty;
         public string KameraLogDosyaYolu { get; set; } = string.Empty;
         public string ApiEndpoint { get; set; } = string.Empty;
+        public string InstallationPath { get; set; } = string.Empty;
         public bool IsDebugMode { get; set; } = false;
     }
 

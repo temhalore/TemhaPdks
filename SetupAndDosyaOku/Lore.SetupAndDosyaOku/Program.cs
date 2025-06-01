@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 
+using System.Threading;
+
 namespace Lore.SetupAndDosyaOku;
 
 public static class Program
@@ -18,12 +20,20 @@ public static class Program
     private static NotifyIcon? _notifyIcon;
     private static bool _firstRun = false;
     private static IHost? _host;
+    private static Mutex _mutex = new Mutex(true, "Global\\LoreSetupAndDosyaOku_Instance");
       /// <summary>
     /// The main entry point for the application.
     /// </summary>
     [STAThread]
     public static void Main(string[] args)
     {
+        // Uygulamanın sadece bir örneğinin çalıştığından emin ol
+        if (!_mutex.WaitOne(TimeSpan.Zero, true))
+        {
+            MessageBox.Show("Uygulama zaten çalışıyor!", "Lore Dosya İzleyici", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
         Application.SetHighDpiMode(HighDpiMode.SystemAware);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
@@ -82,12 +92,32 @@ public static class Program
             MessageBox.Show($"Uygulama başlatılırken bir hata oluştu: {ex.Message}", "Hata", 
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             Debug.WriteLine($"Unhandled exception: {ex}");
-        }
-        finally
+        }        finally
         {
-            _notifyIcon?.Dispose();
-            await _host.StopAsync();
-            _host.Dispose();
+            if (_notifyIcon != null)
+            {
+                _notifyIcon.Visible = false;
+                _notifyIcon.Dispose();
+                _notifyIcon = null;
+            }
+            
+            if (_host != null)
+            {
+                try
+                {
+                    await _host.StopAsync(TimeSpan.FromSeconds(5));
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error stopping host: {ex.Message}");
+                }
+                finally
+                {
+                    _host.Dispose();
+                }
+            }
+            
+            _mutex.ReleaseMutex();
         }
     }
     
@@ -128,16 +158,44 @@ public static class Program
             MessageBox.Show($"Servisler başlatılırken bir hata oluştu: {ex.Message}", "Hata", 
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-    }
-    
-    private static void InitializeSystemTray()
+    }      private static void InitializeSystemTray()
     {
+        // If the previous instance didn't clean up properly
+        if (_notifyIcon != null)
+        {
+            _notifyIcon.Visible = false;
+            _notifyIcon.Dispose();
+            _notifyIcon = null;
+        }
+        
+        // Create new notifyIcon instance
         _notifyIcon = new NotifyIcon
         {
-            Icon = new Icon(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico")),
-            Visible = true,
+            Visible = false,  // Initially invisible to avoid ghost icons
             Text = "Lore Dosya İzleyici"
         };
+        
+        // Get icon path
+        string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico");
+        if (File.Exists(iconPath))
+        {
+            try
+            {
+                _notifyIcon.Icon = new Icon(iconPath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to load icon: {ex.Message}");
+                _notifyIcon.Icon = SystemIcons.Application;  // Fallback to system icon
+            }
+        }
+        else
+        {
+            _notifyIcon.Icon = SystemIcons.Application;  // Fallback to system icon
+        }
+          
+        // Now make it visible after everything is set up
+        _notifyIcon.Visible = true;
         
         // Create context menu
         var contextMenu = new ContextMenuStrip();
@@ -173,12 +231,16 @@ public static class Program
         
         // Add separator
         contextMenu.Items.Add(new ToolStripSeparator());
-        
-        // Add exit option
+          // Add exit option
         var exitMenuItem = new ToolStripMenuItem("Çıkış");
         exitMenuItem.Click += (s, e) => 
         {
-            _notifyIcon.Visible = false;
+            if (_notifyIcon != null)
+            {
+                _notifyIcon.Visible = false;
+                _notifyIcon.Dispose();
+                _notifyIcon = null;
+            }
             Application.Exit();
         };
         contextMenu.Items.Add(exitMenuItem);
