@@ -18,16 +18,22 @@ public static class Program
     private static NotifyIcon? _notifyIcon;
     private static bool _firstRun = false;
     private static IHost? _host;
-    
-    /// <summary>
+      /// <summary>
     /// The main entry point for the application.
     /// </summary>
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         Application.SetHighDpiMode(HighDpiMode.SystemAware);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
+        
+        // Async işlemleri senkron olarak çalıştır
+        MainAsync(args).GetAwaiter().GetResult();
+    }
+    
+    private static async Task MainAsync(string[] args)
+    {
         
         // Initialize services and configuration
         _host = CreateHostBuilder(args).Build();
@@ -185,9 +191,7 @@ public static class Program
         {
             Interval = 1000, // Update every second
             Enabled = true
-        };
-        
-        timer.Tick += (s, e) =>
+        };        timer.Tick += (s, e) =>
         {
             var logger = _host?.Services.GetRequiredService<Logger>();
             if (logger != null)
