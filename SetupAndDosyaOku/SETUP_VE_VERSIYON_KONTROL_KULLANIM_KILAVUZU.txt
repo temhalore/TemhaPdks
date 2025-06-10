@@ -1,0 +1,233 @@
+================================================================================
+          LORE DOSYA İZLEYİCİ - SETUP VE VERSİYON KONTROL KULLANIM KILAVUZU
+================================================================================
+
+📅 Oluşturulma Tarihi: 10 Haziran 2025
+🎯 Proje: Lore.SetupAndDosyaOku
+📍 Konum: d:\Development\ozel\TemhaPdks\SetupAndDosyaOku\
+
+================================================================================
+                              📦 SETUP DOSYASI OLUŞTURMA
+================================================================================
+
+🔧 ADIM 1: Projeyi Publish Etme
+-------------------------------
+Komut: 
+cd "d:\Development\ozel\TemhaPdks\SetupAndDosyaOku\Lore.SetupAndDosyaOku"
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false
+
+Çıktı Konumu: 
+bin\Release\net8.0-windows\win-x64\publish\
+
+Oluşan Dosyalar:
+- LoreSetupAndDosyaOku.exe (Ana uygulama)
+- appsettings.json (Konfigürasyon)
+- LoreSetupAndDosyaOku.pdb (Debug bilgileri)
+
+🔧 ADIM 2: InnoSetup ile Setup Oluşturma
+----------------------------------------
+Komut:
+cd "d:\Development\ozel\TemhaPdks\SetupAndDosyaOku\Lore.SetupAndDosyaOku"
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+Çıktı:
+installer\LoreDosyaIzleyici_Setup.exe
+
+📝 ÖNEMLI DOSYALAR:
+- installer.iss (InnoSetup script dosyası)
+- license.txt (Lisans dosyası)
+- app.ico (Uygulama ikonu)
+
+================================================================================
+                             🔄 VERSİYON KONTROL SİSTEMİ
+================================================================================
+
+🏗️ SİSTEM MİMARİSİ:
+-------------------
+Client Side (Lore.SetupAndDosyaOku):
+├── Program.cs → CheckForUpdatesOnStartupAsync()
+├── UpdateService.cs → CheckForUpdatesAsync(), DownloadUpdateAsync()
+├── FileMonitoringService.cs → Periyodik versiyon kontrolü
+└── System Tray → Güncelleme bildirimleri
+
+Server Side (LorePdks.API):
+├── DataOkuConsoleSetupController.cs
+├── CheckVersion endpoint → Versiyon karşılaştırması
+├── DownloadUpdate endpoint → Setup dosyası indirme
+└── uploadSetupFile endpoint → Setup dosyası yükleme
+
+🔍 API ENDPOINTS:
+----------------
+1. Versiyon Kontrolü:
+   GET /Api/DataOkuConsoleSetup/CheckVersion?firmaKod=XXX&currentVersion=1.0.0
+   
+2. Setup İndirme:
+   GET /Api/DataOkuConsoleSetup/DownloadUpdate?firmaKod=XXX
+   
+3. Setup Yükleme (Admin):
+   POST /Api/DataOkuConsoleSetup/uploadSetupFile
+
+📊 VERSİYON KONTROL AKIŞI:
+-------------------------
+1. Uygulama başlangıcında otomatik kontrol
+2. API'den güncel versiyon bilgisi alınır
+3. Mevcut versiyon ile karşılaştırılır
+4. Yeni versiyon varsa sistem tray'de bildirim gösterilir
+5. Kullanıcı isterse otomatik indirme yapılır
+
+================================================================================
+                           📋 YENİ VERSİYON ÇIKARMA SÜRECİ
+================================================================================
+
+🔄 A) GELİŞTİRME ORTAMINDA:
+---------------------------
+1. Versiyon numarasını artırın:
+   Dosya: appsettings.json
+   Değişiklik: "Version": "1.0.1" (örnek)
+
+2. installer.iss dosyasında versiyon güncelleyin:
+   #define MyAppVersion "1.0.1"
+
+3. Projeyi yeniden publish edin:
+   dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+
+4. Yeni setup dosyası oluşturun:
+   & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+🔄 B) SUNUCU TARAFINDA:
+----------------------
+1. API appsettings.json güncelleme:
+   Dosya: LorePdks.API\appsettings.Development.json
+   
+   "DataOkuConsole": {
+     "CurrentVersion": "1.0.1",  // YENİ VERSİYON
+     "SetupUrl": "https://localhost:44374/Api/DataOkuConsoleSetup/DownloadUpdate",
+     "ReleaseNotes": "Bu sürümde: Yeni özellikler ve hata düzeltmeleri",
+     "DefaultInstallPath": "C:\\Program Files\\LoreBilisim\\",
+     "ExecutablePath": "LoreSetupAndDosyaOku.exe"
+   }
+
+2. Setup dosyasını sunucuya yükleme:
+   a) Manuel: wwwroot/uploads/ klasörüne kopyalayın
+   b) API ile: uploadSetupFile endpoint'ini kullanın
+   c) Dosya adı: LoreDosyaIzleyici_Setup.exe olmalı
+
+================================================================================
+                              🔧 SETUP YÜKLEMESİ
+================================================================================
+
+📁 DOSYA KONUMLARI:
+------------------
+Setup Dosyası: installer\LoreDosyaIzleyici_Setup.exe
+Kurulum Dizini: C:\Program Files\LoreBilisim\
+Konfigürasyon: %ProgramFiles%\LoreBilisim\appsettings.json
+
+📋 KURULUM ÖZELLİKLERİ:
+-----------------------
+✅ Yönetici yetkisi gerekli (PrivilegesRequired=admin)
+✅ Masaüstü kısayolu (varsayılan seçili)
+✅ Başlat menüsü grubu
+✅ Self-contained executable (tek dosya)
+✅ Otomatik uninstaller kayıt
+
+================================================================================
+                             🐛 SORUN GİDERME
+================================================================================
+
+❌ YAYGIN SORUNLAR:
+
+1. "Yükseltme gerekiyor" Hatası:
+   Çözüm: Setup'ı yönetici olarak çalıştırın
+
+2. API bağlantı hatası:
+   Kontrol: appsettings.json → ApiSettings → BaseUrl
+   Test: API sunucusunun çalışır durumda olduğunu doğrulayın
+
+3. Versiyon kontrolü çalışmıyor:
+   Kontrol: FirmaKod ayarının yapıldığını doğrulayın
+   Log: %ProgramFiles%\LoreBilisim\logs\ klasörünü kontrol edin
+
+4. Setup dosyası oluşturamıyor:
+   Kontrol: InnoSetup yüklü mü?
+   Kontrol: publish klasöründe dosyalar var mı?
+
+📝 LOG DOSYALARI:
+----------------
+Uygulama Logları: %ProgramFiles%\LoreBilisim\logs\
+Setup Logları: %TEMP%\Setup Log xxxx-xx-xx #xxx.txt
+
+================================================================================
+                            📂 DOSYA YAPISI
+================================================================================
+
+SetupAndDosyaOku/
+├── Lore.SetupAndDosyaOku/
+│   ├── installer.iss                 # InnoSetup script
+│   ├── license.txt                   # Lisans dosyası
+│   ├── app.ico                       # Uygulama ikonu
+│   ├── appsettings.json              # Konfigürasyon
+│   ├── installer/                    # Setup çıktı klasörü
+│   │   └── LoreDosyaIzleyici_Setup.exe
+│   └── bin/Release/net8.0-windows/win-x64/publish/
+│       ├── LoreSetupAndDosyaOku.exe  # Ana uygulama
+│       ├── appsettings.json          # Runtime konfigürasyon
+│       └── LoreSetupAndDosyaOku.pdb  # Debug bilgileri
+└── upload_setup.sh                  # Setup yükleme script'i
+
+================================================================================
+                           🚀 DEPLOYMENT CHECKLİST
+================================================================================
+
+✅ PRODUCTION HAZIRLIK:
+----------------------
+□ Versiyon numarası güncellendi
+□ Release notes hazırlandı
+□ Setup dosyası oluşturuldu
+□ Setup dosyası test edildi
+□ API sunucusu güncel versiyon bilgileri ile güncellendi
+□ SSL sertifikaları geçerli
+□ Domain ayarları doğru
+□ Firewall kuralları uygun
+□ Backup alındı
+
+📧 İLETİŞİM:
+-----------
+Geliştirici: info@lorebilisim.com
+Web: https://www.lorebilisim.com
+Teknik Destek: Bu kılavuzda belirtilen adımları takip edin
+
+================================================================================
+                              📚 EK BİLGİLER
+================================================================================
+
+🔐 GÜVENLİK:
+-----------
+- Uygulama admin yetkisi gerektiriyor
+- API endpoints'leri firma koduna göre yetkilendiriliyor
+- Setup dosyaları güvenli sunucuda saklanıyor
+
+⚡ PERFORMANS:
+-------------
+- Self-contained executable (tek dosya)
+- ReadyToRun ile optimize edilmiş
+- Minimal resource kullanımı
+- Background service olarak çalışır
+
+🔄 GÜNCELLEMELER:
+---------------
+- Otomatik versiyon kontrolü
+- System tray bildirimleri  
+- Manuel indirme seçeneği
+- Silent update desteği (gelecek versiyon)
+
+================================================================================
+                            SON GÜNCELLEME TARİHİ
+================================================================================
+
+📅 Tarih: 10 Haziran 2025
+👤 Güncelleme Yapan: GitHub Copilot
+📝 Versiyon: 1.0.0 - İlk sürüm notları
+
+Bu kılavuz gelecek güncellemeler ile birlikte genişletilecektir.
+
+================================================================================
