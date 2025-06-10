@@ -38,14 +38,14 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
         /// Firma koduna göre DataOkuConsole versiyon bilgisini getirir
         /// </summary>
         [HttpGet]
-        [Route("getFirmaDataOkuVersiyon")]
-        public IActionResult getFirmaDataOkuVersiyon([FromQuery] string firmaKodu)
+        [Route("getFirmaDataOkuSetupBilgi")]
+        public IActionResult getFirmaDataOkuSetupBilgi([FromQuery] string firmaKodu)
         {
             try
             {
-                _logger.LogInformation($"getFirmaDataOkuVersiyon çağrıldı. FirmaKodu: {firmaKodu}");
+                _logger.LogInformation($"getFirmaDataOkuSetupBilgi çağrıldı. FirmaKodu: {firmaKodu}");
                 
-                var response = new ServiceResponse<DataOkuVersiyon>();
+                var response = new ServiceResponse<FirmaDataOkuSetupBilgiDto>();
                 
                 // Firma koduna göre firmayı bul
                 var firmaList = _firmaManager.getFirmaDtoListById(false);
@@ -53,30 +53,25 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 
                 if (firma == null)
                 {
-                    response.data = new DataOkuVersiyon
-                    {
-                        Success = false,
-                        Message = $"Firma bulunamadı: {firmaKodu}",
-                        Version = ""
-                    };
+                   
                     response.messageType = ServiceResponseMessageType.Error;
                     response.message = $"Firma bulunamadı: {firmaKodu}";
                     return Ok(response);
                 }
                 
-                // Firma için DataOkuConsole versiyon bilgisini getir
-                // TODO: Gerçek uygulamada firma veya genel versiyon bilgisi veritabanından alınabilir bunu indirince firma için firma tablosuna yazacağız
-                // Şimdilik config dosyasından okuyalım
-                string version = _configuration["DataOkuConsole:CurrentVersion"] ?? "1.0.0";
-                
-                response.data = new DataOkuVersiyon
+                var firmaBilgiDto = new FirmaDataOkuSetupBilgiDto
                 {
-                    Success = true,
-                    Message = "Başarılı",
-                    //Version = version
-                     Version = "0.0.9"
+                    FirmaKod = firma.kod,
+                    //isPdks = firma.isPdks,
+                    //isAlarm = firma.isAlarm,
+                    //isKamera = firma.isKamera
+                     isPdks = true,
+                    isAlarm = true,
+                    isKamera = true
                 };
-                
+                response.data = firmaBilgiDto;
+
+
                 _logger.LogInformation($"getFirmaDataOkuVersiyon başarılı. FirmaKodu: {firmaKodu}, Versiyon: {version}");
                 
                 return Ok(response);
@@ -492,6 +487,14 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
         public string FirmaKod { get; set; } = string.Empty;
         public string LogType { get; set; } = string.Empty; // "pdks", "alarm", "kameralog"
         public string LogData { get; set; } = string.Empty;
+    }
+
+    public class FirmaDataOkuSetupBilgiDto
+    {
+        public string FirmaKod { get; set; } = string.Empty;
+        public bool isPdks { get; set; }
+        public bool isAlarm { get; set; }
+        public bool isKamera { get; set; }
     }
 
     public class VersionCheckResult
