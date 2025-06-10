@@ -53,23 +53,18 @@ public static class Program
             // Check if this is the first run or if config needs to be set up
             var configHelper = _host.Services.GetRequiredService<ConfigHelper>();
             var appSettings = configHelper.GetSettings();
-            
-            _firstRun = string.IsNullOrEmpty(appSettings.FirmaKod) ||
-                        string.IsNullOrEmpty(appSettings.PdksKayitDosyaYolu) ||
-                        string.IsNullOrEmpty(appSettings.AlarmKayitDosyaYolu) ||
-                        string.IsNullOrEmpty(appSettings.KameraLogDosyaYolu);            // Initialize logging
+              _firstRun = string.IsNullOrEmpty(appSettings.FirmaKod);// Initialize logging
             var logger = _host.Services.GetRequiredService<Logger>();
             logger.Info("Application starting");
             
             // Check for updates on startup
             await CheckForUpdatesOnStartupAsync();
-            
-            // If first run or settings incomplete, show setup form
+              // If first run or settings incomplete, show setup wizard
             if (_firstRun)
             {
-                logger.Info("First run or incomplete configuration detected. Showing setup form.");
-                var setupForm = _host.Services.GetRequiredService<SetupForm>();
-                Application.Run(setupForm);
+                logger.Info("First run or incomplete configuration detected. Showing setup wizard.");
+                var setupWizardForm = _host.Services.GetRequiredService<SetupWizardForm>();
+                Application.Run(setupWizardForm);
                 
                 // Check if the setup was completed successfully
                 if (string.IsNullOrEmpty(configHelper.GetSettings().FirmaKod))
@@ -142,9 +137,9 @@ public static class Program
                 services.AddSingleton<StartupHelper>();
                 services.AddSingleton<UpdateService>();
                 services.AddSingleton<LogSenderService>();
-                
-                // Register forms
+                  // Register forms
                 services.AddTransient<SetupForm>();
+                services.AddTransient<SetupWizardForm>();
                 
                 // Register monitoring services
                 services.AddHostedService<FileMonitoringService>();

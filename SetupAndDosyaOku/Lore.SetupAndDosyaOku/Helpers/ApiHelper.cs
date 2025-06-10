@@ -254,6 +254,54 @@ namespace Lore.SetupAndDosyaOku.Helpers
                 return false;
             }
         }
+        
+        /// <summary>
+        /// Firma koduna göre setup bilgilerini API'den alır
+        /// </summary>
+        /// <param name="firmaKodu">Firma kodu</param>
+        /// <returns>Firma setup bilgileri</returns>
+        public async Task<FirmaDataOkuSetupBilgiDto?> GetFirmaDataOkuSetupBilgiAsync(string firmaKodu)
+        {
+            try
+            {
+                string endpoint = $"{_baseUrl}/Api/DataOkuConsoleSetup/getFirmaDataOkuSetupBilgi?firmaKodu={firmaKodu}";
+                
+                _logger.Debug($"Firma setup bilgileri isteniyor: {endpoint}");
+                
+                using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                var response = await _httpClient.GetAsync(endpoint, cancellationTokenSource.Token);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var serviceResponse = JsonSerializer.Deserialize<ServiceResponse<FirmaDataOkuSetupBilgiDto>>(jsonContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    
+                    if (serviceResponse?.data != null)
+                    {
+                        _logger.Info($"Firma setup bilgileri başarıyla alındı: {firmaKodu}");
+                        return serviceResponse.data;
+                    }
+                    else
+                    {
+                        _logger.Warning($"Firma setup bilgileri alınamadı: {serviceResponse?.message}");
+                        return null;
+                    }
+                }
+                else
+                {
+                    _logger.Warning($"Firma setup bilgileri API çağrısı başarısız: {response.StatusCode}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Firma setup bilgileri alınırken hata oluştu: {firmaKodu}", ex);
+                return null;
+            }
+        }
     }
     
     public class UpdateInfo
