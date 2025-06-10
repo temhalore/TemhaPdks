@@ -534,6 +534,8 @@ Artık tüm publish ve setup işlemlerini tek bir dosya ile yapabilirsiniz:
 2. "publishAndCreateSetupForDosyaokuProjesi.bat" dosyasına çift tıklayın
 
 3. Script otomatik olarak:
+   ✅ Mevcut versiyonu gösterir ve seçenekler sunar
+   ✅ Versiyon güncellemesi yapar (istenirse)
    ✅ Eski build dosyalarını temizler
    ✅ Projeyi publish eder
    ✅ Setup dosyasını oluşturur
@@ -549,11 +551,34 @@ publishAndCreateSetupForDosyaokuProjesi.bat
 ### 📋 SCRIPT ADIM ADIM NE YAPIYOR:
 
 ```
+[BAŞLANGIÇ] Versiyon yönetimi ve seçenekler
 [ADIM 1/4] Eski build dosyalarını temizleme
 [ADIM 2/4] Projeyi publish etme (30-60 saniye)
 [ADIM 3/4] Setup dosyasını oluşturma (10-20 saniye)
 [ADIM 4/4] Final kontroller ve raporlama
 ```
+
+### 🔢 VERSİYON YÖNETİMİ SEÇENEKLERİ:
+
+Script başladığında size 3 seçenek sunar:
+
+**[1] Mevcut versiyonu kullan**
+- Herhangi bir değişiklik yapmaz
+- Doğrudan publish işlemine geçer
+
+**[2] Yeni versiyon numarası gir**
+- Manuel olarak yeni versiyon girebilirsiniz (örn: 1.2.5)
+- Onay istenir ve kabul ederseniz dosyalar güncellenir
+
+**[3] Otomatik versiyon artır**
+- Son rakamı otomatik olarak 1 artırır (1.0.0 → 1.0.1)
+- Onay istenir ve kabul ederseniz dosyalar güncellenir
+
+### 📝 HANGİ DOSYALAR GÜNCELLENİR:
+
+Versiyon değişikliği yapıldığında:
+- ✅ `appsettings.json` → "Version" alanı güncellenir
+- ✅ `installer.iss` → "#define MyAppVersion" güncellenir
 
 ### 🎛️ İŞLEM SONRASI SEÇENEKLER:
 
@@ -579,6 +604,9 @@ Script tamamlandıktan sonra size şu seçenekleri sunar:
 
 ✅ **Tek tıkla her şey**: Publish + Setup oluşturma
 ✅ **Otomatik temizlik**: Eski dosyaları siler
+✅ **Akıllı versiyon yönetimi**: 3 farklı versiyon seçeneği
+✅ **Otomatik versiyon artırma**: Son rakamı otomatik +1
+✅ **Güvenli güncelleme**: Kullanıcı onayı ile versiyon değiştirme
 ✅ **Hata kontrolü**: Her adımda kontrol yapar
 ✅ **Kullanıcı dostu**: Renkli çıktı ve açık mesajlar
 ✅ **Etkileşimli**: İşlem sonrası seçenekler sunar
@@ -599,7 +627,13 @@ Yaklaşık **1-2 dakika** (internet hızına bağlı)
 🎉 **SONUÇ**: Artık sadece `publishAndCreateSetupForDosyaokuProjesi.bat` dosyasına 
     çift tıklayarak tüm publish ve setup işlemlerini yapabilirsiniz!
 
-Son güncelleme: 10 Haziran 2025
+**🔥 YENİ ÖZELLİK (v2.0)**: Script artık akıllı versiyon yönetimi ile geliyor!
+- Mevcut versiyonu gösterir
+- 3 farklı güncelleme seçeneği sunar  
+- Otomatik dosya güncellemesi yapar
+- Kullanıcı onayı ile güvenli güncelleme
+
+Son güncelleme: 10 Haziran 2025 - v2.0 (Versiyon Yönetimi Eklendi)
 Güncelleme yapan: GitHub Copilot
 Test yapan: GitHub Copilot
 
