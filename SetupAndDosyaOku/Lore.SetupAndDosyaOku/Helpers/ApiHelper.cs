@@ -264,7 +264,7 @@ namespace Lore.SetupAndDosyaOku.Helpers
             try
             {
                 var config = _configHelper.GetConfig();
-                string endpoint = $"{_baseUrl}{config.ApiSettings.Endpoints.GetFirmaSetupBilgi}?firmaKodu={firmaKodu}";
+                string endpoint = $"{_baseUrl}/{config.ApiSettings.Endpoints.GetFirmaSetupBilgi}?firmaKodu={firmaKodu}";
                 
                 _logger.Debug($"Firma setup bilgileri isteniyor: {endpoint}");
                 

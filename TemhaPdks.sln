@@ -3,7 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LorePdks.Service", "LorePdks.Service", "{062FA069-E7E7-480E-994A-6ECFC5570B30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LorePdks.BAL", "LorePdks.BAL\LorePdks.BAL.csproj", "{B6F575B6-5D7D-45DE-9A13-3C6FB89B206D}"
@@ -13,8 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LorePdks.DAL", "LorePdks.DAL\LorePdks.DAL.csproj", "{1E4F1945-593F-4919-AFB4-27409C209223}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LorePdks.API", "LorePdks.API\LorePdks.API.csproj", "{1077AEE6-491F-4365-A4A7-415FA39B531F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LorePdks.DataOku", "LorePdks.DataOku", "{F81B1119-2007-4666-BC24-D59E78DB2162}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lore.SetupAndDosyaOku", "SetupAndDosyaOku\Lore.SetupAndDosyaOku\Lore.SetupAndDosyaOku.csproj", "{D5BADB7E-34A9-169D-3F71-216678EB9517}"
 EndProject
