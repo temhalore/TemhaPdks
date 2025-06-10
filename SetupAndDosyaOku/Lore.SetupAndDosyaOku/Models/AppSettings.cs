@@ -32,12 +32,11 @@ namespace Lore.SetupAndDosyaOku.Models
     {
         public string BaseUrl { get; set; } = string.Empty;
         public ApiEndpoints Endpoints { get; set; } = new ApiEndpoints();
-    }
-
-    public class ApiEndpoints
+    }    public class ApiEndpoints
     {
         public string SendLogData { get; set; } = "SendLogData";
         public string CheckVersion { get; set; } = "CheckVersion";
         public string DownloadUpdate { get; set; } = "DownloadUpdate";
+        public string GetFirmaSetupBilgi { get; set; } = "getFirmaDataOkuSetupBilgi";
     }
 }

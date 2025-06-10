@@ -252,8 +252,7 @@ namespace Lore.SetupAndDosyaOku.Helpers
             {
                 _logger.Error("Güncelleme indirilirken hata oluştu", ex);
                 return false;
-            }
-        }
+            }        }
         
         /// <summary>
         /// Firma koduna göre setup bilgilerini API'den alır
@@ -264,7 +263,8 @@ namespace Lore.SetupAndDosyaOku.Helpers
         {
             try
             {
-                string endpoint = $"{_baseUrl}/Api/DataOkuConsoleSetup/getFirmaDataOkuSetupBilgi?firmaKodu={firmaKodu}";
+                var config = _configHelper.GetConfig();
+                string endpoint = $"{_baseUrl}{config.ApiSettings.Endpoints.GetFirmaSetupBilgi}?firmaKodu={firmaKodu}";
                 
                 _logger.Debug($"Firma setup bilgileri isteniyor: {endpoint}");
                 

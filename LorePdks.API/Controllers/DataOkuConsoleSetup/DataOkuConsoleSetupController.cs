@@ -44,42 +44,42 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             try
             {
                 _logger.LogInformation($"getFirmaDataOkuSetupBilgi çağrıldı. FirmaKodu: {firmaKodu}");
-                
+
                 var response = new ServiceResponse<FirmaDataOkuSetupBilgiDto>();
-                
+
                 // Firma koduna göre firmayı bul
                 var firmaList = _firmaManager.getFirmaDtoListById(false);
                 var firma = firmaList.FirstOrDefault(x => x.kod == firmaKodu);
-                
+
                 if (firma == null)
                 {
-                   
+
                     response.messageType = ServiceResponseMessageType.Error;
                     response.message = $"Firma bulunamadı: {firmaKodu}";
                     return Ok(response);
                 }
-                
+
                 var firmaBilgiDto = new FirmaDataOkuSetupBilgiDto
                 {
                     FirmaKod = firma.kod,
                     //isPdks = firma.isPdks,
                     //isAlarm = firma.isAlarm,
                     //isKamera = firma.isKamera
-                     isPdks = true,
+                    isPdks = true,
                     isAlarm = true,
                     isKamera = true
                 };
                 response.data = firmaBilgiDto;
 
 
-                _logger.LogInformation($"getFirmaDataOkuVersiyon başarılı. FirmaKodu: {firmaKodu}, Versiyon: {version}");
-                
+                _logger.LogInformation($"getFirmaDataOkuSetupBilgi çağrıldı ve döüş sağlandı. FirmaKodu: {firmaKodu}");
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"getFirmaDataOkuVersiyon hatası. FirmaKodu: {firmaKodu}");
-                
+
                 var response = new ServiceResponse<DataOkuVersiyon>
                 {
                     data = new DataOkuVersiyon
@@ -91,7 +91,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                     messageType = ServiceResponseMessageType.Error,
                     message = $"İşlem sırasında hata: {ex.Message}"
                 };
-                
+
                 return Ok(response);
             }
         }
@@ -106,20 +106,20 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             try
             {
                 _logger.LogInformation($"getGuncelDataOkuSetupVersiyon çağrıldı. FirmaKodu: {firmaKodu}");
-                
+
                 var response = new ServiceResponse<DataOkuSetupVersiyon>();
-                
+
                 // Firma koduna göre firmayı bul
                 var firmaList = _firmaManager.getFirmaDtoListById(false);
                 var firma = firmaList.FirstOrDefault(x => x.kod == firmaKodu);
-                
+
                 if (firma == null)
                 {
                     response.messageType = ServiceResponseMessageType.Error;
                     response.message = $"Firma bulunamadı: {firmaKodu}";
                     return Ok(response);
                 }
-                  // Güncel setup versiyonu ve indirme bağlantısını getir
+                // Güncel setup versiyonu ve indirme bağlantısını getir
                 // TODO: Gerçek uygulamada firma veya genel versiyon bilgisi veritabanından alınabilir
                 // Şimdilik config dosyasından okuyalım
                 string version = _configuration["DataOkuConsole:CurrentVersion"] ?? "1.0.0";
@@ -127,7 +127,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 string releaseNotes = _configuration["DataOkuConsole:ReleaseNotes"] ?? "Bu sürümde yeni özellikler ve hata düzeltmeleri bulunmaktadır.";
                 string defaultInstallPath = _configuration["DataOkuConsole:DefaultInstallPath"] ?? "C:\\LoreSoft\\";
                 string executablePath = _configuration["DataOkuConsole:ExecutablePath"] ?? "Temha.DataOkuConsole.exe";
-                
+
                 response.data = new DataOkuSetupVersiyon
                 {
                     Version = version,
@@ -136,25 +136,25 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                     DefaultInstallPath = defaultInstallPath,
                     ExecutablePath = executablePath
                 };
-                
+
                 _logger.LogInformation($"getGuncelDataOkuSetupVersiyon başarılı. FirmaKodu: {firmaKodu}, Versiyon: {version}");
-                
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"getGuncelDataOkuSetupVersiyon hatası. FirmaKodu: {firmaKodu}");
-                
+
                 var response = new ServiceResponse<DataOkuSetupVersiyon>
                 {
                     messageType = ServiceResponseMessageType.Error,
                     message = $"İşlem sırasında hata: {ex.Message}"
                 };
-                
+
                 return Ok(response);
             }
         }
-          /// <summary>
+        /// <summary>
         /// DataOkuConsole setup dosyalarını yükle
         /// </summary>
         [HttpPost]
@@ -164,45 +164,45 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             try
             {
                 _logger.LogInformation($"uploadSetupFile çağrıldı. Dosya boyutu: {file?.Length ?? 0} bytes");
-                
+
                 if (file == null || file.Length == 0)
                 {
                     return BadRequest("Dosya yüklenmedi.");
                 }
-                
+
                 // Dosya uzantısı kontrolü yap (.zip, .rar veya .exe dosyaları kabul ediliyor)
                 string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
                 if (extension != ".zip" && extension != ".rar" && extension != ".exe")
                 {
                     return BadRequest("Sadece .zip, .rar veya .exe dosyaları yüklenebilir.");
                 }
-                
+
                 // Uploads klasörüne dosyayı kaydet
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
-                
+
                 // Dosya adını uzantıyla birlikte belirle
                 var uniqueFileName = $"DataOkuConsole_latest{extension}";
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                
+
                 // Eğer dosya mevcutsa önce sil
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
-                
+
                 // Yeni dosyayı kaydet
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     file.CopyTo(stream);
                 }
-                
+
                 // appSettings.json dosyasını güncelle
                 UpdateAppSettings(extension);
-                
+
                 // Başarılı yanıt döndür
                 var response = new ServiceResponse<string>
                 {
@@ -210,25 +210,25 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                     messageType = ServiceResponseMessageType.Success,
                     message = "Dosya başarıyla yüklendi."
                 };
-                
+
                 _logger.LogInformation($"uploadSetupFile başarılı. Yüklenen dosya: {filePath}");
-                
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "uploadSetupFile hatası.");
-                
+
                 var response = new ServiceResponse<string>
                 {
                     messageType = ServiceResponseMessageType.Error,
                     message = $"Dosya yükleme sırasında hata: {ex.Message}"
                 };
-                
+
                 return Ok(response);
             }
         }
-        
+
         /// <summary>
         /// appSettings.json dosyasını günceller
         /// </summary>
@@ -239,21 +239,21 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 // AppSettings yolunu ve içeriğini al
                 var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
                 var json = System.IO.File.ReadAllText(appSettingsPath);
-                
+
                 // Json dosyasını objeye dönüştür
                 var jsonObj = System.Text.Json.JsonDocument.Parse(json).RootElement;
-                
+
                 // JsonElement'i dynamic olarak kullanamadığımız için, yeni bir JsonObject oluşturalım
                 using (JsonDocument document = JsonDocument.Parse(json))
                 {
                     var root = document.RootElement;
-                    
+
                     using (var stream = new MemoryStream())
                     {
                         using (var writer = new Utf8JsonWriter(stream))
                         {
                             writer.WriteStartObject();
-                            
+
                             // Root seviyesindeki tüm özellikleri kopyala
                             foreach (var property in root.EnumerateObject())
                             {
@@ -266,7 +266,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                                     // DataOkuConsole bölümünü güncelle
                                     writer.WritePropertyName("DataOkuConsole");
                                     writer.WriteStartObject();
-                                    
+
                                     foreach (var setting in property.Value.EnumerateObject())
                                     {
                                         if (setting.Name == "SetupUrl")
@@ -279,14 +279,14 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                                             setting.WriteTo(writer);
                                         }
                                     }
-                                    
+
                                     writer.WriteEndObject();
                                 }
                             }
-                            
+
                             writer.WriteEndObject();
                         }
-                        
+
                         // Güncellenmiş JSON'u dosyaya yaz
                         var updatedJson = Encoding.UTF8.GetString(stream.ToArray());
                         System.IO.File.WriteAllText(appSettingsPath, updatedJson);
@@ -310,7 +310,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             try
             {
                 _logger.LogInformation($"SendLogData çağrıldı. FirmaKod: {request.FirmaKod}, LogType: {request.LogType}");
-                
+
                 if (string.IsNullOrEmpty(request.FirmaKod) || string.IsNullOrEmpty(request.LogType) || string.IsNullOrEmpty(request.LogData))
                 {
                     return BadRequest("FirmaKod, LogType ve LogData alanları gereklidir.");
@@ -320,51 +320,51 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 var baseFolder = Path.Combine(Directory.GetCurrentDirectory(), "GelenRequestler");
                 var firmaFolder = Path.Combine(baseFolder, request.FirmaKod);
                 var logTypeFolder = Path.Combine(firmaFolder, request.LogType.ToLower());
-                
+
                 // Klasörleri oluştur
                 Directory.CreateDirectory(logTypeFolder);
-                
+
                 // Dosya adını oluştur (log tipine göre)
                 string fileName = request.LogType.ToLower() switch
                 {
                     "pdks" => "pdks_logs.txt",
-                    "alarm" => "alarm_logs.txt", 
+                    "alarm" => "alarm_logs.txt",
                     "kameralog" => "kamera_logs.txt",
                     _ => "unknown_logs.txt"
                 };
-                
+
                 var filePath = Path.Combine(logTypeFolder, fileName);
-                
+
                 // Log verisini işle - her satırın başına tarih saat ekle
                 var lines = request.LogData.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                var processedLines = lines.Select(line => 
+                var processedLines = lines.Select(line =>
                     $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {line.Trim()}");
-                
+
                 // Dosyaya append et
                 await System.IO.File.AppendAllLinesAsync(filePath, processedLines, Encoding.UTF8);
-                
+
                 _logger.LogInformation($"Log verisi başarıyla kaydedildi. Dosya: {filePath}, Satır sayısı: {lines.Length}");
-                
+
                 var response = new ServiceResponse<object>
                 {
                     data = new { Success = true, Message = "Log verisi başarıyla kaydedildi.", ProcessedLines = lines.Length },
                     messageType = ServiceResponseMessageType.Success,
                     message = "İşlem başarılı"
                 };
-                
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"SendLogData hatası. FirmaKod: {request?.FirmaKod}");
-                
+
                 var response = new ServiceResponse<object>
                 {
                     data = new { Success = false, Message = $"Hata: {ex.Message}" },
                     messageType = ServiceResponseMessageType.Error,
                     message = $"İşlem sırasında hata: {ex.Message}"
                 };
-                
+
                 return Ok(response);
             }
         }
@@ -379,7 +379,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             try
             {
                 _logger.LogInformation($"CheckVersion çağrıldı. FirmaKod: {firmaKod}, CurrentVersion: {currentVersion}");
-                
+
                 if (string.IsNullOrEmpty(firmaKod) || string.IsNullOrEmpty(currentVersion))
                 {
                     return BadRequest("FirmaKod ve CurrentVersion parametreleri gereklidir.");
@@ -387,10 +387,10 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
 
                 // Güncel versiyonu al (config'den veya veritabanından)
                 string latestVersion = _configuration["DataOkuConsole:CurrentVersion"] ?? "1.0.0";
-                
+
                 // Versiyon karşılaştırması
                 bool updateAvailable = IsVersionNewer(latestVersion, currentVersion);
-                
+
                 var response = new ServiceResponse<VersionCheckResult>
                 {
                     data = new VersionCheckResult
@@ -404,20 +404,20 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                     messageType = ServiceResponseMessageType.Success,
                     message = updateAvailable ? "Güncelleme mevcut" : "Güncel versiyon kullanılıyor"
                 };
-                
+
                 _logger.LogInformation($"CheckVersion tamamlandı. UpdateAvailable: {updateAvailable}");
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"CheckVersion hatası. FirmaKod: {firmaKod}");
-                
+
                 var response = new ServiceResponse<VersionCheckResult>
                 {
                     messageType = ServiceResponseMessageType.Error,
                     message = $"Versiyon kontrolü sırasında hata: {ex.Message}"
                 };
-                
+
                 return Ok(response);
             }
         }
@@ -432,7 +432,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             try
             {
                 _logger.LogInformation($"DownloadUpdate çağrıldı. FirmaKod: {firmaKod}");
-                
+
                 if (string.IsNullOrEmpty(firmaKod))
                 {
                     return BadRequest("FirmaKod parametresi gereklidir.");
@@ -441,7 +441,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 // Setup dosyasının yolunu al
                 var setupFileName = "LoreDosyaIzleyici_Setup.exe";
                 var setupFilePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", setupFileName);
-                
+
                 if (!System.IO.File.Exists(setupFilePath))
                 {
                     return NotFound("Güncelleme dosyası bulunamadı.");
@@ -449,9 +449,9 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
 
                 // Dosyayı stream olarak dön
                 var fileStream = new FileStream(setupFilePath, FileMode.Open, FileAccess.Read);
-                
+
                 _logger.LogInformation($"DownloadUpdate başarılı. FirmaKod: {firmaKod}, Dosya: {setupFileName}");
-                
+
                 return File(fileStream, "application/octet-stream", setupFileName);
             }
             catch (Exception ex)
@@ -470,7 +470,7 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
             {
                 var latest = new Version(latestVersion);
                 var current = new Version(currentVersion);
-                
+
                 return latest > current;
             }
             catch
@@ -505,3 +505,4 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
         public string? DownloadUrl { get; set; }
         public string? ReleaseNotes { get; set; }
     }
+}
