@@ -62,12 +62,10 @@ namespace LorePdks.API.Controllers.DataOkuConsoleSetup
                 var firmaBilgiDto = new FirmaDataOkuSetupBilgiDto
                 {
                     FirmaKod = firma.kod,
-                    //isPdks = firma.isPdks,
-                    //isAlarm = firma.isAlarm,
-                    //isKamera = firma.isKamera
-                    isPdks = true,
-                    isAlarm = true,
-                    isKamera = true
+                    isPdks = firma.isPdks,
+                    isAlarm = firma.isAlarm,
+                    isKamera = firma.isKamera
+                   
                 };
                 response.data = firmaBilgiDto;
 
