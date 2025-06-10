@@ -32,8 +32,10 @@ namespace LorePdks.DAL.Model
         public string ADRES { get; set;}
         public decimal? MESAI_SAAT { get; set;}
         public decimal? MOLA_SAAT { get; set;}
-        public decimal? CUMARTESI_MESAI_SAAT { get; set;}
-        public decimal? CUMARTESI_MOLA_SAAT { get; set;}
+        public decimal? CUMARTESI_MESAI_SAAT { get; set;}        public decimal? CUMARTESI_MOLA_SAAT { get; set;}
+        public bool IS_PDKS { get; set;}
+        public bool IS_ALARM { get; set;}
+        public bool IS_KAMERA { get; set;}
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
@@ -49,9 +51,11 @@ namespace LorePdks.DAL.Model
 		ACIKLAMA,
 		ADRES,
 		MESAI_SAAT,
-		MOLA_SAAT,
-		CUMARTESI_MESAI_SAAT,
+		MOLA_SAAT,		CUMARTESI_MESAI_SAAT,
 		CUMARTESI_MOLA_SAAT,
+		IS_PDKS,
+		IS_ALARM,
+		IS_KAMERA,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

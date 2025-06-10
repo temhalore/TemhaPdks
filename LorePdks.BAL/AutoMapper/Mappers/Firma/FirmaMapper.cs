@@ -26,9 +26,11 @@ public class FirmaMapper : MappingProfile
                 .ForMember(x => x.adres, y => y.MapFrom(z => z.ADRES))
                 .ForMember(x => x.aciklama, y => y.MapFrom(z => z.ACIKLAMA))
                 .ForMember(x => x.mesaiSaat, y => y.MapFrom(z => z.MESAI_SAAT))
-                .ForMember(x => x.molaSaat, y => y.MapFrom(z => z.MOLA_SAAT))
-                .ForMember(x => x.cumartesiMesaiSaat, y => y.MapFrom(z => z.CUMARTESI_MESAI_SAAT))
+                .ForMember(x => x.molaSaat, y => y.MapFrom(z => z.MOLA_SAAT))                .ForMember(x => x.cumartesiMesaiSaat, y => y.MapFrom(z => z.CUMARTESI_MESAI_SAAT))
                 .ForMember(x => x.cumartesiMolaSaat, y => y.MapFrom(z => z.CUMARTESI_MOLA_SAAT))
+                .ForMember(x => x.isPdks, y => y.MapFrom(z => z.IS_PDKS))
+                .ForMember(x => x.isAlarm, y => y.MapFrom(z => z.IS_ALARM))
+                .ForMember(x => x.isKamera, y => y.MapFrom(z => z.IS_KAMERA))
         //   ;
         .ReverseMap()
         .ForMember(x => x.ID, y => y.MapFrom(z => z.id))
@@ -37,9 +39,11 @@ public class FirmaMapper : MappingProfile
                 .ForMember(x => x.ADRES, y => y.MapFrom(z => z.adres))
                 .ForMember(x => x.ACIKLAMA , y => y.MapFrom(z => z.aciklama))
                 .ForMember(x => x.MESAI_SAAT , y => y.MapFrom(z => z.mesaiSaat))
-                .ForMember(x => x.MOLA_SAAT , y => y.MapFrom(z => z.molaSaat))
-                .ForMember(x => x.CUMARTESI_MESAI_SAAT , y => y.MapFrom(z => z.cumartesiMesaiSaat))
+                .ForMember(x => x.MOLA_SAAT , y => y.MapFrom(z => z.molaSaat))                .ForMember(x => x.CUMARTESI_MESAI_SAAT , y => y.MapFrom(z => z.cumartesiMesaiSaat))
                 .ForMember(x => x.CUMARTESI_MOLA_SAAT , y => y.MapFrom(z => z.cumartesiMolaSaat))
+                .ForMember(x => x.IS_PDKS, y => y.MapFrom(z => z.isPdks))
+                .ForMember(x => x.IS_ALARM, y => y.MapFrom(z => z.isAlarm))
+                .ForMember(x => x.IS_KAMERA, y => y.MapFrom(z => z.isKamera))
         ;
     }
 }

@@ -47,8 +47,44 @@
       
       .form-group {
         flex: 1;
-        padding: 0 0.5rem;
+        padding: 0 0.5rem;      }
+    }
+    
+    .form-section {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+      
+      h4 {
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .form-group {
+        margin-bottom: 0.75rem;
+        
+        app-check-box {
+          display: block;
+        }
       }
     }
+  }
+}
+
+// DataGrid için özel stiller
+::ng-deep {
+  .text-success {
+    color: #28a745 !important;
+  }
+  
+  .text-danger {
+    color: #dc3545 !important;
+  }
+  
+  .pi-check, .pi-times {
+    font-size: 1.1rem;
+    font-weight: bold;
   }
 }

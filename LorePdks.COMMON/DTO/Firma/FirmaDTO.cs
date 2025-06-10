@@ -16,8 +16,10 @@ namespace LorePdks.COMMON.DTO.Firma
         public string aciklama { get; set; }
         public string adres { get; set; }
         public decimal? mesaiSaat { get; set; }
-        public decimal? molaSaat { get; set; }
-        public decimal? cumartesiMesaiSaat { get; set; }
+        public decimal? molaSaat { get; set; }        public decimal? cumartesiMesaiSaat { get; set; }
         public decimal? cumartesiMolaSaat { get; set; }
+        public bool isPdks { get; set; }
+        public bool isAlarm { get; set; }
+        public bool isKamera { get; set; }
     }
 }

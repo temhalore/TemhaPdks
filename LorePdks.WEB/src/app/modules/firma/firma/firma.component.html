@@ -7,8 +7,7 @@
       (onClick)="openAddFirmaModal()">
     </app-button>
   </div>
-  
-  <div class="firma-content" style="width: 100%;">
+    <div class="firma-content" style="width: 100%;">
     <app-data-grid
       [data]="firmaList"
       [columns]="columns"
@@ -18,6 +17,21 @@
       [tableStyle]="{'width': '100%', 'min-width': '800px'}"
       [actionButtons]="actionButtons"
       (rowAction)="onRowAction($event)">
+      
+      <!-- PDKS durumu için özel template -->
+      <ng-template #pdksTemplate let-rowData>
+        <i [class]="rowData.isPdks ? 'pi pi-check text-success' : 'pi pi-times text-danger'"></i>
+      </ng-template>
+      
+      <!-- Alarm durumu için özel template -->
+      <ng-template #alarmTemplate let-rowData>
+        <i [class]="rowData.isAlarm ? 'pi pi-check text-success' : 'pi pi-times text-danger'"></i>
+      </ng-template>
+      
+      <!-- Kamera durumu için özel template -->
+      <ng-template #kameraTemplate let-rowData>
+        <i [class]="rowData.isKamera ? 'pi pi-check text-success' : 'pi pi-times text-danger'"></i>
+      </ng-template>
     </app-data-grid>
   </div>
   
@@ -89,7 +103,32 @@
             [value]="firmaModel.cumartesiMolaSaat != null ? firmaModel.cumartesiMolaSaat.toString() : ''"
             (valueChange)="firmaModel.cumartesiMolaSaat = parseFloat($event)"
             placeholder="Cumartesi mola saati">
-          </app-text-input>
+          </app-text-input>        </div>
+      </div>
+      
+      <!-- Sistem Özellikleri -->
+      <div class="form-section">
+        <h4>Sistem Özellikleri</h4>        <div class="form-row">
+          <div class="form-group col-md-4">
+            <app-check-box
+              label="PDKS Sistemi"
+              [(ngModel)]="firmaModel.isPdks">
+            </app-check-box>
+          </div>
+          
+          <div class="form-group col-md-4">
+            <app-check-box
+              label="Alarm Sistemi"
+              [(ngModel)]="firmaModel.isAlarm">
+            </app-check-box>
+          </div>
+          
+          <div class="form-group col-md-4">
+            <app-check-box
+              label="Kamera Sistemi"
+              [(ngModel)]="firmaModel.isKamera">
+            </app-check-box>
+          </div>
         </div>
       </div>
     </div>

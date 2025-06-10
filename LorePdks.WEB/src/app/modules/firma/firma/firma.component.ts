@@ -10,6 +10,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { PaginatorModule } from 'primeng/paginator';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
 
 // Ortak Bileşenler
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
@@ -17,6 +18,7 @@ import { DataGridComponent, ActionButtonConfig } from '../../../core/components/
 import { ModalComponent } from '../../../core/components/modal/modal.component';
 import { TextInputComponent } from '../../../core/components/text-input/text-input.component';
 import { ButtonComponent } from '../../../core/components/button/button.component';
+import { CheckBoxComponent } from '../../../core/components/check-box/check-box.component';
 
 // Servis ve Modeller
 import { FirmaService } from '../../../core/services/modules/firma.service';
@@ -35,11 +37,13 @@ import { FirmaDto } from '../../../core/models/FirmaDto';
     TooltipModule,
     PaginatorModule,
     InputNumberModule,
+    CheckboxModule,
     DataGridComponent,
     ModalComponent,
     ConfirmDialogComponent,
     TextInputComponent,
-    ButtonComponent
+    ButtonComponent,
+    CheckBoxComponent
   ]
 })
 export class FirmaListeComponent implements OnInit {
@@ -57,13 +61,15 @@ export class FirmaListeComponent implements OnInit {
 
   // ViewChild referansı
   @ViewChild(ConfirmDialogComponent) confirmDialog!: ConfirmDialogComponent;
-
   // DataGrid kolonları
   columns: any[] = [
     { field: 'ad', header: 'Firma Adı' },
     { field: 'kod', header: 'Firma Kodu' },
     { field: 'adres', header: 'Adres' },
-    { field: 'aciklama', header: 'Açıklama' }
+    { field: 'aciklama', header: 'Açıklama' },
+    { field: 'isPdks', header: 'PDKS', customTemplate: 'pdksTemplate' },
+    { field: 'isAlarm', header: 'Alarm', customTemplate: 'alarmTemplate' },
+    { field: 'isKamera', header: 'Kamera', customTemplate: 'kameraTemplate' }
   ];
   // DataGrid aksiyon butonları
   actionButtons: ActionButtonConfig[] = [
@@ -117,8 +123,7 @@ export class FirmaListeComponent implements OnInit {
   }
   /**
    * Yeni firma eklemek için modal açar
-   */
-  openAddFirmaModal(): void {
+   */  openAddFirmaModal(): void {
     this.firmaModel = { 
       ad: '', 
       kod: '', 
@@ -127,7 +132,10 @@ export class FirmaListeComponent implements OnInit {
       mesaiSaat: null,
       molaSaat: null,
       cumartesiMesaiSaat: null,
-      cumartesiMolaSaat: null
+      cumartesiMolaSaat: null,
+      isPdks: false,
+      isAlarm: false,
+      isKamera: false
     } as FirmaDto;
     this.firmaModalVisible = true;
   }

@@ -9,7 +9,9 @@ export class FirmaDto extends baseDto {
   aciklama: string;
   adres: string;
   mesaiSaat?: number;
-  molaSaat?: number;
-  cumartesiMesaiSaat?: number;
+  molaSaat?: number;  cumartesiMesaiSaat?: number;
   cumartesiMolaSaat?: number;
+  isPdks: boolean;
+  isAlarm: boolean;
+  isKamera: boolean;
 }
