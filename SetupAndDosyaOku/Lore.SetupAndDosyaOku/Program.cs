@@ -136,9 +136,7 @@ public static class Program
                 services.AddSingleton<FileHelper>();
                 services.AddSingleton<StartupHelper>();
                 services.AddSingleton<UpdateService>();
-                services.AddSingleton<LogSenderService>();
-                  // Register forms
-                services.AddTransient<SetupForm>();
+                services.AddSingleton<LogSenderService>();                // Register forms
                 services.AddTransient<SetupWizardForm>();
                 
                 // Register monitoring services
@@ -219,13 +217,12 @@ public static class Program
                 MessageBox.Show("Log dizini bulunamadı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
         };
         contextMenu.Items.Add(openLogsMenuItem);
-        
-        // Add settings option
+          // Add settings option
         var settingsMenuItem = new ToolStripMenuItem("Ayarlar");
         settingsMenuItem.Click += async (s, e) => 
         {
-            var setupForm = _host?.Services.GetRequiredService<SetupForm>();
-            setupForm?.ShowDialog();
+            var setupWizardForm = _host?.Services.GetRequiredService<SetupWizardForm>();
+            setupWizardForm?.ShowDialog();
         };
         contextMenu.Items.Add(settingsMenuItem);
         
