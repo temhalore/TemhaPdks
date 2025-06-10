@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Temha.DataOkuConsole": {
-      "commandName": "Project",
-      "commandLineArgs": "install"
-    }
-  }
-}

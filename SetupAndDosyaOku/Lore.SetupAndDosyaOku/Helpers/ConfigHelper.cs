@@ -102,17 +102,15 @@ namespace Lore.SetupAndDosyaOku.Helpers
                 
             return true;
         }
-        
-        /// <summary>
-        /// AppSettings'i döndürür. Bu metod Program ve SetupForm tarafından kullanılıyor.
+          /// <summary>
+        /// AppSettings'i döndürür. Bu metod Program ve SetupWizardForm tarafından kullanılıyor.
         /// </summary>
         public AppSettings GetSettings()
         {
             return GetConfig().AppSettings ?? new AppSettings();
         }
-        
-        /// <summary>
-        /// AppSettings'i kaydeder. Bu metod SetupForm tarafından kullanılıyor.
+          /// <summary>
+        /// AppSettings'i kaydeder. Bu metod SetupWizardForm tarafından kullanılıyor.
         /// </summary>
         public void SaveSettings(AppSettings settings)
         {
