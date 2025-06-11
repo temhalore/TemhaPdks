@@ -211,6 +211,12 @@ builder.Services.AddTransient<IAuthManager, AuthManager>();
 builder.Services.AddTransient<IRolManager, RolManager>();
 builder.Services.AddTransient<IEkranManager, EkranManager>();
 
+// Log Merkezi Sistem Servisleri
+builder.Services.AddTransient<LorePdks.BAL.Managers.Pdks.Interfaces.IPdksHareketManager, LorePdks.BAL.Managers.Pdks.PdksHareketManager>();
+builder.Services.AddTransient<LorePdks.BAL.Managers.Alarm.Interfaces.IAlarmHareketManager, LorePdks.BAL.Managers.Alarm.AlarmHareketManager>();
+builder.Services.AddTransient<LorePdks.BAL.Managers.Kamera.Interfaces.IKameraHareketManager, LorePdks.BAL.Managers.Kamera.KameraHareketManager>();
+builder.Services.AddTransient<LorePdks.BAL.Services.LogParsing.Interfaces.ILogParserService, LorePdks.BAL.Services.LogParsing.LogParserService>();
+
 
 
 

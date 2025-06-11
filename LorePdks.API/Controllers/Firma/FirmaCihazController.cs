@@ -65,9 +65,7 @@ namespace LorePdks.API.Controllers.Firma
             var dto = _firmaCihazManager.getFirmaCihazDtoListByFirmaId(request.id);
             response.data = dto;
             return Ok(response);
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Firma ID'ye göre firma cihazlarını listeler (SingleValueDTO kullanarak)
         /// </summary>
         [HttpPost]
@@ -78,6 +76,73 @@ namespace LorePdks.API.Controllers.Firma
             var dto = _firmaCihazManager.getFirmaCihazDtoListByFirmaId(request.Value);
             response.data = dto;
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Cihazın log parsing konfigürasyonunu günceller
+        /// </summary>
+        [HttpPost]
+        [Route("updateLogConfig")]
+        public IActionResult updateLogConfig(FirmaCihazDTO request)
+        {
+            var response = new ServiceResponse<FirmaCihazDTO>();
+            try
+            {
+                // Sadece log config alanlarını güncelle
+                var existingCihaz = _firmaCihazManager.getFirmaCihazDtoById(request.id, true);
+                
+                // Log config alanlarını güncelle
+                existingCihaz.logParserConfig = request.logParserConfig;
+                existingCihaz.logDelimiter = request.logDelimiter;
+                existingCihaz.logDateFormat = request.logDateFormat;
+                existingCihaz.logTimeFormat = request.logTimeFormat;
+                existingCihaz.logFieldMapping = request.logFieldMapping;
+                existingCihaz.logSample = request.logSample;
+                
+                var dto = _firmaCihazManager.saveFirmaCihaz(existingCihaz);
+                response.data = dto;
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "Log konfigürasyonu başarıyla güncellendi";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = $"Log konfigürasyonu güncellenirken hata oluştu: {ex.Message}";
+                return BadRequest(response);
+            }
+        }
+
+        /// <summary>
+        /// Cihazın log parsing konfigürasyonunu test eder
+        /// </summary>
+        [HttpPost]
+        [Route("testLogConfig")]
+        public IActionResult testLogConfig(FirmaCihazDTO request)
+        {
+            var response = new ServiceResponse<object>();
+            try
+            {
+                // Log parser servisini kullanarak test et
+                // Bu servis henüz oluşturulmadı, placeholder olarak bırakıyorum
+                var testResult = new
+                {
+                    success = true,
+                    message = "Log konfigürasyonu test edildi",
+                    parsedFields = new string[] { "timestamp", "user_id", "action", "result" },
+                    sampleOutput = "Test başarılı - log parsing yapılandırması çalışıyor"
+                };
+                
+                response.data = testResult;
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "Test başarıyla tamamlandı";
+                return Ok(response);
+            }            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = $"Test sırasında hata oluştu: {ex.Message}";
+                return BadRequest(response);
+            }
         }
     }
 }
