@@ -75,8 +75,7 @@ switch ($versionChoice) {
         
         Write-Host ""
         Write-Host "Versiyon $currentVersion -> $newVersion olarak degistirilecek." -ForegroundColor Yellow
-        Write-Host ""
-        $confirm = Read-Host "Devam etmek istiyor musunuz? (E/H)"
+        Write-Host ""        $confirm = Read-Host "Devam etmek istiyor musunuz? (E/H)"
         
         if ($confirm -eq "E" -or $confirm -eq "e") {
             Write-Host "Versiyon guncelleniyor..." -ForegroundColor Yellow
@@ -95,6 +94,16 @@ switch ($versionChoice) {
                 $content = $content -replace '#define MyAppVersion\s+"[^"]*"', "#define MyAppVersion `"$newVersion`""
                 Set-Content "installer.iss" $content
                 Write-Log "installer.iss guncellendi"
+            }
+            
+            # API projesindeki DataOkuConsole:CurrentVersion guncelleme
+            $apiSettingsPath = "..\..\LorePdks.API\appsettings.Development.json"
+            if (Test-Path $apiSettingsPath) {
+                $apiContent = Get-Content $apiSettingsPath -Raw
+                $apiContent = $apiContent -replace '"CurrentVersion"\s*:\s*"[^"]+"', "`"CurrentVersion`": `"$newVersion`""
+                Set-Content $apiSettingsPath $apiContent
+                Write-Log "API appsettings.Development.json DataOkuConsole:CurrentVersion guncellendi"
+                Write-Host "API DataOkuConsole:CurrentVersion guncellendi: $newVersion" -ForegroundColor Cyan
             }
             
             Write-Host "Versiyon guncellendi: $newVersion" -ForegroundColor Green
@@ -118,8 +127,7 @@ switch ($versionChoice) {
         $newVersion = "$major.$minor.$patch"
         
         Write-Host "Versiyon artirildi: $currentVersion -> $newVersion" -ForegroundColor Green
-        Write-Host ""
-        $confirm = Read-Host "Bu degisikligi kaydetmek istiyor musunuz? (E/H)"
+        Write-Host ""        $confirm = Read-Host "Bu degisikligi kaydetmek istiyor musunuz? (E/H)"
         
         if ($confirm -eq "E" -or $confirm -eq "e") {
             Write-Host "Versiyon guncelleniyor..." -ForegroundColor Yellow
@@ -138,6 +146,16 @@ switch ($versionChoice) {
                 $content = $content -replace '#define MyAppVersion\s+"[^"]*"', "#define MyAppVersion `"$newVersion`""
                 Set-Content "installer.iss" $content
                 Write-Log "installer.iss guncellendi"
+            }
+            
+            # API projesindeki DataOkuConsole:CurrentVersion guncelleme
+            $apiSettingsPath = "..\..\LorePdks.API\appsettings.Development.json"
+            if (Test-Path $apiSettingsPath) {
+                $apiContent = Get-Content $apiSettingsPath -Raw
+                $apiContent = $apiContent -replace '"CurrentVersion"\s*:\s*"[^"]+"', "`"CurrentVersion`": `"$newVersion`""
+                Set-Content $apiSettingsPath $apiContent
+                Write-Log "API appsettings.Development.json DataOkuConsole:CurrentVersion guncellendi"
+                Write-Host "API DataOkuConsole:CurrentVersion guncellendi: $newVersion" -ForegroundColor Cyan
             }
             
             Write-Host "Versiyon guncellendi: $newVersion" -ForegroundColor Green
