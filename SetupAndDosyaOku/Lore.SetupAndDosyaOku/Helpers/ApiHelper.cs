@@ -4,12 +4,15 @@ using System.Text;
 using System.Text.Json;
 
 namespace Lore.SetupAndDosyaOku.Helpers
-{    public class ApiHelper
-    {        private readonly HttpClient _httpClient;
+{
+    public class ApiHelper
+    {
+        private readonly HttpClient _httpClient;
         private readonly ConfigHelper _configHelper;
         private readonly Logger _logger;
         private string _baseUrl;
-          public ApiHelper(ConfigHelper configHelper, Logger logger)
+
+        public ApiHelper(ConfigHelper configHelper, Logger logger)
         {
             _httpClient = new HttpClient();
             _configHelper = configHelper;
@@ -24,14 +27,15 @@ namespace Lore.SetupAndDosyaOku.Helpers
         }
         
         /// <summary>
-        /// API bağlantısını kontrol eder
+        /// API bağlantısını kontrol eder - getFirmaDataOkuSetupBilgi endpoint'ini kullanarak
         /// </summary>
         /// <returns>API'ye bağlanılabiliyorsa true, aksi halde false</returns>
         public async Task<bool> CheckApiConnectivityAsync()
         {
             try
             {
-                string endpoint = $"{_baseUrl}/health";
+                var config = _configHelper.GetConfig();
+                string endpoint = $"{_baseUrl}/{config.ApiSettings.Endpoints.GetFirmaSetupBilgi}?firmaKodu=TEST";
                 
                 _logger.Debug($"API bağlantısı kontrol ediliyor: {endpoint}");
                 
@@ -39,7 +43,8 @@ namespace Lore.SetupAndDosyaOku.Helpers
                 using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
                 var response = await _httpClient.GetAsync(endpoint, cancellationTokenSource.Token);
                 
-                if (response.IsSuccessStatusCode)
+                // 200 OK veya 400 Bad Request (geçersiz firma kodu) da kabul edilebilir bağlantı kanıtı
+                if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                 {
                     _logger.Debug("API bağlantısı başarılı");
                     return true;
@@ -68,23 +73,26 @@ namespace Lore.SetupAndDosyaOku.Helpers
         }
         
         /// <summary>
-        /// Dosya içeriğini API'ye gönderir
+        /// Log verilerini API'ye gönderir - SendLogData endpoint'ini kullanır
         /// </summary>
         public async Task<bool> SendFileContentAsync(string fileType, string content)
         {
             try
-            {                if (string.IsNullOrEmpty(content))
+            {
+                if (string.IsNullOrEmpty(content))
                 {
                     _logger.Warning($"API'ye gönderilecek içerik boş: {fileType}");
                     return false;
                 }
                 
-                string endpoint = $"{_baseUrl}/SaveData";                var payload = new
+                var config = _configHelper.GetConfig();
+                string endpoint = $"{_baseUrl}/{config.ApiSettings.Endpoints.SendLogData}";
+                
+                var payload = new
                 {
                     FirmaKod = _configHelper.GetSettings().FirmaKod,
-                    FileType = fileType,
-                    Content = content,
-                    Timestamp = DateTime.Now
+                    LogType = fileType,
+                    LogData = content
                 };
                 
                 _logger.Info($"API isteği gönderiliyor: {endpoint}");
@@ -99,7 +107,8 @@ namespace Lore.SetupAndDosyaOku.Helpers
                     {
                         var jsonContent = JsonContent.Create(payload);
                         var response = await _httpClient.PostAsync(endpoint, jsonContent);
-                          if (response.IsSuccessStatusCode)
+                        
+                        if (response.IsSuccessStatusCode)
                         {
                             string responseContent = await response.Content.ReadAsStringAsync();
                             _logger.Info($"API yanıtı başarılı: {response.StatusCode} - {responseContent}");
@@ -150,109 +159,6 @@ namespace Lore.SetupAndDosyaOku.Helpers
                 return false;
             }
         }
-          /// <summary>
-        /// Güncel sürümü kontrol eder
-        /// </summary>
-        /// <param name="currentVersion">Mevcut uygulama sürümü (örn: "1.0.0.0")</param>
-        /// <returns>Eğer güncelleme varsa indirme URL'si, yoksa null</returns>
-        public async Task<string?> CheckForUpdatesAsync(string currentVersion)
-        {
-            try
-            {                string endpoint = $"{_baseUrl}/CheckForUpdates?currentVersion={currentVersion}&firmaKod={_configHelper.GetSettings().FirmaKod}";
-                
-                _logger.Info($"Güncellemeler kontrol ediliyor: {endpoint}");
-                
-                var response = await _httpClient.GetAsync(endpoint);
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseContent = await response.Content.ReadAsStringAsync();
-                    var updateInfo = JsonSerializer.Deserialize<UpdateInfo>(responseContent);
-                      if (updateInfo != null && !string.IsNullOrEmpty(updateInfo.DownloadUrl) && updateInfo.NewVersion != currentVersion)
-                    {
-                        _logger.Info($"Yeni sürüm mevcut: {updateInfo.NewVersion} (Şu anki: {currentVersion})");
-                        return updateInfo.DownloadUrl;
-                    }
-                    else
-                    {
-                        _logger.Info("Güncel sürüm kullanılıyor.");
-                        return null;
-                    }
-                }
-                else
-                {
-                    string errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.Warning($"Güncelleme kontrolü başarısız: {response.StatusCode} - {errorContent}");
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Güncelleme kontrolü sırasında hata oluştu", ex);
-                return null;
-            }
-        }
-          /// <summary>
-        /// Güncelleme dosyasını indirir
-        /// </summary>
-        /// <param name="downloadUrl">İndirilecek güncelleme dosyası URL'si</param>
-        /// <param name="savePath">İndirilen dosyanın kaydedileceği yerel yol</param>
-        /// <returns>İndirme başarılı ise true, değilse false</returns>
-        public async Task<bool> DownloadUpdateAsync(string downloadUrl, string savePath)
-        {
-            try
-            {                _logger.Info($"Güncelleme indiriliyor: {downloadUrl}");
-                
-                using (var response = await _httpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead))
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string directory = Path.GetDirectoryName(savePath) ?? string.Empty;
-                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
-                        
-                        using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None))
-                        using (var downloadStream = await response.Content.ReadAsStreamAsync())
-                        {
-                            // İlerleme göstergesi ile indir
-                            byte[] buffer = new byte[8192];
-                            long totalBytes = response.Content.Headers.ContentLength ?? -1;
-                            long bytesRead = 0;
-                            int read;
-                            
-                            while ((read = await downloadStream.ReadAsync(buffer)) > 0)
-                            {
-                                await fileStream.WriteAsync(buffer.AsMemory(0, read));
-                                bytesRead += read;
-                                
-                                if (totalBytes > 0)
-                                {
-                                    int progressPercentage = (int)((bytesRead * 100) / totalBytes);
-                                    if (progressPercentage % 10 == 0) // Her %10'luk artışta log
-                                    {
-                                        _logger.Info($"İndirme ilerlemesi: %{progressPercentage}");
-                                    }
-                                }
-                            }
-                        }
-                        
-                        _logger.Info($"Güncelleme başarıyla indirildi: {savePath}");
-                        return true;
-                    }
-                    else
-                    {
-                        _logger.Error($"Güncelleme indirme başarısız: {response.StatusCode}");
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Güncelleme indirilirken hata oluştu", ex);
-                return false;
-            }        }
         
         /// <summary>
         /// Firma koduna göre setup bilgilerini API'den alır
@@ -302,12 +208,5 @@ namespace Lore.SetupAndDosyaOku.Helpers
                 return null;
             }
         }
-    }
-    
-    public class UpdateInfo
-    {
-        public string? NewVersion { get; set; }
-        public string? DownloadUrl { get; set; }
-        public string? ReleaseNotes { get; set; }
     }
 }
