@@ -31,13 +31,13 @@ namespace LorePdks.DAL.Model
         [Required]
         public int KISI_ID { get; set;}
         public int? FIRMA_KISI_TIP_KID { get; set;}
-        public string FIRMA_KISI_CIHAZ_KOD { get; set; }
         [Required]
         public int ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
         public DateTime? CREATEDDATE { get; set;}
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
+        public string FIRMA_KISI_CIHAZ_KOD { get; set;}
     } 
 	public enum t_firma_kisi_PROPERTIES {
 
@@ -45,12 +45,12 @@ namespace LorePdks.DAL.Model
 		FIRMA_ID,
 		KISI_ID,
 		FIRMA_KISI_TIP_KID,
-		FIRMA_KISI_CIHAZ_KOD,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,
 		MODIFIEDUSER,
 		MODIFIEDDATE,
+		FIRMA_KISI_CIHAZ_KOD,
 		
 	}
 }

@@ -17,9 +17,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
 namespace LorePdks.DAL.Model
 {
-    public partial class t_login_user  : _BaseModel
+    public partial class t_kamera_hareket  : _BaseModel
     {
-		public t_login_user() 
+		public t_kamera_hareket() 
 		{
 		}
 
@@ -27,28 +27,32 @@ namespace LorePdks.DAL.Model
      [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
 	  public int ID { get; set;}
         [Required]
-        public int USER_ID { get; set;}
-        public string USER_NAME { get; set;}
-        public string TOKEN { get; set;}
-        public string IP_ADRESI { get; set;}
-        public string USER_AGENT { get; set;}
-        public DateTime? EXP_DATE { get; set;}
+        public int FIRMA_ID { get; set;}
         [Required]
-        public int ISDELETED { get; set;}
+        public int FIRMA_CIHAZ_ID { get; set;}
+        [Required]
+        public DateTime OLAY_TARIHI { get; set;}
+        [Required]
+        public int KAMERA_OLAY_TIP_KID { get; set;}
+        public string DOSYA_YOL { get; set;}
+        public string ACIKLAMA { get; set;}
+        public string HAM_LOG_VERISI { get; set;}
+        public int? ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
         public DateTime? CREATEDDATE { get; set;}
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
     } 
-	public enum t_login_user_PROPERTIES {
+	public enum t_kamera_hareket_PROPERTIES {
 
 		ID,
-		USER_ID,
-		USER_NAME,
-		TOKEN,
-		IP_ADRESI,
-		USER_AGENT,
-		EXP_DATE,
+		FIRMA_ID,
+		FIRMA_CIHAZ_ID,
+		OLAY_TARIHI,
+		KAMERA_OLAY_TIP_KID,
+		DOSYA_YOL,
+		ACIKLAMA,
+		HAM_LOG_VERISI,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

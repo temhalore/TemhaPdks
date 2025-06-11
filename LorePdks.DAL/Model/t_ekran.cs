@@ -3,6 +3,8 @@
 // Don't change it directly as your change would get overwritten.  Instead, make changes
 // to the .tt file (i.e. the T4 template) and save it to regenerate this file.
 
+
+
 // Make sure the compiler doesn't complain about missing Xml comments
 #pragma warning disable 1591
 
@@ -13,48 +15,51 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
-
 namespace LorePdks.DAL.Model
 {
-    public partial class t_ekran : _BaseModel
+    public partial class t_ekran  : _BaseModel
     {
-        public t_ekran() 
-        {
-        }
+		public t_ekran() 
+		{
+		}
 
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ID { get; set; }
-        public string EKRAN_ADI { get; set; }
-        public string EKRAN_YOLU { get; set; }
-        public string EKRAN_KODU { get; set; }
-        public string ACIKLAMA { get; set; }
-        public int? UST_EKRAN_ID { get; set; }
-        public int SIRA_NO { get; set; }
-        public string IKON { get; set; }
-        public bool AKTIF { get; set; }
+     //   [AutoIncrement]
+     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
+	  public int ID { get; set;}
+        public string EKRAN_ADI { get; set;}
+        public string EKRAN_YOLU { get; set;}
+        public string EKRAN_KODU { get; set;}
+        public string ACIKLAMA { get; set;}
+        public int? UST_EKRAN_ID { get; set;}
         [Required]
-        public int ISDELETED { get; set; }
-        public int? CREATEDUSER { get; set; }
-        public DateTime? CREATEDDATE { get; set; }
-        public int? MODIFIEDUSER { get; set; }
-        public DateTime? MODIFIEDDATE { get; set; }
-    }
-    
-    public enum t_ekran_PROPERTIES {
-        ID,
-        EKRAN_ADI,
-        EKRAN_YOLU,
-        EKRAN_KODU,
-        ACIKLAMA,
-        UST_EKRAN_ID,
-        SIRA_NO,
-        IKON,
-        AKTIF,
-        ISDELETED,
-        CREATEDUSER,
-        CREATEDDATE,
-        MODIFIEDUSER,
-        MODIFIEDDATE,
-    }
+        public int SIRA_NO { get; set;}
+        public string IKON { get; set;}
+        [Required]
+        public sbyte AKTIF { get; set;}
+        [Required]
+        public int ISDELETED { get; set;}
+        public int? CREATEDUSER { get; set;}
+        public DateTime? CREATEDDATE { get; set;}
+        public int? MODIFIEDUSER { get; set;}
+        public DateTime? MODIFIEDDATE { get; set;}
+    } 
+	public enum t_ekran_PROPERTIES {
+
+		ID,
+		EKRAN_ADI,
+		EKRAN_YOLU,
+		EKRAN_KODU,
+		ACIKLAMA,
+		UST_EKRAN_ID,
+		SIRA_NO,
+		IKON,
+		AKTIF,
+		ISDELETED,
+		CREATEDUSER,
+		CREATEDDATE,
+		MODIFIEDUSER,
+		MODIFIEDDATE,
+		
+	}
 }
 #pragma warning restore 1591

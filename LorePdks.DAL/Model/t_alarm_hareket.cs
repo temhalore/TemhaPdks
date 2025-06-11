@@ -17,9 +17,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
 namespace LorePdks.DAL.Model
 {
-    public partial class t_pdks  : _BaseModel
+    public partial class t_alarm_hareket  : _BaseModel
     {
-		public t_pdks() 
+		public t_alarm_hareket() 
 		{
 		}
 
@@ -29,26 +29,32 @@ namespace LorePdks.DAL.Model
         [Required]
         public int FIRMA_ID { get; set;}
         [Required]
-        public int KISI_ID { get; set;}
-        [Required]
         public int FIRMA_CIHAZ_ID { get; set;}
-        public DateTime? GIRIS_TARIH { get; set;}
-        public string CIKIS_TARIH { get; set;}
         [Required]
-        public int ISDELETED { get; set;}
+        public DateTime ALARM_TARIHI { get; set;}
+        [Required]
+        public int ALARM_TIP_KID { get; set;}
+        public int? ALARM_SEVIYE_KID { get; set;}
+        public string SENSOR_BILGISI { get; set;}
+        public string ACIKLAMA { get; set;}
+        public string HAM_LOG_VERISI { get; set;}
+        public int? ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
         public DateTime? CREATEDDATE { get; set;}
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
     } 
-	public enum t_pdks_PROPERTIES {
+	public enum t_alarm_hareket_PROPERTIES {
 
 		ID,
 		FIRMA_ID,
-		KISI_ID,
 		FIRMA_CIHAZ_ID,
-		GIRIS_TARIH,
-		CIKIS_TARIH,
+		ALARM_TARIHI,
+		ALARM_TIP_KID,
+		ALARM_SEVIYE_KID,
+		SENSOR_BILGISI,
+		ACIKLAMA,
+		HAM_LOG_VERISI,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

@@ -27,11 +27,17 @@ namespace LorePdks.DAL.Model
      [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
 	  public int ID { get; set;}
         [Required]
-        public int PDKS_ID { get; set;}
+        public int FIRMA_ID { get; set;}
+        public int? KISI_ID { get; set;}
         [Required]
-        public int HAREKET_ID { get; set;}
+        public int FIRMA_CIHAZ_ID { get; set;}
+        public string KULLANICI_CIHAZ_KODU { get; set;}
         [Required]
-        public int ISDELETED { get; set;}
+        public DateTime HAREKET_TARIHI { get; set;}
+        [Required]
+        public int PDKS_YON_KID { get; set;}
+        public string HAM_LOG_VERISI { get; set;}
+        public int? ISDELETED { get; set;}
         public int? CREATEDUSER { get; set;}
         public DateTime? CREATEDDATE { get; set;}
         public int? MODIFIEDUSER { get; set;}
@@ -40,8 +46,13 @@ namespace LorePdks.DAL.Model
 	public enum t_pdks_hareket_PROPERTIES {
 
 		ID,
-		PDKS_ID,
-		HAREKET_ID,
+		FIRMA_ID,
+		KISI_ID,
+		FIRMA_CIHAZ_ID,
+		KULLANICI_CIHAZ_KODU,
+		HAREKET_TARIHI,
+		PDKS_YON_KID,
+		HAM_LOG_VERISI,
 		ISDELETED,
 		CREATEDUSER,
 		CREATEDDATE,

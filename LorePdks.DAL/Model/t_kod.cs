@@ -24,7 +24,6 @@ namespace LorePdks.DAL.Model
 		}
 
         [Required]
-		[Key]
         public int ID { get; set;}
         public int? TIP_ID { get; set;}
         public string KOD { get; set;}

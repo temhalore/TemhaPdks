@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.COMMON.DTO.Pdks;
 using LorePdks.BAL.Managers.Pdks.Interfaces;
-using LorePdks.BAL.Managers.Hareket.Interfaces;
 
 namespace LorePdks.BAL.Managers.Pdks
 {
@@ -21,22 +20,16 @@ namespace LorePdks.BAL.Managers.Pdks
         private readonly IHelperManager _helperManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
-        private readonly IPdksManager _pdksManager;
-        private readonly IHareketManager _hareketManager;
         private readonly GenericRepository<t_pdks_hareket> _repoPdksHareket = new GenericRepository<t_pdks_hareket>();
 
         public PdksHareketManager(
             IHelperManager helperManager,
             IHttpContextAccessor httpContextAccessor,
-            IMapper mapper,
-            IPdksManager pdksManager,
-            IHareketManager hareketManager)
+            IMapper mapper)
         {
             _helperManager = helperManager;
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
-            _pdksManager = pdksManager;
-            _hareketManager = hareketManager;
         }
 
         public PdksHareketDTO savePdksHareket(PdksHareketDTO pdksHareketDto)
@@ -118,7 +111,7 @@ namespace LorePdks.BAL.Managers.Pdks
                 throw new AppException(MessageCode.ERROR_502_EKSIK_VERI_GONDERIMI, $"Hareket bilgisi boş olamaz");
 
             // İlişkili varlıkların var olup olmadığını kontrol et
-            _pdksManager.getPdksByPdksId(pdksHareketDto.pdksDto.id, isYoksaHataDondur: true);
+            //_pdksManager.getPdksByPdksId(pdksHareketDto.pdksDto.id, isYoksaHataDondur: true);
             //_hareketManager.getHareketByHareketId(pdksHareketDto.hareketDto.id, isYoksaHataDondur: true);
 
             // Eğer önceden kayıtlı ve güncelleme oluyorsa farklı kontroller yapılması gerekebilir

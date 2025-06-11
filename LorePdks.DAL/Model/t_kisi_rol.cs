@@ -3,6 +3,8 @@
 // Don't change it directly as your change would get overwritten.  Instead, make changes
 // to the .tt file (i.e. the T4 template) and save it to regenerate this file.
 
+
+
 // Make sure the compiler doesn't complain about missing Xml comments
 #pragma warning disable 1591
 
@@ -13,36 +15,39 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using LorePdks.DAL.Model;
-
 namespace LorePdks.DAL.Model
 {
-    public partial class t_kisi_rol : _BaseModel
+    public partial class t_kisi_rol  : _BaseModel
     {
-        public t_kisi_rol() 
-        {
-        }
+		public t_kisi_rol() 
+		{
+		}
 
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ID { get; set; }
-        public int KISI_ID { get; set; }
-        public int ROL_ID { get; set; }
+     //   [AutoIncrement]
+     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]	
+	  public int ID { get; set;}
         [Required]
-        public int ISDELETED { get; set; }
-        public int? CREATEDUSER { get; set; }
-        public DateTime? CREATEDDATE { get; set; }
-        public int? MODIFIEDUSER { get; set; }
-        public DateTime? MODIFIEDDATE { get; set; }
-    }
-    
-    public enum t_kisi_rol_PROPERTIES {
-        ID,
-        KISI_ID,
-        ROL_ID,
-        ISDELETED,
-        CREATEDUSER,
-        CREATEDDATE,
-        MODIFIEDUSER,
-        MODIFIEDDATE,
-    }
+        public int KISI_ID { get; set;}
+        [Required]
+        public int ROL_ID { get; set;}
+        [Required]
+        public int ISDELETED { get; set;}
+        public int? CREATEDUSER { get; set;}
+        public DateTime? CREATEDDATE { get; set;}
+        public int? MODIFIEDUSER { get; set;}
+        public DateTime? MODIFIEDDATE { get; set;}
+    } 
+	public enum t_kisi_rol_PROPERTIES {
+
+		ID,
+		KISI_ID,
+		ROL_ID,
+		ISDELETED,
+		CREATEDUSER,
+		CREATEDDATE,
+		MODIFIEDUSER,
+		MODIFIEDDATE,
+		
+	}
 }
 #pragma warning restore 1591

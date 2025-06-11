@@ -39,6 +39,12 @@ namespace LorePdks.DAL.Model
         public DateTime? CREATEDDATE { get; set;}
         public int? MODIFIEDUSER { get; set;}
         public DateTime? MODIFIEDDATE { get; set;}
+        public string LOG_PARSER_CONFIG { get; set;}
+        public string LOG_DELIMITER { get; set;}
+        public string LOG_DATE_FORMAT { get; set;}
+        public string LOG_TIME_FORMAT { get; set;}
+        public string LOG_FIELD_MAPPING { get; set;}
+        public string LOG_SAMPLE { get; set;}
     } 
 	public enum t_firma_cihaz_PROPERTIES {
 
@@ -53,6 +59,12 @@ namespace LorePdks.DAL.Model
 		CREATEDDATE,
 		MODIFIEDUSER,
 		MODIFIEDDATE,
+		LOG_PARSER_CONFIG,
+		LOG_DELIMITER,
+		LOG_DATE_FORMAT,
+		LOG_TIME_FORMAT,
+		LOG_FIELD_MAPPING,
+		LOG_SAMPLE,
 		
 	}
 }
