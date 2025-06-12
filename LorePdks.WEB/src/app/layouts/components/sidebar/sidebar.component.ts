@@ -452,6 +452,41 @@ export class SidebarComponent implements OnInit, OnDestroy {
             routerLink: ['/secure/rapor/yillik']
           }
         ]
+      },      {
+        label: 'Hareketler',
+        icon: 'pi pi-history',
+        children: [
+          {
+            label: 'PDKS Hareketleri',
+            icon: 'pi pi-clock',
+            route: '/secure/hareket/pdks',
+            routerLink: ['/secure/hareket/pdks']
+          },
+          {
+            label: 'Kamera Hareketleri',
+            icon: 'pi pi-eye',
+            route: '/secure/hareket/kamera',
+            routerLink: ['/secure/hareket/kamera']
+          },
+          {
+            label: 'Alarm Hareketleri',
+            icon: 'pi pi-exclamation-triangle',
+            route: '/secure/hareket/alarm',
+            routerLink: ['/secure/hareket/alarm']
+          }
+        ]
+      },
+      {
+        label: 'Log Yönetimi',
+        icon: 'pi pi-file-o',
+        children: [
+          {
+            label: 'Log Parser',
+            icon: 'pi pi-cog',
+            route: '/secure/log/log-parser',
+            routerLink: ['/secure/log/log-parser']
+          }
+        ]
       },
       {
         label: 'Ayarlar',

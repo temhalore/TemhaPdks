@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { finalize, BehaviorSubject } from 'rxjs';
 
 // PrimeNG Modülleri
@@ -10,6 +11,10 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { PaginatorModule } from 'primeng/paginator';
 import { DropdownModule } from 'primeng/dropdown';
+import { TabViewModule } from 'primeng/tabview';
+import { PanelModule } from 'primeng/panel';
+import { AccordionModule } from 'primeng/accordion';
+import { DividerModule } from 'primeng/divider';
 
 // Ortak Bileşenler
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
@@ -24,9 +29,11 @@ import { SelectInputModel } from '../../../core/components/select/select-input.m
 import { FirmaCihazService } from '../../../core/services/modules/firmacihaz.service';
 import { FirmaService } from '../../../core/services/modules/firma.service';
 import { KodService } from '../../../core/services/modules/kod.service';
+import { LogParserService } from '../../../core/services/modules/log-parser.service';
 import { FirmaCihazDto } from '../../../core/models/FirmaCihazDto';
 import { FirmaDto } from '../../../core/models/FirmaDto';
 import { KodDto } from '../../../core/models/KodDto';
+import { LogParserConfigDto, FieldMappingDto, LogParserTestResultDto } from '../../../core/models/LogParserDto';
 
 @Component({
   selector: 'app-firmacihaz',
@@ -41,6 +48,10 @@ import { KodDto } from '../../../core/models/KodDto';
     TooltipModule,
     PaginatorModule,
     DropdownModule,
+    TabViewModule,
+    PanelModule,
+    AccordionModule,
+    DividerModule,
     DataGridComponent,
     ModalComponent,
     ConfirmDialogComponent,
@@ -64,10 +75,30 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   firmaCihazModel: FirmaCihazDto = {} as FirmaCihazDto;
 
   // Seçilen firma
-  selectedFirma: FirmaDto | null = null;
-  // Modal kontrolleri
+  selectedFirma: FirmaDto | null = null;  // Modal kontrolleri
   firmaCihazModalVisible: boolean = false;
   deletingFirmaCihazId: string = '';
+  
+  // Log Parser Modal kontrolleri
+  logParserModalVisible: boolean = false;
+  selectedFirmaCihazForLogParser: FirmaCihazDto | null = null;
+  
+  // Log parser konfigürasyonu
+  logParserConfig: LogParserConfigDto = {
+    delimiter: ',',
+    dateFormat: 'dd.MM.yyyy HH:mm:ss',
+    timeFormat: 'HH:mm:ss',
+    fieldMapping: []
+  };
+  
+  // Test verileri
+  sampleLogData = '';
+  testResult: LogParserTestResultDto | null = null;
+  
+  // Loading durumları
+  isLogParserLoading = false;
+  isLogParserSaving = false;
+  isLogParserTesting = false;
 
   // DataGrid kolonları
   columns: any[] = [
@@ -76,13 +107,18 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     { field: 'firmaCihazTipKodDto.kisaAd', header: 'Cihaz Tipi' },
     { field: 'cihazMakineGercekId', header: 'Cihaz ID' },
     { field: 'aciklama', header: 'Açıklama' }
-  ];
-  // DataGrid aksiyon butonları
+  ];  // DataGrid aksiyon butonları
   actionButtons: ActionButtonConfig[] = [
     {
       icon: 'pi pi-pencil',
       tooltip: 'Düzenle',
       action: 'edit'
+    },
+    {
+      icon: 'pi pi-cog',
+      tooltip: 'Log Parser Ayarları',
+      action: 'logparser',
+      class: 'p-button-info'
     },
     {
       icon: 'pi pi-trash',
@@ -93,11 +129,12 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   ];
 
   // ViewChild referansı
-  @ViewChild(ConfirmDialogComponent) confirmDialog!: ConfirmDialogComponent;
-  constructor(
+  @ViewChild(ConfirmDialogComponent) confirmDialog!: ConfirmDialogComponent;  constructor(
     private firmaCihazService: FirmaCihazService,
     private firmaService: FirmaService,
-    private kodService: KodService
+    private kodService: KodService,
+    private router: Router,
+    private logParserService: LogParserService
   ) { }  ngOnInit(): void {
     // Önce cihaz tiplerini yükleyelim
     this.loadCihazTipleri();
@@ -105,6 +142,9 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     // Sonra diğer verileri yükleyelim
     this.loadFirmaList();
     this.loadFirmaCihazList();
+    
+    // Log Parser için ilk field mapping ekle
+    this.addLogParserFieldMapping();
   }
   /**
    * Cihaz tiplerini veritabanından yükler (tipId = 101 olan kodları getirir)
@@ -240,11 +280,13 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   /**
    * DataGrid satır aksiyonlarını yönetir
    * @param event Aksiyon olayı
-   */
-  onRowAction(event: { action: string; data: any }): void {
+   */  onRowAction(event: { action: string; data: any }): void {
     switch (event.action) {
       case 'edit':
         this.openEditFirmaCihazModal(event.data);
+        break;
+      case 'logparser':
+        this.openLogParserPage(event.data);
         break;
       case 'delete':
         this.confirmDeleteFirmaCihaz(event.data);
@@ -387,5 +429,219 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     } else {
       console.warn('Cihaz tipleri henüz yüklenmedi veya boş!');
     }
+  }
+  /**
+   * Log Parser sayfasını açar
+   */
+  openLogParserPage(firmaCihaz: FirmaCihazDto): void {
+    // Artık modal açacağız sayfa yönlendirmesi yerine
+    this.openLogParserModal(firmaCihaz);
+  }
+
+  /**
+   * Log Parser modal'ını açar
+   */
+  openLogParserModal(firmaCihaz: FirmaCihazDto): void {
+    this.selectedFirmaCihazForLogParser = firmaCihaz;
+    this.loadLogParserConfig(firmaCihaz.eid);
+    this.logParserModalVisible = true;
+  }
+
+  /**
+   * Log Parser modal'ını kapatır
+   */
+  closeLogParserModal(): void {
+    this.logParserModalVisible = false;
+    this.selectedFirmaCihazForLogParser = null;
+    this.resetLogParserConfig();
+  }
+
+  // Delimiter seçenekleri
+  delimiterOptions = [
+    { label: 'Virgül (,)', value: ',' },
+    { label: 'Noktalı virgül (;)', value: ';' },
+    { label: 'Tab (\\t)', value: '\\t' },
+    { label: 'Pipe (|)', value: '|' },
+    { label: 'Boşluk ( )', value: ' ' },
+    { label: 'Yeni satır (\\n)', value: '\\n' },
+    { label: 'Regex Pattern', value: 'regex' }
+  ];
+  
+  // Alan tipleri
+  fieldTypes = [
+    { label: 'Metin', value: 'string' },
+    { label: 'Sayı', value: 'int' },
+    { label: 'Ondalık', value: 'double' },
+    { label: 'Tarih', value: 'datetime' },
+    { label: 'Boolean', value: 'boolean' }
+  ];
+  
+  // Önceden tanımlı alan isimleri
+  predefinedFields = [
+    { label: 'Kullanıcı ID', value: 'userId' },
+    { label: 'Zaman Damgası', value: 'timestamp' },
+    { label: 'Cihaz ID', value: 'deviceId' },
+    { label: 'Kart Numarası', value: 'cardNumber' },
+    { label: 'Hareket Tipi', value: 'actionType' },
+    { label: 'Kapı Numarası', value: 'doorNumber' },
+    { label: 'Alarm Tipi', value: 'alarmType' },
+    { label: 'Event Tipi', value: 'eventType' },
+    { label: 'Lokasyon', value: 'location' },
+    { label: 'Açıklama', value: 'description' }
+  ];
+
+  /**
+   * Log Parser konfigürasyonunu yükler
+   */
+  loadLogParserConfig(firmaCihazEid: string): void {
+    this.isLogParserLoading = true;
+    this.logParserService.getLogParserConfig(firmaCihazEid)
+      .pipe(finalize(() => this.isLogParserLoading = false))
+      .subscribe({
+        next: (config) => {
+          if (config) {
+            this.logParserConfig = config;
+            // Eğer field mapping yoksa en az bir tane ekle
+            if (!this.logParserConfig.fieldMapping || this.logParserConfig.fieldMapping.length === 0) {
+              this.addLogParserFieldMapping();
+            }
+          }
+        },
+        error: (error) => {
+          console.error('Log parser konfigürasyonu yüklenirken hata oluştu:', error);
+        }
+      });
+  }
+
+  /**
+   * Yeni alan mapping'i ekler
+   */
+  addLogParserFieldMapping(): void {
+    if (!this.logParserConfig.fieldMapping) {
+      this.logParserConfig.fieldMapping = [];
+    }
+    
+    this.logParserConfig.fieldMapping.push({
+      name: '',
+      index: this.logParserConfig.fieldMapping.length,
+      type: 'string',
+      format: ''
+    });
+  }
+
+  /**
+   * Alan mapping'ini siler
+   */
+  removeLogParserFieldMapping(index: number): void {
+    if (this.logParserConfig.fieldMapping && index >= 0 && index < this.logParserConfig.fieldMapping.length) {
+      this.logParserConfig.fieldMapping.splice(index, 1);
+      
+      // Index'leri yeniden düzenle
+      this.logParserConfig.fieldMapping.forEach((field, i) => {
+        field.index = i;
+      });
+    }
+  }
+
+  /**
+   * Log Parser konfigürasyonunu test eder
+   */
+  testLogParserConfiguration(): void {
+    if (!this.sampleLogData.trim()) {
+      alert('Lütfen önce örnek log verisi girin.');
+      return;
+    }
+
+    this.isLogParserTesting = true;
+    this.testResult = null;
+    
+    this.logParserService.testLogParserConfig(this.logParserConfig, this.sampleLogData)
+      .pipe(finalize(() => this.isLogParserTesting = false))
+      .subscribe({
+        next: (result) => {
+          this.testResult = result;
+        },
+        error: (error) => {
+          console.error('Test sırasında hata oluştu:', error);
+          this.testResult = {
+            success: false,
+            message: 'Test sırasında bir hata oluştu.',
+            parsedData: {}
+          };
+        }
+      });
+  }
+
+  /**
+   * Log Parser konfigürasyonunu kaydeder
+   */
+  saveLogParserConfiguration(): void {
+    if (!this.selectedFirmaCihazForLogParser?.eid) {
+      alert('Bir hata oluştu. Lütfen modal\'ı kapatıp tekrar açın.');
+      return;
+    }
+
+    this.isLogParserSaving = true;
+    
+    this.logParserService.updateLogParserConfig(this.selectedFirmaCihazForLogParser.eid, this.logParserConfig)
+      .pipe(finalize(() => this.isLogParserSaving = false))
+      .subscribe({
+        next: (success) => {
+          if (success) {
+            alert('Log Parser konfigürasyonu başarıyla kaydedildi.');
+            this.closeLogParserModal();
+          } else {
+            alert('Konfigürasyon kaydedilirken bir hata oluştu.');
+          }
+        },
+        error: (error) => {
+          console.error('Konfigürasyon kaydedilirken hata oluştu:', error);
+          alert('Konfigürasyon kaydedilirken bir hata oluştu.');
+        }
+      });
+  }
+
+  /**
+   * Log Parser örnek veri yükler
+   */
+  loadLogParserSampleData(): void {
+    const samples = {
+      csv: '1234,2025-06-12 10:30:15,GİRİŞ,1,192.168.1.100',
+      pipe: '1234|2025-06-12 10:30:15|GİRİŞ|1|192.168.1.100',
+      tab: '1234\t2025-06-12 10:30:15\tGİRİŞ\t1\t192.168.1.100'
+    };
+    
+    const delimiter = this.logParserConfig.delimiter;
+    if (delimiter === ',') {
+      this.sampleLogData = samples.csv;
+    } else if (delimiter === '|') {
+      this.sampleLogData = samples.pipe;
+    } else if (delimiter === '\\t') {
+      this.sampleLogData = samples.tab;
+    } else {
+      this.sampleLogData = samples.csv;
+    }
+  }
+
+  /**
+   * Log Parser konfigürasyonunu sıfırlar
+   */
+  resetLogParserConfig(): void {
+    this.logParserConfig = {
+      delimiter: ',',
+      dateFormat: 'dd.MM.yyyy HH:mm:ss',
+      timeFormat: 'HH:mm:ss',
+      fieldMapping: []
+    };
+    this.addLogParserFieldMapping();
+    this.sampleLogData = '';
+    this.testResult = null;
+  }
+
+  /**
+   * Log Parser JSON formatında göster
+   */
+  getLogParserConfigAsJson(): string {
+    return JSON.stringify(this.logParserConfig, null, 2);
   }
 }
