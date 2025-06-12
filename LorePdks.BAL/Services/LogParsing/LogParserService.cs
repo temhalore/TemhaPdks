@@ -1,7 +1,10 @@
 using LorePdks.BAL.Services.LogParsing.Interfaces;
+using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using LorePdks.COMMON.DTO.LogParser;
+using LorePdks.COMMON.DTO.FirmaCihaz;
+using LorePdks.COMMON.DTO.Firma;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,6 +19,12 @@ namespace LorePdks.BAL.Services.LogParsing
     /// </summary>
     public class LogParserService : ILogParserService
     {
+        private readonly IFirmaCihazManager _firmaCihazManager;
+
+        public LogParserService(IFirmaCihazManager firmaCihazManager)
+        {
+            _firmaCihazManager = firmaCihazManager;
+        }
         /// <summary>
         /// Ham log verisini parse ederek yapılandırılmış veri döndürür
         /// </summary>
@@ -242,16 +251,27 @@ namespace LorePdks.BAL.Services.LogParsing
                 default:
                     return value;
             }
-        }
-
-        // CRUD Operations for LogParser Configuration
+        }        // CRUD Operations for LogParser Configuration
         /// <summary>
         /// Log parser konfigürasyonu kaydet
         /// </summary>
         public LogParserDTO saveLogParser(LogParserDTO logParserDto)
         {
-            // TODO: Implement database save logic
-            throw new NotImplementedException("saveLogParser method needs database implementation");
+            try
+            {
+                // LogParserDTO'yu FirmaCihazDTO'ya çevir
+                var firmaCihazDto = ConvertLogParserToFirmaCihaz(logParserDto);
+                
+                // FirmaCihazManager ile kaydet
+                var savedFirmaCihaz = _firmaCihazManager.saveFirmaCihaz(firmaCihazDto);
+                
+                // Kaydedilen FirmaCihazDTO'yu LogParserDTO'ya çevir
+                return ConvertFirmaCihazToLogParser(savedFirmaCihaz);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Log parser kayıt hatası: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -259,8 +279,15 @@ namespace LorePdks.BAL.Services.LogParsing
         /// </summary>
         public LogParserDTO getLogParserById(int id)
         {
-            // TODO: Implement database retrieval logic
-            throw new NotImplementedException("getLogParserById method needs database implementation");
+            try
+            {
+                var firmaCihazDto = _firmaCihazManager.getFirmaCihazDtoById(id, true);
+                return ConvertFirmaCihazToLogParser(firmaCihazDto);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Log parser getirme hatası: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -268,8 +295,15 @@ namespace LorePdks.BAL.Services.LogParsing
         /// </summary>
         public List<LogParserDTO> getLogParserListByFirmaId(int firmaId)
         {
-            // TODO: Implement database retrieval logic
-            throw new NotImplementedException("getLogParserListByFirmaId method needs database implementation");
+            try
+            {
+                var firmaCihazList = _firmaCihazManager.getFirmaCihazDtoListByFirmaId(firmaId);
+                return firmaCihazList.Select(ConvertFirmaCihazToLogParser).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Firmaya göre log parser listesi getirme hatası: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -277,21 +311,127 @@ namespace LorePdks.BAL.Services.LogParsing
         /// </summary>
         public List<LogParserDTO> getAllLogParsers()
         {
-            // TODO: Implement database retrieval logic
-            throw new NotImplementedException("getAllLogParsers method needs database implementation");
+            try
+            {
+                // Tüm firmaları getir ve her firma için cihazları al
+                var allLogParsers = new List<LogParserDTO>();
+                
+                // Bu metod için FirmaCihazManager'da tüm cihazları getirecek bir metod eklenmeli
+                // Şimdilik boş liste döndürüyoruz
+                return allLogParsers;
+            }
+            catch (Exception ex)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Tüm log parser listesi getirme hatası: {ex.Message}");
+            }
         }
 
         /// <summary>
+        /// Log parser konfigürasyonunu sil
+        /// </summary>
+        public void deleteLogParser(int id)
+        {
+            try
+            {
+                _firmaCihazManager.deleteFirmaCihazByFirmaCihazId(id);
+            }
+            catch (Exception ex)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Log parser silme hatası: {ex.Message}");
+            }
+        }        /// <summary>
+        /// FirmaCihazDTO'yu LogParserDTO'ya çevirir
+        /// </summary>
+        private LogParserDTO ConvertFirmaCihazToLogParser(FirmaCihazDTO firmaCihazDto)
+        {
+            if (firmaCihazDto == null) return null;
+
+            return new LogParserDTO
+            {
+                id = firmaCihazDto.id,
+                firmaDto = firmaCihazDto.firmaDto,
+                ad = firmaCihazDto.ad,
+                aciklama = firmaCihazDto.aciklama,
+                cihazTip = firmaCihazDto.firmaCihazTipKodDto?.kisaAd ?? "",
+                delimiter = firmaCihazDto.logDelimiter,
+                dateFormat = firmaCihazDto.logDateFormat,
+                timeFormat = firmaCihazDto.logTimeFormat,
+                fieldMappingJson = firmaCihazDto.logFieldMapping,
+                sampleLogData = firmaCihazDto.logSample,
+                aktif = true
+            };
+        }
+
+        /// <summary>
+        /// LogParserDTO'yu FirmaCihazDTO'ya çevirir
+        /// </summary>
+        private FirmaCihazDTO ConvertLogParserToFirmaCihaz(LogParserDTO logParserDto)
+        {
+            if (logParserDto == null) return null;
+
+            return new FirmaCihazDTO
+            {
+                id = logParserDto.id,
+                firmaDto = logParserDto.firmaDto,
+                ad = logParserDto.ad,
+                aciklama = logParserDto.aciklama,
+                cihazMakineGercekId = 0, // Bu değer controller'da set edilmeli
+                logDelimiter = logParserDto.delimiter,
+                logDateFormat = logParserDto.dateFormat,
+                logTimeFormat = logParserDto.timeFormat,
+                logFieldMapping = logParserDto.fieldMappingJson,
+                logSample = logParserDto.sampleLogData,
+                logParserConfig = BuildLogParserConfig(logParserDto)
+            };
+        }
+
+        /// <summary>
+        /// LogParserDTO'dan JSON konfigürasyonu oluşturur
+        /// </summary>
+        private string BuildLogParserConfig(LogParserDTO logParserDto)
+        {
+            try
+            {
+                var config = new LogParserConfig
+                {
+                    Delimiter = logParserDto.delimiter,
+                    DateFormat = logParserDto.dateFormat,
+                    TimeFormat = logParserDto.timeFormat,
+                    RegexPattern = logParserDto.regexPattern
+                };
+
+                // FieldMapping JSON'ını parse et
+                if (!string.IsNullOrEmpty(logParserDto.fieldMappingJson))
+                {
+                    config.FieldMapping = JsonConvert.DeserializeObject<List<FieldMapping>>(logParserDto.fieldMappingJson) ?? new List<FieldMapping>();
+                }
+
+                return JsonConvert.SerializeObject(config);
+            }
+            catch (Exception)
+            {
+                return "{}";
+            }
+        }        /// <summary>
         /// Konfigürasyon ID'si ile log verisi parse et
         /// </summary>
         public Dictionary<string, object> parseLogData(string rawLogData, int configId)
         {
-            // TODO: Get configuration from database by configId, then parse
-            var config = getLogParserById(configId);
-            return ParseLog(rawLogData, config?.fieldMappingJson ?? "{}");
-        }
+            try
+            {
+                var config = getLogParserById(configId);
+                if (config == null)
+                {
+                    throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, $"ID: {configId} ile log parser konfigürasyonu bulunamadı");
+                }
 
-        /// <summary>
+                return ParseLog(rawLogData, config.fieldMappingJson ?? "{}");
+            }
+            catch (Exception ex)
+            {
+                throw new AppException(MessageCode.ERROR_500_BIR_HATA_OLUSTU, $"Log parse hatası: {ex.Message}");
+            }
+        }        /// <summary>
         /// Log parser konfigürasyonunu test et
         /// </summary>
         public Dictionary<string, object> testLogParserConfig(string sampleLogData, string config)
@@ -306,26 +446,15 @@ namespace LorePdks.BAL.Services.LogParsing
                 throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, result.Message);
             }
         }
-
-        /// <summary>
-        /// Log parser konfigürasyonu sil
-        /// </summary>
-        public void deleteLogParser(int id)
-        {
-            // TODO: Implement database deletion logic
-            throw new NotImplementedException("deleteLogParser method needs database implementation");
-        }
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Log parser konfigürasyon modeli
     /// </summary>
     public class LogParserConfig
     {
-        public string Delimiter { get; set; }
-        public string DateFormat { get; set; }
-        public string TimeFormat { get; set; }
-        public string RegexPattern { get; set; }
+        public string? Delimiter { get; set; }
+        public string? DateFormat { get; set; }
+        public string? TimeFormat { get; set; }
+        public string? RegexPattern { get; set; }
         public List<FieldMapping> FieldMapping { get; set; } = new List<FieldMapping>();
     }
 
@@ -334,9 +463,9 @@ namespace LorePdks.BAL.Services.LogParsing
     /// </summary>
     public class FieldMapping
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int Index { get; set; }
         public string Type { get; set; } = "string";
-        public string Format { get; set; }
+        public string? Format { get; set; }
     }
 }

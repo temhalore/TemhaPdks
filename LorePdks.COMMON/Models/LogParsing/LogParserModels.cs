@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Text.Json;
 
 namespace LorePdks.COMMON.Models.LogParsing
-{
-    /// <summary>
+{    /// <summary>
     /// Log parsing konfigürasyon modeli
     /// </summary>
     public class LogParserConfig
     {
         public string Type { get; set; } // "PDKS", "ALARM", "KAMERA"
-        public int SkipLines { get; set; } = 0
+        public int SkipLines { get; set; } = 0;
         public string Encoding { get; set; } = "UTF-8";
         public bool HasHeader { get; set; } = false;
         public List<ValidationRule> ValidationRules { get; set; } = new();
