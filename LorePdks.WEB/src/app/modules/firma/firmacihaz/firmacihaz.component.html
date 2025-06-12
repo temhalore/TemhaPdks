@@ -115,11 +115,12 @@
                Böylece ham log verisi anlamlı bilgilere dönüştürülür.</p>
             
             <h4>📋 Adım Adım Kullanım</h4>
-            <ol>
-              <li><strong>Temel Ayarlar:</strong>
+            <ol>              <li><strong>Temel Ayarlar:</strong>
                 <ul>
                   <li><strong>Delimiter:</strong> Log satırındaki verileri ayıran karakteri seçin (virgül, noktalı virgül, vs.)</li>
-                  <li><strong>Tarih/Saat Formatı:</strong> Cihazın kullandığı tarih ve saat formatını belirtin</li>
+                  <li><strong>Tarih Formatı:</strong> Cihazın kullandığı tarih formatını dropdown'dan seçin. Örnek görüntüler ile kolay seçim yapabilirsiniz</li>
+                  <li><strong>Saat Formatı:</strong> Cihazın kullandığı saat formatını dropdown'dan seçin. 24 saat veya 12 saat formatları mevcut</li>
+                  <li><strong>Örnek Veri Yükle:</strong> Seçtiğiniz delimiter'a göre otomatik örnek log satırı oluşturur</li>
                 </ul>
               </li>
               <li><strong>Alan Eşlemeleri:</strong>
@@ -129,28 +130,50 @@
                   <li><strong>Alan Adı:</strong> Bu veriye hangi ismi vermek istediğinizi seçin</li>
                   <li><strong>Tip:</strong> Verinin türünü belirtin (sayı, metin, tarih, vs.)</li>
                 </ul>
-              </li>
-              <li><strong>Test:</strong>
+              </li>              <li><strong>Test:</strong>
                 <ul>
                   <li>Örnek log satırını yapıştırın</li>
                   <li>"Test Et" butonuna basarak ayarlarınızı doğrulayın</li>
                   <li>Parse edilmiş sonucu kontrol edin</li>
+                  <li><strong>Test başarılıysa:</strong> Veriler doğru şekilde ayrıştırıldı, kaydetme işlemine geçebilirsiniz</li>
+                  <li><strong>Test başarısızsa:</strong> Ayarlarınızı kontrol edip tekrar deneyin</li>
+                </ul>
+              </li>
+              <li><strong>JSON Konfigürasyon:</strong>
+                <ul>
+                  <li>Bu sekme, girdiğiniz tüm ayarların <strong>otomatik olarak JSON formatına</strong> dönüştürüldüğü halini gösterir</li>
+                  <li>Bu JSON, sistem tarafından cihazdan gelen logları parse etmek için kullanılır</li>
+                  <li><strong>Sadece görüntüleme amaçlıdır</strong> - bu alanı manuel olarak düzenlemenize gerek yoktur</li>
+                  <li>Teknik ekiplerin konfigürasyonu kontrol etmesi için faydalıdır</li>
                 </ul>
               </li>
               <li><strong>Kaydet:</strong> Ayarlar doğruysa "Kaydet" butonuna basın</li>
             </ol>
             
-            <h4>💡 Örnek</h4>
-            <div class="example-box">
+            <h4>💡 Örnek</h4>            <div class="example-box">
               <strong>Örnek Log Satırı:</strong><br>
               <code>1234,10:30,060125,1,001</code><br><br>
+              
+              <strong>Delimiter:</strong> Virgül (,)<br>
+              <strong>Tarih Formatı:</strong> ddMMyy (060125 = 06.01.2025)<br>
+              <strong>Saat Formatı:</strong> HH:mm (10:30)<br><br>
               
               <strong>Alan Eşlemeleri:</strong><br>
               • Pozisyon 0: Kullanıcı ID (1234)<br>
               • Pozisyon 1: Saat (10:30)<br>
               • Pozisyon 2: Tarih (060125)<br>
               • Pozisyon 3: Hareket Tipi (1=Giriş)<br>
-              • Pozisyon 4: Cihaz ID (001)
+              • Pozisyon 4: Cihaz ID (001)<br><br>
+                <strong>Test Sonucu:</strong><br>
+              <code>
+              {{ '{' }}<br>
+              &nbsp;&nbsp;"userId": "1234",<br>
+              &nbsp;&nbsp;"time": "10:30",<br>
+              &nbsp;&nbsp;"date": "060125",<br>
+              &nbsp;&nbsp;"actionType": "1",<br>
+              &nbsp;&nbsp;"deviceId": "001"<br>
+              {{ '}' }}
+              </code>
             </div>
           </div>
         </p-panel>
@@ -181,24 +204,31 @@
                   placeholder="Delimiter seçin"
                   styleClass="w-full">
                 </p-dropdown>
-              </div>
-              <div class="form-item">
+              </div>              <div class="form-item">
                 <label>Tarih Formatı:</label>
-                <input 
-                  pInputText 
-                  [(ngModel)]="logParserConfig.dateFormat" 
-                  placeholder="dd.MM.yyyy HH:mm:ss"
-                  class="w-full">
+                <p-dropdown 
+                  [options]="dateFormatOptions" 
+                  [(ngModel)]="logParserConfig.dateFormat"
+                  [editable]="true"
+                  optionLabel="label" 
+                  optionValue="value"
+                  placeholder="Tarih formatı seçin veya yazın"
+                  styleClass="w-full">
+                </p-dropdown>
               </div>
             </div>
             <div class="form-row">
               <div class="form-item">
                 <label>Saat Formatı:</label>
-                <input 
-                  pInputText 
-                  [(ngModel)]="logParserConfig.timeFormat" 
-                  placeholder="HH:mm:ss"
-                  class="w-full">
+                <p-dropdown 
+                  [options]="timeFormatOptions" 
+                  [(ngModel)]="logParserConfig.timeFormat"
+                  [editable]="true"
+                  optionLabel="label" 
+                  optionValue="value"
+                  placeholder="Saat formatı seçin veya yazın"
+                  styleClass="w-full">
+                </p-dropdown>
               </div>
               <div class="form-item">
                 <button 

@@ -484,8 +484,7 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     { label: 'Tarih', value: 'datetime' },
     { label: 'Boolean', value: 'boolean' }
   ];
-  
-  // Önceden tanımlı alan isimleri
+    // Önceden tanımlı alan isimleri
   predefinedFields = [
     { label: 'Kullanıcı ID', value: 'userId' },
     { label: 'Zaman Damgası', value: 'timestamp' },
@@ -497,6 +496,34 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     { label: 'Event Tipi', value: 'eventType' },
     { label: 'Lokasyon', value: 'location' },
     { label: 'Açıklama', value: 'description' }
+  ];
+
+  // Tarih formatı seçenekleri
+  dateFormatOptions = [
+    { label: 'dd.MM.yyyy HH:mm:ss (06.12.2025 14:30:15)', value: 'dd.MM.yyyy HH:mm:ss' },
+    { label: 'dd/MM/yyyy HH:mm:ss (06/12/2025 14:30:15)', value: 'dd/MM/yyyy HH:mm:ss' },
+    { label: 'yyyy-MM-dd HH:mm:ss (2025-12-06 14:30:15)', value: 'yyyy-MM-dd HH:mm:ss' },
+    { label: 'ddMMyy HHmm (061225 1430)', value: 'ddMMyy HHmm' },
+    { label: 'ddMMyyyy HHmmss (06122025 143015)', value: 'ddMMyyyy HHmmss' },
+    { label: 'yyMMdd HHmm (251206 1430)', value: 'yyMMdd HHmm' },
+    { label: 'dd-MM-yyyy HH:mm (06-12-2025 14:30)', value: 'dd-MM-yyyy HH:mm' },
+    { label: 'MM/dd/yyyy HH:mm:ss (12/06/2025 14:30:15)', value: 'MM/dd/yyyy HH:mm:ss' },
+    { label: 'yyyy/MM/dd HH:mm (2025/12/06 14:30)', value: 'yyyy/MM/dd HH:mm' },
+    { label: 'ddMMyy (061225)', value: 'ddMMyy' },
+    { label: 'yyMMdd (251206)', value: 'yyMMdd' },
+    { label: 'dd.MM.yyyy (06.12.2025)', value: 'dd.MM.yyyy' }
+  ];
+
+  // Saat formatı seçenekleri
+  timeFormatOptions = [
+    { label: 'HH:mm:ss (14:30:15)', value: 'HH:mm:ss' },
+    { label: 'HH:mm (14:30)', value: 'HH:mm' },
+    { label: 'HHmmss (143015)', value: 'HHmmss' },
+    { label: 'HHmm (1430)', value: 'HHmm' },
+    { label: 'H:mm:ss (14:30:15)', value: 'H:mm:ss' },
+    { label: 'H:mm (14:30)', value: 'H:mm' },
+    { label: 'hh:mm:ss tt (02:30:15 PM)', value: 'hh:mm:ss tt' },
+    { label: 'hh:mm tt (02:30 PM)', value: 'hh:mm tt' }
   ];
 
   /**
