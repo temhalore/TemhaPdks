@@ -1,5 +1,7 @@
 using LorePdks.BAL.Managers.Pdks.Interfaces;
 using LorePdks.COMMON.DTO.PdksHareket;
+using LorePdks.COMMON.DTO.Base;
+using LorePdks.COMMON.Models.ServiceResponse;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +10,8 @@ using System.Collections.Generic;
 
 namespace LorePdks.API.Controllers.PdksHareket
 {
+    [Route("api/PdksHareket")]
     [ApiController]
-    [Route("api/[controller]")]
     public class PdksHareketController : ControllerBase
     {
         private readonly IPdksHareketManager _pdksHareketManager;
@@ -17,156 +19,217 @@ namespace LorePdks.API.Controllers.PdksHareket
         public PdksHareketController(IPdksHareketManager pdksHareketManager)
         {
             _pdksHareketManager = pdksHareketManager;
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// PDKS hareket kaydı oluştur veya güncelle
         /// </summary>
-        [HttpPost("save")]
-        public ActionResult<PdksHareketDTO> SavePdksHareket([FromBody] PdksHareketDTO pdksHareketDto)
+        [HttpPost]
+        [Route("savePdksHareketByPdksHareketDto")]
+        public IActionResult savePdksHareketByPdksHareketDto(PdksHareketDTO request)
         {
+            var response = new ServiceResponse<PdksHareketDTO>();
             try
             {
-                var result = _pdksHareketManager.savePdksHareket(pdksHareketDto);
-                return Ok(result);
+                var result = _pdksHareketManager.savePdksHareket(request);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// ID'ye göre PDKS hareket kaydı getir
         /// </summary>
-        [HttpGet("{id}")]
-        public ActionResult<PdksHareketDTO> GetPdksHareketById(int id)
+        [HttpPost]
+        [Route("getPdksHareketDtoByEIdDto")]
+        public IActionResult getPdksHareketDtoByEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<PdksHareketDTO>();
             try
             {
-                var result = _pdksHareketManager.getPdksHareketDtoById(id, isYoksaHataDondur: true);
-                return Ok(result);
+                var result = _pdksHareketManager.getPdksHareketDtoById(request.id, isYoksaHataDondur: true);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return NotFound(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Firmaya göre PDKS hareket kayıtları listele
         /// </summary>
-        [HttpGet("firma/{firmaId}")]
-        public ActionResult<List<PdksHareketDTO>> GetPdksHareketListByFirmaId(int firmaId)
+        [HttpPost]
+        [Route("getPdksHareketListByFirmaEIdDto")]
+        public IActionResult getPdksHareketListByFirmaEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<List<PdksHareketDTO>>();
             try
             {
-                var result = _pdksHareketManager.getPdksHareketDtoListByFirmaId(firmaId);
-                return Ok(result);
+                var result = _pdksHareketManager.getPdksHareketDtoListByFirmaId(request.id);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Kişiye göre PDKS hareket kayıtları listele
         /// </summary>
-        [HttpGet("kisi/{kisiId}")]
-        public ActionResult<List<PdksHareketDTO>> GetPdksHareketListByKisiId(int kisiId)
+        [HttpPost]
+        [Route("getPdksHareketListByKisiEIdDto")]
+        public IActionResult getPdksHareketListByKisiEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<List<PdksHareketDTO>>();
             try
             {
-                var result = _pdksHareketManager.getPdksHareketDtoListByKisiId(kisiId);
-                return Ok(result);
+                var result = _pdksHareketManager.getPdksHareketDtoListByKisiId(request.id);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Firma cihazına göre PDKS hareket kayıtları listele
         /// </summary>
-        [HttpGet("firmacihaz/{firmaCihazId}")]
-        public ActionResult<List<PdksHareketDTO>> GetPdksHareketListByFirmaCihazId(int firmaCihazId)
+        [HttpPost]
+        [Route("getPdksHareketListByFirmaCihazEIdDto")]
+        public IActionResult getPdksHareketListByFirmaCihazEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<List<PdksHareketDTO>>();
             try
             {
-                var result = _pdksHareketManager.getPdksHareketDtoListByFirmaCihazId(firmaCihazId);
-                return Ok(result);
+                var result = _pdksHareketManager.getPdksHareketDtoListByFirmaCihazId(request.id);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Tarih aralığına göre PDKS hareket kayıtları listele
         /// </summary>
-        [HttpGet("firma/{firmaId}/daterange")]
-        public ActionResult<List<PdksHareketDTO>> GetPdksHareketListByDateRange(
-            int firmaId, 
-            [FromQuery] DateTime baslangicTarihi, 
-            [FromQuery] DateTime bitisTarihi)
+        [HttpPost]
+        [Route("getPdksHareketListByDateRange")]
+        public IActionResult getPdksHareketListByDateRange(PdksHareketDateRangeRequestDTO request)
         {
+            var response = new ServiceResponse<List<PdksHareketDTO>>();
             try
             {
                 var result = _pdksHareketManager.getPdksHareketDtoListByFirmaIdAndDateRange(
-                    firmaId, baslangicTarihi, bitisTarihi);
-                return Ok(result);
+                    request.firmaId, request.baslangicTarihi, request.bitisTarihi);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// PDKS hareket kaydını sil
         /// </summary>
-        [HttpDelete("{id}")]
-        public ActionResult DeletePdksHareket(int id)
+        [HttpPost]
+        [Route("deletePdksHareketByEIdDto")]
+        public IActionResult deletePdksHareketByEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<bool>();
             try
             {
-                _pdksHareketManager.deletePdksHareketById(id);
-                return Ok(new { message = "PDKS hareket kaydı başarıyla silindi" });
+                _pdksHareketManager.deletePdksHareketById(request.id);
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "PDKS hareket kaydı başarıyla silindi";
+                response.data = true;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
+            }
+        }        /// <summary>
+        /// Tüm PDKS hareket kayıtlarını listele
+        /// </summary>
+        [HttpPost]
+        [Route("getAllPdksHareketList")]
+        public IActionResult getAllPdksHareketList()
+        {
+            var response = new ServiceResponse<List<PdksHareketDTO>>();
+            try
+            {
+                // Burada manager'da getAllPdksHareketDtoList metodunu çağıracağız
+                // Şimdilik boş liste döndürüyoruz
+                response.data = new List<PdksHareketDTO>();
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
         }
     }

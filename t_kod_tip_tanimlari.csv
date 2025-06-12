@@ -1,0 +1,60 @@
+ID,TIP_ID,SIRA,KOD,KISA_AD,ACIKLAMA
+205,0,0,CihazTip,Cihaz Tip,Cihaz tipi tanımlamaları
+2050001,205,1,PDKS,PDKS,Personel Devam Kontrol Sistemi
+2050002,205,2,ALARM,Alarm,Alarm sistemi
+2050003,205,3,KAMERA,Kamera,Kamera sistemi
+
+206,0,0,PdksLogAlanlari,PDKS Log Alanları,PDKS log dosyası alanları
+2060001,206,1,KULLANICI_ID,Kullanıcı ID,PDKS kullanıcı kimlik numarası
+2060002,206,2,TARIH,Tarih,PDKS giriş/çıkış tarihi
+2060003,206,3,SAAT,Saat,PDKS giriş/çıkış saati  
+2060004,206,4,YON,Yön,Giriş/çıkış yönü
+2060005,206,5,CIHAZ_ID,Cihaz ID,PDKS cihaz kimlik numarası
+
+207,0,0,AlarmLogAlanlari,Alarm Log Alanları,Alarm log dosyası alanları
+2070001,207,1,TARIH_SAAT,Tarih Saat,Alarm tarih ve saati
+2070002,207,2,ALARM_TIPI,Alarm Tipi,Alarm türü
+2070003,207,3,ALARM_SEVIYESI,Alarm Seviyesi,Alarm önem seviyesi
+2070004,207,4,CIHAZ_ID,Cihaz ID,Alarm cihaz kimlik numarası
+2070005,207,5,DURUM,Durum,Alarm durumu
+
+208,0,0,KameraLogAlanlari,Kamera Log Alanları,Kamera log dosyası alanları
+2080001,208,1,TARIH_SAAT,Tarih Saat,Kamera kayıt tarih saati
+2080002,208,2,KAMERA_ID,Kamera ID,Kamera kimlik numarası
+2080003,208,3,OLAY_TIPI,Olay Tipi,Kamera olay türü
+2080004,208,4,DOSYA_YOLU,Dosya Yolu,Kayıt dosya yolu
+2080005,208,5,SURE,Süre,Kayıt süresi
+
+209,0,0,LogGirisYonu,Log Giriş Yönü,PDKS giriş/çıkış yön tanımları
+2090001,209,1,GIRIS,Giriş,Giriş yönü
+2090002,209,0,CIKIS,Çıkış,Çıkış yönü
+
+210,0,0,AlarmTipi,Alarm Tipi,Alarm türü tanımları
+2100001,210,1,HAREKET_ALGILAMA,Hareket Algılama,Hareket sensörü alarmı
+2100002,210,2,KAPI_ACIK,Kapı Açık,Kapı açık bırakma alarmı
+2100003,210,3,GUVENLIK_IHLALI,Güvenlik İhlali,Güvenlik ihlali alarmı
+2100004,210,4,SISTEM_HATASI,Sistem Hatası,Sistem hatası alarmı
+
+211,0,0,AlarmSeviyesi,Alarm Seviyesi,Alarm önem seviyesi tanımları
+2110001,211,1,DUSUK,Düşük,Düşük seviye alarm
+2110002,211,2,ORTA,Orta,Orta seviye alarm
+2110003,211,3,YUKSEK,Yüksek,Yüksek seviye alarm
+2110004,211,4,KRITIK,Kritik,Kritik seviye alarm
+
+212,0,0,KameraOlayTipi,Kamera Olay Tipi,Kamera olay türü tanımları
+2120001,212,1,HAREKET,Hareket,Hareket algılama
+2120002,212,2,KAYIT_BASLAMA,Kayıt Başlama,Kayıt başlatma
+2120003,212,3,KAYIT_BITME,Kayıt Bitme,Kayıt sonlandırma
+2120004,212,4,BAGLANTI_KESILMESI,Bağlantı Kesilmesi,Bağlantı hatası
+
+213,0,0,LogEntryTipi,Log Entry Tipi,Log giriş türü tanımları
+2130001,213,1,PDKS_LOG,PDKS Log,PDKS hareket logu
+2130002,213,2,ALARM_LOG,Alarm Log,Alarm sistem logu
+2130003,213,3,KAMERA_LOG,Kamera Log,Kamera sistem logu
+
+214,0,0,ParsingDurumu,Parsing Durumu,Log parsing durum tanımları
+2140001,214,1,BEKLEMEDE,Beklemede,Parse edilmeyi bekliyor
+2140002,214,2,ISLENIYOR,İşleniyor,Parse ediliyor
+2140003,214,3,TAMAMLANDI,Tamamlandı,Parse işlemi tamamlandı
+2140004,214,4,HATA,Hata,Parse işleminde hata oluştu
+2140005,214,5,MANUEL_KONTROL,Manuel Kontrol,Manuel kontrol gerekiyor

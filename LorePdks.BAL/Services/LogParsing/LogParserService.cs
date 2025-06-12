@@ -1,6 +1,7 @@
 using LorePdks.BAL.Services.LogParsing.Interfaces;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
+using LorePdks.COMMON.DTO.LogParser;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -237,12 +238,82 @@ namespace LorePdks.BAL.Services.LogParsing
                         return DateTime.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateValue) 
                             ? dateValue : DateTime.MinValue;
                     }
-                    return DateTime.TryParse(value, out DateTime parsedDate) ? parsedDate : DateTime.MinValue;
-
-                case "string":
+                    return DateTime.TryParse(value, out DateTime parsedDate) ? parsedDate : DateTime.MinValue;                case "string":
                 default:
                     return value;
             }
+        }
+
+        // CRUD Operations for LogParser Configuration
+        /// <summary>
+        /// Log parser konfigürasyonu kaydet
+        /// </summary>
+        public LogParserDTO saveLogParser(LogParserDTO logParserDto)
+        {
+            // TODO: Implement database save logic
+            throw new NotImplementedException("saveLogParser method needs database implementation");
+        }
+
+        /// <summary>
+        /// ID'ye göre log parser konfigürasyonu getir
+        /// </summary>
+        public LogParserDTO getLogParserById(int id)
+        {
+            // TODO: Implement database retrieval logic
+            throw new NotImplementedException("getLogParserById method needs database implementation");
+        }
+
+        /// <summary>
+        /// Firmaya göre log parser konfigürasyonları getir
+        /// </summary>
+        public List<LogParserDTO> getLogParserListByFirmaId(int firmaId)
+        {
+            // TODO: Implement database retrieval logic
+            throw new NotImplementedException("getLogParserListByFirmaId method needs database implementation");
+        }
+
+        /// <summary>
+        /// Tüm log parser konfigürasyonları getir
+        /// </summary>
+        public List<LogParserDTO> getAllLogParsers()
+        {
+            // TODO: Implement database retrieval logic
+            throw new NotImplementedException("getAllLogParsers method needs database implementation");
+        }
+
+        /// <summary>
+        /// Konfigürasyon ID'si ile log verisi parse et
+        /// </summary>
+        public Dictionary<string, object> parseLogData(string rawLogData, int configId)
+        {
+            // TODO: Get configuration from database by configId, then parse
+            var config = getLogParserById(configId);
+            return ParseLog(rawLogData, config?.fieldMappingJson ?? "{}");
+        }
+
+        /// <summary>
+        /// Log parser konfigürasyonunu test et
+        /// </summary>
+        public Dictionary<string, object> testLogParserConfig(string sampleLogData, string config)
+        {
+            var result = TestParserConfig(sampleLogData, config);
+            if (result.Success)
+            {
+                return result.ParsedData;
+            }
+            else
+            {
+                throw new AppException(MessageCode.ERROR_503_GECERSIZ_VERI_GONDERIMI, result.Message);
+            }
+        }
+
+        /// <summary>
+        /// Log parser konfigürasyonu sil
+        /// </summary>
+        public void deleteLogParser(int id)
+        {
+            // TODO: Implement database deletion logic
+            throw new NotImplementedException("deleteLogParser method needs database implementation");
         }
     }
 

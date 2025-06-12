@@ -1,5 +1,5 @@
-using LorePdks.BAL.Managers.Alarm.Interfaces;
-using LorePdks.COMMON.DTO.AlarmHareket;
+using LorePdks.BAL.Services.LogParsing.Interfaces;
+using LorePdks.COMMON.DTO.LogParser;
 using LorePdks.COMMON.DTO.Base;
 using LorePdks.COMMON.Models.ServiceResponse;
 using LorePdks.COMMON.Enums;
@@ -8,30 +8,30 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace LorePdks.API.Controllers.AlarmHareket
+namespace LorePdks.API.Controllers.LogParser
 {
-    [Route("api/AlarmHareket")]
+    [Route("api/LogParser")]
     [ApiController]
-    public class AlarmHareketController : ControllerBase
+    public class LogParserController : ControllerBase
     {
-        private readonly IAlarmHareketManager _alarmHareketManager;
+        private readonly ILogParserService _logParserService;
 
-        public AlarmHareketController(IAlarmHareketManager alarmHareketManager)
+        public LogParserController(ILogParserService logParserService)
         {
-            _alarmHareketManager = alarmHareketManager;
+            _logParserService = logParserService;
         }
 
         /// <summary>
-        /// Alarm hareket kaydı oluştur veya güncelle
+        /// Log parser konfigürasyonu oluştur veya güncelle
         /// </summary>
         [HttpPost]
-        [Route("saveAlarmHareketByAlarmHareketDto")]
-        public IActionResult saveAlarmHareketByAlarmHareketDto(AlarmHareketDTO request)
+        [Route("saveLogParserByLogParserDto")]
+        public IActionResult saveLogParserByLogParserDto(LogParserDTO request)
         {
-            var response = new ServiceResponse<AlarmHareketDTO>();
+            var response = new ServiceResponse<LogParserDTO>();
             try
             {
-                var result = _alarmHareketManager.saveAlarmHareket(request);
+                var result = _logParserService.saveLogParser(request);
                 response.data = result;
                 return Ok(response);
             }
@@ -50,16 +50,16 @@ namespace LorePdks.API.Controllers.AlarmHareket
         }
 
         /// <summary>
-        /// ID'ye göre Alarm hareket kaydı getir
+        /// ID'ye göre log parser konfigürasyonu getir
         /// </summary>
         [HttpPost]
-        [Route("getAlarmHareketDtoByEIdDto")]
-        public IActionResult getAlarmHareketDtoByEIdDto(EIdDTO request)
+        [Route("getLogParserDtoByEIdDto")]
+        public IActionResult getLogParserDtoByEIdDto(EIdDTO request)
         {
-            var response = new ServiceResponse<AlarmHareketDTO>();
+            var response = new ServiceResponse<LogParserDTO>();
             try
             {
-                var result = _alarmHareketManager.getAlarmHareketDtoById(request.id, isYoksaHataDondur: true);
+                var result = _logParserService.getLogParserById(request.id);
                 response.data = result;
                 return Ok(response);
             }
@@ -78,16 +78,16 @@ namespace LorePdks.API.Controllers.AlarmHareket
         }
 
         /// <summary>
-        /// Firmaya göre Alarm hareket kayıtları listele
+        /// Firmaya göre log parser konfigürasyonları listele
         /// </summary>
         [HttpPost]
-        [Route("getAlarmHareketListByFirmaEIdDto")]
-        public IActionResult getAlarmHareketListByFirmaEIdDto(EIdDTO request)
+        [Route("getLogParserListByFirmaEIdDto")]
+        public IActionResult getLogParserListByFirmaEIdDto(EIdDTO request)
         {
-            var response = new ServiceResponse<List<AlarmHareketDTO>>();
+            var response = new ServiceResponse<List<LogParserDTO>>();
             try
             {
-                var result = _alarmHareketManager.getAlarmHareketDtoListByFirmaId(request.id);
+                var result = _logParserService.getLogParserListByFirmaId(request.id);
                 response.data = result;
                 return Ok(response);
             }
@@ -106,16 +106,16 @@ namespace LorePdks.API.Controllers.AlarmHareket
         }
 
         /// <summary>
-        /// Firma cihazına göre Alarm hareket kayıtları listele
+        /// Tüm log parser konfigürasyonlarını listele
         /// </summary>
         [HttpPost]
-        [Route("getAlarmHareketListByFirmaCihazEIdDto")]
-        public IActionResult getAlarmHareketListByFirmaCihazEIdDto(EIdDTO request)
+        [Route("getAllLogParserList")]
+        public IActionResult getAllLogParserList()
         {
-            var response = new ServiceResponse<List<AlarmHareketDTO>>();
+            var response = new ServiceResponse<List<LogParserDTO>>();
             try
             {
-                var result = _alarmHareketManager.getAlarmHareketDtoListByFirmaCihazId(request.id);
+                var result = _logParserService.getAllLogParsers();
                 response.data = result;
                 return Ok(response);
             }
@@ -134,17 +134,16 @@ namespace LorePdks.API.Controllers.AlarmHareket
         }
 
         /// <summary>
-        /// Tarih aralığına göre Alarm hareket kayıtları listele
+        /// Log verisini parse et
         /// </summary>
         [HttpPost]
-        [Route("getAlarmHareketListByDateRange")]
-        public IActionResult getAlarmHareketListByDateRange(AlarmHareketDateRangeRequestDTO request)
+        [Route("parseLogData")]
+        public IActionResult parseLogData(LogParseRequestDTO request)
         {
-            var response = new ServiceResponse<List<AlarmHareketDTO>>();
+            var response = new ServiceResponse<Dictionary<string, object>>();
             try
             {
-                var result = _alarmHareketManager.getAlarmHareketDtoListByFirmaIdAndDateRange(
-                    request.firmaId, request.baslangicTarihi, request.bitisTarihi);
+                var result = _logParserService.parseLogData(request.rawLogData, request.configId);
                 response.data = result;
                 return Ok(response);
             }
@@ -163,18 +162,17 @@ namespace LorePdks.API.Controllers.AlarmHareket
         }
 
         /// <summary>
-        /// Tüm Alarm hareket kayıtlarını listele
+        /// Log parser konfigürasyonunu test et
         /// </summary>
         [HttpPost]
-        [Route("getAllAlarmHareketList")]
-        public IActionResult getAllAlarmHareketList()
+        [Route("testLogParserConfig")]
+        public IActionResult testLogParserConfig(LogParserTestRequestDTO request)
         {
-            var response = new ServiceResponse<List<AlarmHareketDTO>>();
+            var response = new ServiceResponse<Dictionary<string, object>>();
             try
             {
-                // Burada manager'da getAllAlarmHareketDtoList metodunu çağıracağız
-                // Şimdilik boş liste döndürüyoruz
-                response.data = new List<AlarmHareketDTO>();
+                var result = _logParserService.testLogParserConfig(request.sampleLogData, request.config);
+                response.data = result;
                 return Ok(response);
             }
             catch (AppException ex)
@@ -192,18 +190,18 @@ namespace LorePdks.API.Controllers.AlarmHareket
         }
 
         /// <summary>
-        /// Alarm hareket kaydını sil
+        /// Log parser konfigürasyonunu sil
         /// </summary>
         [HttpPost]
-        [Route("deleteAlarmHareketByEIdDto")]
-        public IActionResult deleteAlarmHareketByEIdDto(EIdDTO request)
+        [Route("deleteLogParserByEIdDto")]
+        public IActionResult deleteLogParserByEIdDto(EIdDTO request)
         {
             var response = new ServiceResponse<bool>();
             try
             {
-                _alarmHareketManager.deleteAlarmHareketById(request.id);
+                _logParserService.deleteLogParser(request.id);
                 response.messageType = ServiceResponseMessageType.Success;
-                response.message = "Alarm hareket kaydı başarıyla silindi";
+                response.message = "Log parser konfigürasyonu başarıyla silindi";
                 response.data = true;
                 return Ok(response);
             }

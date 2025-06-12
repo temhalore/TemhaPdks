@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LorePdks.COMMON.DTO.LogParser;
 
 namespace LorePdks.BAL.Services.LogParsing.Interfaces
 {
@@ -54,5 +55,53 @@ namespace LorePdks.BAL.Services.LogParsing.Interfaces
         /// <param name="parserConfig">Doğrulanacak parser konfigürasyonu</param>
         /// <returns>Doğrulama sonucu</returns>
         (bool IsValid, string ErrorMessage) ValidateParserConfig(string parserConfig);
+
+        // CRUD Operations for LogParser
+        /// <summary>
+        /// Log parser konfigürasyonu kaydet
+        /// </summary>
+        /// <param name="logParserDto">Kaydedilecek log parser DTO</param>
+        /// <returns>Kaydedilen log parser DTO</returns>
+        LogParserDTO saveLogParser(LogParserDTO logParserDto);
+
+        /// <summary>
+        /// ID'ye göre log parser konfigürasyonu getir
+        /// </summary>
+        /// <param name="id">Log parser ID</param>
+        /// <returns>Log parser DTO</returns>
+        LogParserDTO getLogParserById(int id);
+
+        /// <summary>
+        /// Firmaya göre log parser konfigürasyonları getir
+        /// </summary>
+        /// <param name="firmaId">Firma ID</param>
+        /// <returns>Log parser DTO listesi</returns>
+        List<LogParserDTO> getLogParserListByFirmaId(int firmaId);
+
+        /// <summary>
+        /// Tüm log parser konfigürasyonları getir
+        /// </summary>
+        /// <returns>Log parser DTO listesi</returns>
+        List<LogParserDTO> getAllLogParsers();
+
+        /// <summary>
+        /// Konfigürasyon ID'si ile log verisi parse et
+        /// </summary>
+        /// <param name="rawLogData">Ham log verisi</param>
+        /// <param name="configId">Konfigürasyon ID</param>
+        /// <returns>Parse edilmiş log verisi</returns>
+        Dictionary<string, object> parseLogData(string rawLogData, int configId);
+
+        /// <summary>
+        /// Log parser konfigürasyonunu test et
+        /// </summary>
+        /// <param name="sampleLogData">Test için örnek log verisi</param>
+        /// <param name="config">Test edilecek konfigürasyon JSON</param>
+        /// <returns>Test sonucu</returns>
+        Dictionary<string, object> testLogParserConfig(string sampleLogData, string config);        /// <summary>
+        /// Log parser konfigürasyonu sil
+        /// </summary>
+        /// <param name="id">Silinecek log parser ID</param>
+        void deleteLogParser(int id);
     }
 }

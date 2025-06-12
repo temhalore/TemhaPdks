@@ -1,0 +1,274 @@
+<div class="log-content">
+  <!-- Başlık -->
+  <div class="page-header">
+    <h2>Log Parser Ayarları</h2>
+    <p class="text-muted">Cihazlardan gelen log verilerinin parse edilmesi için konfigürasyon ayarları</p>
+  </div>
+
+  <!-- Cihaz Seçimi -->
+  <p-panel header="Cihaz Seçimi" styleClass="mb-3">
+    <div class="device-selection">
+      <label>Firma Cihazı:</label>
+      <p-dropdown 
+        [options]="firmaCihazList" 
+        [(ngModel)]="selectedFirmaCihaz"
+        optionLabel="cihazAdi"
+        placeholder="Cihaz seçin"
+        [showClear]="true"
+        (onChange)="onFirmaCihazSelect()"
+        styleClass="w-full">
+        <ng-template pTemplate="selectedItem">
+          <div *ngIf="selectedFirmaCihaz">
+            <span>{{selectedFirmaCihaz.firmaAdi}} - {{selectedFirmaCihaz.cihazAdi}}</span>
+          </div>
+        </ng-template>
+        <ng-template let-option pTemplate="item">
+          <div>
+            <span>{{option.firmaAdi}} - {{option.cihazAdi}}</span>
+            <small class="text-muted d-block">{{option.cihazTipi}}</small>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+  </p-panel>
+
+  <!-- Konfigürasyon Formu -->
+  <p-accordion *ngIf="selectedFirmaCihaz">
+    <!-- Temel Ayarlar -->
+    <p-accordionTab header="Temel Parser Ayarları" [selected]="true">
+      <div class="config-form">
+        <div class="form-row">
+          <div class="form-item">
+            <label>Delimiter:</label>
+            <p-dropdown 
+              [options]="delimiterOptions" 
+              [(ngModel)]="logParserConfig.delimiter"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Delimiter seçin"
+              styleClass="w-full">
+            </p-dropdown>
+          </div>
+          
+          <div class="form-item" *ngIf="logParserConfig.delimiter === 'regex'">
+            <app-text-input
+              label="Regex Pattern"
+              [(ngModel)]="logParserConfig.regexPattern"
+              placeholder="Regex pattern girin">
+            </app-text-input>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-item">
+            <app-text-input
+              label="Tarih Formatı"
+              [(ngModel)]="logParserConfig.dateFormat"
+              placeholder="dd.MM.yyyy HH:mm:ss">
+            </app-text-input>
+          </div>
+          
+          <div class="form-item">
+            <app-text-input
+              label="Saat Formatı"
+              [(ngModel)]="logParserConfig.timeFormat"
+              placeholder="HH:mm:ss">
+            </app-text-input>
+          </div>
+        </div>
+      </div>
+    </p-accordionTab>
+
+    <!-- Alan Eşlemeleri -->
+    <p-accordionTab header="Alan Eşlemeleri">
+      <div class="field-mappings">
+        <div class="mapping-header">
+          <h4>Log Alanları</h4>
+          <div class="mapping-actions">
+            <button 
+              pButton 
+              type="button" 
+              label="Alan Ekle" 
+              icon="pi pi-plus"
+              (click)="addFieldMapping()"
+              class="p-button-sm p-button-success">
+            </button>
+            <button 
+              pButton 
+              type="button" 
+              label="Tümünü Temizle" 
+              icon="pi pi-trash"
+              (click)="clearAllFields()"
+              class="p-button-sm p-button-danger ml-2">
+            </button>
+          </div>
+        </div>
+        
+        <div *ngFor="let field of logParserConfig.fieldMapping; let i = index" class="field-mapping">
+          <div class="mapping-row">
+            <div class="field-item">
+              <label>Alan Adı:</label>
+              <p-dropdown 
+                [options]="predefinedFields" 
+                [(ngModel)]="field.name"
+                optionLabel="label"
+                optionValue="value"
+                [editable]="true"
+                placeholder="Alan adı seçin veya yazın"
+                styleClass="w-full">
+              </p-dropdown>
+            </div>
+            
+            <div class="field-item">
+              <label>Sıra (Index):</label>
+              <input 
+                type="number" 
+                pInputText 
+                [(ngModel)]="field.index"
+                placeholder="0"
+                class="w-full">
+            </div>
+            
+            <div class="field-item">
+              <label>Veri Tipi:</label>
+              <p-dropdown 
+                [options]="fieldTypes" 
+                [(ngModel)]="field.type"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Tip seçin"
+                styleClass="w-full">
+              </p-dropdown>
+            </div>
+            
+            <div class="field-item" *ngIf="field.type === 'datetime'">
+              <label>Format:</label>
+              <input 
+                type="text" 
+                pInputText 
+                [(ngModel)]="field.format"
+                placeholder="dd.MM.yyyy HH:mm:ss"
+                class="w-full">
+            </div>
+            
+            <div class="field-actions">
+              <button 
+                pButton 
+                type="button" 
+                icon="pi pi-trash"
+                (click)="removeFieldMapping(i)"
+                class="p-button-sm p-button-danger p-button-text"
+                pTooltip="Alanı sil">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-accordionTab>
+
+    <!-- Test Alanı -->
+    <p-accordionTab header="Konfigürasyon Testi">
+      <div class="test-section">
+        <div class="test-input">
+          <label>Örnek Log Verisi:</label>
+          <div class="sample-actions mb-2">
+            <button 
+              pButton 
+              type="button" 
+              label="Örnek Veri Yükle" 
+              icon="pi pi-download"
+              (click)="loadSampleData()"
+              class="p-button-sm p-button-secondary">
+            </button>
+          </div>
+          <textarea 
+            pInputTextarea 
+            [(ngModel)]="sampleLogData"
+            placeholder="Örnek log verisini buraya yapıştırın..."
+            rows="4"
+            class="w-full">
+          </textarea>
+        </div>
+        
+        <div class="test-actions mt-3">
+          <button 
+            pButton 
+            type="button" 
+            label="Testi Çalıştır" 
+            icon="pi pi-play"
+            (click)="testConfiguration()"
+            [loading]="isTesting"
+            class="p-button-primary">
+          </button>
+        </div>
+        
+        <!-- Test Sonucu -->
+        <div *ngIf="testResult" class="test-result mt-3">
+          <p-divider></p-divider>
+          <h5>Test Sonucu</h5>
+          
+          <p-message 
+            *ngIf="testResult.success" 
+            severity="success" 
+            text="Parser konfigürasyonu başarıyla test edildi">
+          </p-message>
+          
+          <p-message 
+            *ngIf="!testResult.success" 
+            severity="error" 
+            [text]="testResult.message">
+          </p-message>
+          
+          <div *ngIf="testResult.success && testResult.parsedData" class="parsed-data mt-3">
+            <label>Parse Edilen Veri:</label>
+            <textarea 
+              pInputTextarea 
+              [value]="getTestResultAsJson()"
+              rows="6"
+              readonly
+              class="w-full">
+            </textarea>
+          </div>
+        </div>
+      </div>
+    </p-accordionTab>
+
+    <!-- JSON Görünümü -->
+    <p-accordionTab header="JSON Konfigürasyonu">
+      <div class="json-view">
+        <label>Konfigürasyon JSON:</label>
+        <textarea 
+          pInputTextarea 
+          [value]="getConfigAsJson()"
+          rows="10"
+          readonly
+          class="w-full json-textarea">
+        </textarea>
+      </div>
+    </p-accordionTab>
+  </p-accordion>
+
+  <!-- Kaydet Butonu -->
+  <div *ngIf="selectedFirmaCihaz" class="save-section mt-4">
+    <p-divider></p-divider>
+    <div class="save-actions">
+      <button 
+        pButton 
+        type="button" 
+        label="Konfigürasyonu Kaydet" 
+        icon="pi pi-save"
+        (click)="saveConfiguration()"
+        [loading]="isSaving"
+        class="p-button-success">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Sıfırla" 
+        icon="pi pi-refresh"
+        (click)="resetConfiguration()"
+        class="p-button-secondary ml-2">
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<div class="log-content">
+  <!-- Başlık ve Filtreler -->
+  <div class="page-header">
+    <h2>Kamera Hareketleri</h2>
+    <p class="text-muted">Kamera güvenlik sistemi hareket kayıtları</p>
+  </div>
+
+  <!-- Filtre Paneli -->
+  <p-panel header="Filtreler" [toggleable]="true" styleClass="mb-3">
+    <div class="filter-row">
+      <div class="filter-item">
+        <label>Firma:</label>
+        <p-dropdown 
+          [options]="firmaList" 
+          [(ngModel)]="selectedFirma"
+          optionLabel="firmaAdi"
+          placeholder="Firma seçin"
+          [showClear]="true"
+          styleClass="w-full">
+        </p-dropdown>
+      </div>
+      
+      <div class="filter-item">
+        <label>Başlangıç Tarihi:</label>
+        <p-calendar 
+          [(ngModel)]="baslangicTarihi"
+          placeholder="Başlangıç tarihi"
+          dateFormat="dd.mm.yy"
+          [showIcon]="true"
+          styleClass="w-full">
+        </p-calendar>
+      </div>
+      
+      <div class="filter-item">
+        <label>Bitiş Tarihi:</label>
+        <p-calendar 
+          [(ngModel)]="bitisTarihi"
+          placeholder="Bitiş tarihi"
+          dateFormat="dd.mm.yy"
+          [showIcon]="true"
+          styleClass="w-full">
+        </p-calendar>
+      </div>
+      
+      <div class="filter-buttons">
+        <button 
+          pButton 
+          type="button" 
+          label="Filtrele" 
+          icon="pi pi-search"
+          (click)="applyFilters()"
+          class="p-button-primary">
+        </button>
+        <button 
+          pButton 
+          type="button" 
+          label="Temizle" 
+          icon="pi pi-times"
+          (click)="clearFilters()"
+          class="p-button-secondary ml-2">
+        </button>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- Aksiyon Butonları -->
+  <div class="action-buttons mb-3">
+    <button 
+      pButton 
+      type="button" 
+      label="Yeni Kayıt" 
+      icon="pi pi-plus"
+      (click)="addNewKameraHareket()"
+      class="p-button-success">
+    </button>
+    <button 
+      pButton 
+      type="button" 
+      label="Yenile" 
+      icon="pi pi-refresh"
+      (click)="loadKameraHareketList()"
+      class="p-button-info ml-2">
+    </button>
+  </div>
+
+  <!-- Veri Tablosu -->
+  <app-data-grid
+    #dataGrid
+    [data]="kameraHareketList"
+    [columns]="columns"
+    [actionButtons]="actionButtons"
+    [loading]="isLoading"
+    [paginator]="true"
+    [rows]="20">
+  </app-data-grid>
+</div>

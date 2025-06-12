@@ -1,0 +1,193 @@
+<div class="log-content">
+  <!-- Başlık ve Filtreler -->
+  <div class="page-header">
+    <h2>Alarm Hareketleri</h2>
+    <p class="text-muted">Güvenlik alarm sistemi hareket kayıtları</p>
+  </div>
+
+  <!-- Filtre Paneli -->
+  <p-panel header="Filtreler" [toggleable]="true" styleClass="mb-3">
+    <div class="filter-row">
+      <div class="filter-item">
+        <label>Firma:</label>
+        <p-dropdown 
+          [options]="firmaList" 
+          [(ngModel)]="selectedFirma"
+          optionLabel="firmaAdi"
+          placeholder="Firma seçin"
+          [showClear]="true"
+          styleClass="w-full">
+        </p-dropdown>
+      </div>
+      
+      <div class="filter-item">
+        <label>Başlangıç Tarihi:</label>
+        <p-calendar 
+          [(ngModel)]="baslangicTarihi"
+          placeholder="Başlangıç tarihi"
+          dateFormat="dd.mm.yy"
+          [showIcon]="true"
+          styleClass="w-full">
+        </p-calendar>
+      </div>
+      
+      <div class="filter-item">
+        <label>Bitiş Tarihi:</label>
+        <p-calendar 
+          [(ngModel)]="bitisTarihi"
+          placeholder="Bitiş tarihi"
+          dateFormat="dd.mm.yy"
+          [showIcon]="true"
+          styleClass="w-full">
+        </p-calendar>
+      </div>
+      
+      <div class="filter-buttons">
+        <button 
+          pButton 
+          type="button" 
+          label="Filtrele" 
+          icon="pi pi-search"
+          (click)="applyFilters()"
+          class="p-button-primary">
+        </button>
+        <button 
+          pButton 
+          type="button" 
+          label="Temizle" 
+          icon="pi pi-times"
+          (click)="clearFilters()"
+          class="p-button-secondary ml-2">
+        </button>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- Aksiyon Butonları -->
+  <div class="action-buttons mb-3">
+    <button 
+      pButton 
+      type="button" 
+      label="Yeni Kayıt" 
+      icon="pi pi-plus"
+      (click)="addNewAlarmHareket()"
+      class="p-button-success">
+    </button>
+    <button 
+      pButton 
+      type="button" 
+      label="Yenile" 
+      icon="pi pi-refresh"
+      (click)="loadAlarmHareketList()"
+      class="p-button-info ml-2">
+    </button>
+  </div>
+
+  <!-- Veri Tablosu -->
+  <app-data-grid
+    #dataGrid
+    [data]="alarmHareketList"
+    [columns]="columns"
+    [actionButtons]="actionButtons"
+    [loading]="isLoading"
+    [paginator]="true"
+    [rows]="20"
+    [exportable]="true"
+    exportFileName="alarm-hareketleri">
+  </app-data-grid>
+</div>
+
+<!-- Modal -->
+<app-modal
+  #modal
+  [visible]="isModalVisible"
+  [title]="modalTitle"
+  [loading]="isSaving"
+  (onClose)="closeModal()"
+  (onSave)="saveAlarmHareket()">
+  
+  <div class="modal-form">
+    <div class="form-row">
+      <div class="form-item">
+        <app-text-input
+          label="Cihaz Numarası"
+          [(ngModel)]="selectedAlarmHareket.cihazNumarasi"
+          placeholder="Cihaz numarası girin"
+          [required]="true">
+        </app-text-input>
+      </div>
+      
+      <div class="form-item">
+        <app-text-input
+          label="Alarm Tipi"
+          [(ngModel)]="selectedAlarmHareket.alarmTipi"
+          placeholder="Alarm tipi"
+          type="number">
+        </app-text-input>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-item">
+        <label>Alarm Tarihi:</label>
+        <p-calendar 
+          [(ngModel)]="selectedAlarmHareket.alarmTarihi"
+          placeholder="Alarm tarihi"
+          dateFormat="dd.mm.yy"
+          [showTime]="true"
+          [showIcon]="true"
+          styleClass="w-full">
+        </p-calendar>
+      </div>
+      
+      <div class="form-item">
+        <app-text-input
+          label="Lokasyon"
+          [(ngModel)]="selectedAlarmHareket.lokasyon"
+          placeholder="Lokasyon bilgisi">
+        </app-text-input>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-item">
+        <app-text-input
+          label="IP Adresi"
+          [(ngModel)]="selectedAlarmHareket.ip"
+          placeholder="IP adresi girin">
+        </app-text-input>
+      </div>
+      
+      <div class="form-item">
+        <label>Gerçek Alarm:</label>
+        <p-checkbox 
+          [(ngModel)]="selectedAlarmHareket.isGercekAlarm"
+          binary="true">
+        </p-checkbox>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-item full-width">
+        <app-text-input
+          label="Açıklama"
+          [(ngModel)]="selectedAlarmHareket.aciklama"
+          placeholder="Alarm açıklaması">
+        </app-text-input>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-item full-width">
+        <label>Ham Veri:</label>
+        <textarea 
+          pInputTextarea 
+          [(ngModel)]="selectedAlarmHareket.rawData"
+          placeholder="Ham log verisi"
+          rows="4"
+          class="w-full">
+        </textarea>
+      </div>
+    </div>
+  </div>
+</app-modal>

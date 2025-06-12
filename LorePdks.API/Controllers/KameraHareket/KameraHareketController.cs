@@ -1,5 +1,7 @@
 using LorePdks.BAL.Managers.Kamera.Interfaces;
 using LorePdks.COMMON.DTO.KameraHareket;
+using LorePdks.COMMON.DTO.Base;
+using LorePdks.COMMON.Models.ServiceResponse;
 using LorePdks.COMMON.Enums;
 using LorePdks.COMMON.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +10,8 @@ using System.Collections.Generic;
 
 namespace LorePdks.API.Controllers.KameraHareket
 {
+    [Route("api/KameraHareket")]
     [ApiController]
-    [Route("api/[controller]")]
     public class KameraHareketController : ControllerBase
     {
         private readonly IKameraHareketManager _kameraHareketManager;
@@ -17,135 +19,195 @@ namespace LorePdks.API.Controllers.KameraHareket
         public KameraHareketController(IKameraHareketManager kameraHareketManager)
         {
             _kameraHareketManager = kameraHareketManager;
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Kamera hareket kaydı oluştur veya güncelle
         /// </summary>
-        [HttpPost("save")]
-        public ActionResult<KameraHareketDTO> SaveKameraHareket([FromBody] KameraHareketDTO kameraHareketDto)
+        [HttpPost]
+        [Route("saveKameraHareketByKameraHareketDto")]
+        public IActionResult saveKameraHareketByKameraHareketDto(KameraHareketDTO request)
         {
+            var response = new ServiceResponse<KameraHareketDTO>();
             try
             {
-                var result = _kameraHareketManager.saveKameraHareket(kameraHareketDto);
-                return Ok(result);
+                var result = _kameraHareketManager.saveKameraHareket(request);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// ID'ye göre Kamera hareket kaydı getir
         /// </summary>
-        [HttpGet("{id}")]
-        public ActionResult<KameraHareketDTO> GetKameraHareketById(int id)
+        [HttpPost]
+        [Route("getKameraHareketDtoByEIdDto")]
+        public IActionResult getKameraHareketDtoByEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<KameraHareketDTO>();
             try
             {
-                var result = _kameraHareketManager.getKameraHareketDtoById(id, isYoksaHataDondur: true);
-                return Ok(result);
+                var result = _kameraHareketManager.getKameraHareketDtoById(request.id, isYoksaHataDondur: true);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return NotFound(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Firmaya göre Kamera hareket kayıtları listele
         /// </summary>
-        [HttpGet("firma/{firmaId}")]
-        public ActionResult<List<KameraHareketDTO>> GetKameraHareketListByFirmaId(int firmaId)
+        [HttpPost]
+        [Route("getKameraHareketListByFirmaEIdDto")]
+        public IActionResult getKameraHareketListByFirmaEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<List<KameraHareketDTO>>();
             try
             {
-                var result = _kameraHareketManager.getKameraHareketDtoListByFirmaId(firmaId);
-                return Ok(result);
+                var result = _kameraHareketManager.getKameraHareketDtoListByFirmaId(request.id);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Firma cihazına göre Kamera hareket kayıtları listele
         /// </summary>
-        [HttpGet("firmacihaz/{firmaCihazId}")]
-        public ActionResult<List<KameraHareketDTO>> GetKameraHareketListByFirmaCihazId(int firmaCihazId)
+        [HttpPost]
+        [Route("getKameraHareketListByFirmaCihazEIdDto")]
+        public IActionResult getKameraHareketListByFirmaCihazEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<List<KameraHareketDTO>>();
             try
             {
-                var result = _kameraHareketManager.getKameraHareketDtoListByFirmaCihazId(firmaCihazId);
-                return Ok(result);
+                var result = _kameraHareketManager.getKameraHareketDtoListByFirmaCihazId(request.id);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Tarih aralığına göre Kamera hareket kayıtları listele
         /// </summary>
-        [HttpGet("firma/{firmaId}/daterange")]
-        public ActionResult<List<KameraHareketDTO>> GetKameraHareketListByDateRange(
-            int firmaId, 
-            [FromQuery] DateTime baslangicTarihi, 
-            [FromQuery] DateTime bitisTarihi)
+        [HttpPost]
+        [Route("getKameraHareketListByDateRange")]
+        public IActionResult getKameraHareketListByDateRange(KameraHareketDateRangeRequestDTO request)
         {
+            var response = new ServiceResponse<List<KameraHareketDTO>>();
             try
             {
                 var result = _kameraHareketManager.getKameraHareketDtoListByFirmaIdAndDateRange(
-                    firmaId, baslangicTarihi, bitisTarihi);
-                return Ok(result);
+                    request.firmaId, request.baslangicTarihi, request.bitisTarihi);
+                response.data = result;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
+            }
+        }
+
+        /// <summary>
+        /// Tüm Kamera hareket kayıtlarını listele
+        /// </summary>
+        [HttpPost]
+        [Route("getAllKameraHareketList")]
+        public IActionResult getAllKameraHareketList()
+        {
+            var response = new ServiceResponse<List<KameraHareketDTO>>();
+            try
+            {
+                // Burada manager'da getAllKameraHareketDtoList metodunu çağıracağız
+                // Şimdilik boş liste döndürüyoruz
+                response.data = new List<KameraHareketDTO>();
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
         }
 
         /// <summary>
         /// Kamera hareket kaydını sil
         /// </summary>
-        [HttpDelete("{id}")]
-        public ActionResult DeleteKameraHareket(int id)
+        [HttpPost]
+        [Route("deleteKameraHareketByEIdDto")]
+        public IActionResult deleteKameraHareketByEIdDto(EIdDTO request)
         {
+            var response = new ServiceResponse<bool>();
             try
             {
-                _kameraHareketManager.deleteKameraHareketById(id);
-                return Ok(new { message = "Kamera hareket kaydı başarıyla silindi" });
+                _kameraHareketManager.deleteKameraHareketById(request.id);
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "Kamera hareket kaydı başarıyla silindi";
+                response.data = true;
+                return Ok(response);
             }
             catch (AppException ex)
             {
-                return BadRequest(new { message = ex.appMessage, code = ex.errorCode });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = ex.appMessage;
+                return BadRequest(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Bir hata oluştu", error = ex.Message });
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = "Bir hata oluştu";
+                return StatusCode(500, response);
             }
         }
     }
