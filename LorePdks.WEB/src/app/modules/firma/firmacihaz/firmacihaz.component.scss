@@ -55,6 +55,86 @@
 
 // Log Parser Modal Stilleri
 .log-parser-content {
+  .modal-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    
+    .p-button-help {
+      background-color: #17a2b8;
+      border-color: #17a2b8;
+      
+      &:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+      }
+    }
+  }
+  
+  .usage-guide {
+    margin-bottom: 1.5rem;
+    
+    .help-panel {
+      border: 2px solid #17a2b8;
+      
+      .help-content {
+        line-height: 1.6;
+        
+        h4 {
+          color: #17a2b8;
+          margin: 1rem 0 0.5rem 0;
+          font-weight: 600;
+          
+          &:first-child {
+            margin-top: 0;
+          }
+        }
+        
+        p {
+          margin-bottom: 1rem;
+          color: #333;
+        }
+        
+        ol, ul {
+          margin-left: 1.5rem;
+          margin-bottom: 1rem;
+          
+          li {
+            margin-bottom: 0.5rem;
+            
+            strong {
+              color: #495057;
+            }
+          }
+          
+          ul {
+            margin-top: 0.5rem;
+            margin-left: 1rem;
+          }
+        }
+        
+        .example-box {
+          background-color: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 4px;
+          padding: 1rem;
+          margin-top: 1rem;
+          
+          code {
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #495057;
+          }
+          
+          strong {
+            color: #495057;
+          }
+        }
+      }
+    }
+  }
   .device-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -63,6 +143,30 @@
     p {
       margin: 0.5rem 0;
       font-size: 0.9rem;
+    }
+  }
+  
+  // Accordion z-index düzeltmesi
+  ::ng-deep p-accordion {
+    .p-accordion-tab {
+      z-index: 1 !important;
+    }
+    
+    .p-accordion-content {
+      z-index: 1 !important;
+    }
+    
+    .p-accordion-header {
+      z-index: 2 !important;
+    }
+  }
+  
+  // Dropdown'ların z-index'ini yükselt
+  ::ng-deep p-dropdown {
+    z-index: 1000 !important;
+    
+    .p-dropdown-panel {
+      z-index: 1001 !important;
     }
   }
   

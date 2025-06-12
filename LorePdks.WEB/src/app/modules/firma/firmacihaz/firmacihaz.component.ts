@@ -94,11 +94,13 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   // Test verileri
   sampleLogData = '';
   testResult: LogParserTestResultDto | null = null;
-  
-  // Loading durumları
+    // Loading durumları
   isLogParserLoading = false;
   isLogParserSaving = false;
   isLogParserTesting = false;
+  
+  // Kullanım kılavuzu
+  showLogParserHelp = false;
 
   // DataGrid kolonları
   columns: any[] = [
@@ -446,14 +448,21 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     this.loadLogParserConfig(firmaCihaz.eid);
     this.logParserModalVisible = true;
   }
-
   /**
    * Log Parser modal'ını kapatır
    */
   closeLogParserModal(): void {
     this.logParserModalVisible = false;
     this.selectedFirmaCihazForLogParser = null;
+    this.showLogParserHelp = false; // Kılavuzu da kapat
     this.resetLogParserConfig();
+  }
+
+  /**
+   * Kullanım kılavuzunu aç/kapat
+   */
+  toggleLogParserHelp(): void {
+    this.showLogParserHelp = !this.showLogParserHelp;
   }
 
   // Delimiter seçenekleri

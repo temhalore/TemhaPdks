@@ -84,7 +84,6 @@
         placeholder="Açıklama giriniz">
       </app-text-input>    </div>
   </app-modal>
-
   <!-- Log Parser Ayarları Modalı -->
   <app-modal
     [(visible)]="logParserModalVisible"
@@ -95,6 +94,67 @@
     (visibleChange)="!logParserModalVisible && closeLogParserModal()">
     
     <div class="log-parser-content">
+      <!-- Üst Başlık ve Kılavuz Butonu -->
+      <div class="modal-header-actions">
+        <button 
+          pButton 
+          type="button" 
+          [label]="showLogParserHelp ? 'Kılavuzu Gizle' : 'Nasıl Kullanılır?'" 
+          [icon]="showLogParserHelp ? 'pi pi-eye-slash' : 'pi pi-question-circle'"
+          (click)="toggleLogParserHelp()"
+          class="p-button-sm p-button-help">
+        </button>
+      </div>
+
+      <!-- Kullanım Kılavuzu -->
+      <div *ngIf="showLogParserHelp" class="usage-guide">
+        <p-panel header="📖 Log Parser Kullanım Kılavuzu" styleClass="mb-3 help-panel">
+          <div class="help-content">
+            <h4>🎯 Amaç</h4>
+            <p>Bu araç, cihazlardan gelen log verilerinin nasıl parse edileceğini tanımlamanızı sağlar. 
+               Böylece ham log verisi anlamlı bilgilere dönüştürülür.</p>
+            
+            <h4>📋 Adım Adım Kullanım</h4>
+            <ol>
+              <li><strong>Temel Ayarlar:</strong>
+                <ul>
+                  <li><strong>Delimiter:</strong> Log satırındaki verileri ayıran karakteri seçin (virgül, noktalı virgül, vs.)</li>
+                  <li><strong>Tarih/Saat Formatı:</strong> Cihazın kullandığı tarih ve saat formatını belirtin</li>
+                </ul>
+              </li>
+              <li><strong>Alan Eşlemeleri:</strong>
+                <ul>
+                  <li>Log satırındaki her veri parçasının ne anlama geldiğini tanımlayın</li>
+                  <li><strong>Pozisyon:</strong> Verinin log satırında kaçıncı sırada olduğunu belirtin (0'dan başlar)</li>
+                  <li><strong>Alan Adı:</strong> Bu veriye hangi ismi vermek istediğinizi seçin</li>
+                  <li><strong>Tip:</strong> Verinin türünü belirtin (sayı, metin, tarih, vs.)</li>
+                </ul>
+              </li>
+              <li><strong>Test:</strong>
+                <ul>
+                  <li>Örnek log satırını yapıştırın</li>
+                  <li>"Test Et" butonuna basarak ayarlarınızı doğrulayın</li>
+                  <li>Parse edilmiş sonucu kontrol edin</li>
+                </ul>
+              </li>
+              <li><strong>Kaydet:</strong> Ayarlar doğruysa "Kaydet" butonuna basın</li>
+            </ol>
+            
+            <h4>💡 Örnek</h4>
+            <div class="example-box">
+              <strong>Örnek Log Satırı:</strong><br>
+              <code>1234,10:30,060125,1,001</code><br><br>
+              
+              <strong>Alan Eşlemeleri:</strong><br>
+              • Pozisyon 0: Kullanıcı ID (1234)<br>
+              • Pozisyon 1: Saat (10:30)<br>
+              • Pozisyon 2: Tarih (060125)<br>
+              • Pozisyon 3: Hareket Tipi (1=Giriş)<br>
+              • Pozisyon 4: Cihaz ID (001)
+            </div>
+          </div>
+        </p-panel>
+      </div>
       <!-- Cihaz Bilgisi -->
       <p-panel header="Cihaz Bilgileri" styleClass="mb-3">
         <div class="device-info">
