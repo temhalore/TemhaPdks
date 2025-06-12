@@ -22,7 +22,7 @@ namespace LorePdks.DAL.Model
 		public t_kod() 
 		{
 		}
-
+        [Key]
         [Required]
         public int ID { get; set;}
         public int? TIP_ID { get; set;}

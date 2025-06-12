@@ -116,7 +116,7 @@ namespace LorePdks.DAL.Repository
                 if (con.State == ConnectionState.Closed)
                     con.Open();
 
-                var query = con.Query<T>(string.Format("select * from {0} where {1} = @ID and IsDeleted = 0", type.Name, _idField), new { ID });
+                var query = con.Query<T>(string.Format("select * from {0} where {1} = @ID and ISDELETED = 0", type.Name, _idField), new { ID });
 
                 if (query.Count() == 0)
                 {
@@ -182,7 +182,7 @@ namespace LorePdks.DAL.Repository
                 if (con.State == ConnectionState.Closed)
                     con.Open();
 
-                var query = con.Query<T>(string.Format("select * from {0} where {1} = @IsDeleted", type.Name, _isDeletedField), new { IsDeleted = 0 });
+                var query = con.Query<T>(string.Format("select * from {0} where {1} = @ISDELETED", type.Name, _isDeletedField), new { IsDeleted = 0 });
 
                 if (query.Count() == 0)
                 {
