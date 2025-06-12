@@ -10,7 +10,6 @@ export class LogParserService {
   private endpoint = 'FirmaCihaz';
 
   constructor(private apiService: ApiService) { }
-
   /**
    * Firma cihazının log parser konfigürasyonunu günceller
    * @param firmaCihazEid Firma cihazının encrypt edilmiş ID'si
@@ -19,7 +18,7 @@ export class LogParserService {
    */
   updateLogParserConfig(firmaCihazEid: string, config: LogParserConfigDto): Observable<boolean> {
     return this.apiService.post<boolean>(`${this.endpoint}/updateLogConfig`, {
-      firmaCihazEid,
+      eid: firmaCihazEid,  // Backend'de 'eid' bekleniyor
       logParserConfig: JSON.stringify(config),
       logDelimiter: config.delimiter,
       logDateFormat: config.dateFormat,
@@ -27,7 +26,6 @@ export class LogParserService {
       logFieldMapping: JSON.stringify(config.fieldMapping)
     });
   }
-
   /**
    * Log parser konfigürasyonunu test eder
    * @param config Log parser konfigürasyonu
@@ -37,16 +35,15 @@ export class LogParserService {
   testLogParserConfig(config: LogParserConfigDto, sampleLogData: string): Observable<LogParserTestResultDto> {
     return this.apiService.post<LogParserTestResultDto>(`${this.endpoint}/testLogConfig`, {
       logParserConfig: JSON.stringify(config),
-      logSample: sampleLogData
+      sampleLogData: sampleLogData  // Backend'de 'sampleLogData' bekleniyor
     });
   }
-
   /**
    * Firma cihazının log parser konfigürasyonunu getirir
    * @param firmaCihazEid Firma cihazının encrypt edilmiş ID'si
    * @returns Observable<LogParserConfigDto>
    */
   getLogParserConfig(firmaCihazEid: string): Observable<LogParserConfigDto> {
-    return this.apiService.post<LogParserConfigDto>(`${this.endpoint}/getLogConfig`, { firmaCihazEid });
+    return this.apiService.post<LogParserConfigDto>(`${this.endpoint}/getLogConfig`, { eid: firmaCihazEid });  // Backend'de 'eid' bekleniyor
   }
 }

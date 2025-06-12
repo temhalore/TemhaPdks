@@ -124,20 +124,19 @@ namespace LorePdks.API.Controllers.Firma
                 response.message = $"Log parse edilirken hata oluştu: {ex.Message}";
                 return BadRequest(response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Cihazın log parsing konfigürasyonunu günceller
         /// </summary>
         [HttpPost]
         [Route("updateLogConfig")]
-        public IActionResult updateLogConfig(FirmaCihazDTO request)
+        public IActionResult updateLogConfig([FromBody] UpdateLogConfigRequest request)
         {
             var response = new ServiceResponse<FirmaCihazDTO>();
             try
             {
-                // Mevcut cihaz bilgilerini al
-                var existingCihaz = _firmaCihazManager.getFirmaCihazDtoById(request.id, true);
+                // EIdDTO oluştur ve mevcut cihaz bilgilerini al
+                var eidDto = new EIdDTO { eid = request.eid };
+                var existingCihaz = _firmaCihazManager.getFirmaCihazDtoById(eidDto.id);
                 
                 // Log config alanlarını güncelle
                 existingCihaz.logParserConfig = request.logParserConfig;
@@ -145,7 +144,7 @@ namespace LorePdks.API.Controllers.Firma
                 existingCihaz.logDateFormat = request.logDateFormat;
                 existingCihaz.logTimeFormat = request.logTimeFormat;
                 existingCihaz.logFieldMapping = request.logFieldMapping;
-                existingCihaz.logSample = request.logSample;
+                existingCihaz.logSample = request.sampleLogData;
                 
                 // LogParserService ile konfigürasyonu doğrula
                 if (!string.IsNullOrEmpty(request.logParserConfig))
@@ -207,9 +206,7 @@ namespace LorePdks.API.Controllers.Firma
                 response.message = $"Test sırasında hata oluştu: {ex.Message}";
                 return BadRequest(response);
             }
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Cihazın log parsing konfigürasyonunu getirir
         /// </summary>
         [HttpPost]
@@ -219,7 +216,7 @@ namespace LorePdks.API.Controllers.Firma
             var response = new ServiceResponse<object>();
             try
             {
-                var firmaCihaz = _firmaCihazManager.getFirmaCihazDtoById(request.id, true);
+                var firmaCihaz = _firmaCihazManager.getFirmaCihazDtoById(request.id);
                 
                 var logConfig = new
                 {
@@ -242,12 +239,26 @@ namespace LorePdks.API.Controllers.Firma
                 response.messageType = ServiceResponseMessageType.Error;
                 response.message = ex.appMessage;
                 return BadRequest(response);
-            }            catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 response.messageType = ServiceResponseMessageType.Error;
                 response.message = $"Log konfigürasyonu getirilirken hata oluştu: {ex.Message}";
                 return BadRequest(response);
-            }        }
+            }
+        }
+    }    /// <summary>
+    /// Log konfigürasyon güncelleme request modeli
+    /// </summary>
+    public class UpdateLogConfigRequest
+    {
+        public string eid { get; set; } = "";
+        public string logParserConfig { get; set; } = "";
+        public string logDelimiter { get; set; } = "";
+        public string logDateFormat { get; set; } = "";
+        public string logTimeFormat { get; set; } = "";
+        public string logFieldMapping { get; set; } = "";
+        public string sampleLogData { get; set; } = "";
     }
 
     /// <summary>

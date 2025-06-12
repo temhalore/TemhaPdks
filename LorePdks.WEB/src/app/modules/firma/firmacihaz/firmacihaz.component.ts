@@ -635,8 +635,7 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
           alert('Konfigürasyon kaydedilirken bir hata oluştu.');
         }
       });
-  }
-  /**
+  }  /**
    * Log Parser örnek veri yükler ve akıllı alan eşlemesi oluşturur
    */
   loadLogParserSampleData(): void {
@@ -665,8 +664,25 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     // Akıllı alan eşlemesi oluştur
     this.generateSmartFieldMapping(selectedSample);
     
+    // Ayrıca temel ayarları da güncelle
+    this.updateBasicConfigForSample();
+    
     // Kullanıcıya bilgi ver
-    alert('Örnek veri yüklendi ve alan eşlemeleri otomatik oluşturuldu. Gerekirse düzenleyebilirsiniz.');
+    alert('Akıllı veri yüklendi! Temel ayarlar ve alan eşlemeleri otomatik tanımlandı. Test edebilir ve gerekirse düzenleyebilirsiniz.');
+  }
+
+  /**
+   * Örnek veriye göre temel ayarları günceller
+   */
+  private updateBasicConfigForSample(): void {
+    // Örnek veriye göre tarih ve saat formatını ayarla
+    if (this.sampleLogData.includes('060125')) { // ddMMyy formatı
+      this.logParserConfig.dateFormat = 'ddMMyy';
+    }
+    
+    if (this.sampleLogData.includes('14:00')) { // HH:mm formatı
+      this.logParserConfig.timeFormat = 'HH:mm';
+    }
   }
 
   /**
