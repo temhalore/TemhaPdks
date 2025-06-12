@@ -120,7 +120,7 @@
                   <li><strong>Delimiter:</strong> Log satırındaki verileri ayıran karakteri seçin (virgül, noktalı virgül, vs.)</li>
                   <li><strong>Tarih Formatı:</strong> Cihazın kullandığı tarih formatını dropdown'dan seçin. Örnek görüntüler ile kolay seçim yapabilirsiniz</li>
                   <li><strong>Saat Formatı:</strong> Cihazın kullandığı saat formatını dropdown'dan seçin. 24 saat veya 12 saat formatları mevcut</li>
-                  <li><strong>Örnek Veri Yükle:</strong> Seçtiğiniz delimiter'a göre otomatik örnek log satırı oluşturur</li>
+                  <li><strong>Akıllı Örnek Yükle:</strong> Seçtiğiniz delimiter'a göre örnek log verisi oluşturur ve alan eşlemelerini otomatik tanımlar</li>
                 </ul>
               </li>
               <li><strong>Alan Eşlemeleri:</strong>
@@ -230,13 +230,13 @@
                   styleClass="w-full">
                 </p-dropdown>
               </div>
-              <div class="form-item">
-                <button 
+              <div class="form-item">                <button 
                   pButton 
                   type="button" 
-                  label="Örnek Veri Yükle" 
-                  icon="pi pi-download"
+                  label="Akıllı Örnek Yükle" 
+                  icon="pi pi-bolt"
                   (click)="loadLogParserSampleData()"
+                  pTooltip="Örnek veri yükler ve alan eşlemelerini otomatik oluşturur"
                   class="p-button-secondary">
                 </button>
               </div>

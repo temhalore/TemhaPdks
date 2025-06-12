@@ -636,27 +636,114 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
         }
       });
   }
-
   /**
-   * Log Parser örnek veri yükler
+   * Log Parser örnek veri yükler ve akıllı alan eşlemesi oluşturur
    */
   loadLogParserSampleData(): void {
     const samples = {
-      csv: '1234,2025-06-12 10:30:15,GİRİŞ,1,192.168.1.100',
-      pipe: '1234|2025-06-12 10:30:15|GİRİŞ|1|192.168.1.100',
-      tab: '1234\t2025-06-12 10:30:15\tGİRİŞ\t1\t192.168.1.100'
+      csv: '00007,14:00,060125,1,001',
+      pipe: '00007|14:00|060125|1|001',
+      tab: '00007\t14:00\t060125\t1\t001'
     };
     
     const delimiter = this.logParserConfig.delimiter;
+    let selectedSample = '';
+    
     if (delimiter === ',') {
-      this.sampleLogData = samples.csv;
+      selectedSample = samples.csv;
     } else if (delimiter === '|') {
-      this.sampleLogData = samples.pipe;
-    } else if (delimiter === '\\t') {
-      this.sampleLogData = samples.tab;
+      selectedSample = samples.pipe;
+    } else if (delimiter === '\\t' || delimiter === '\t') {
+      selectedSample = samples.tab;
     } else {
-      this.sampleLogData = samples.csv;
+      selectedSample = samples.csv;
     }
+    
+    // Örnek veriyi yükle
+    this.sampleLogData = selectedSample;
+    
+    // Akıllı alan eşlemesi oluştur
+    this.generateSmartFieldMapping(selectedSample);
+    
+    // Kullanıcıya bilgi ver
+    alert('Örnek veri yüklendi ve alan eşlemeleri otomatik oluşturuldu. Gerekirse düzenleyebilirsiniz.');
+  }
+
+  /**
+   * Örnek veriye göre akıllı alan eşlemesi oluşturur
+   */
+  private generateSmartFieldMapping(sampleData: string): void {
+    // Mevcut alan eşlemelerini temizle
+    this.logParserConfig.fieldMapping = [];
+    
+    // Veriyi böl
+    let fields: string[] = [];
+    const delimiter = this.logParserConfig.delimiter;
+    
+    if (delimiter === '\\t' || delimiter === '\t') {
+      fields = sampleData.split('\t');
+    } else if (delimiter === '\\n') {
+      fields = sampleData.split('\n');
+    } else {
+      fields = sampleData.split(delimiter);
+    }
+    
+    // Her alan için akıllı tahmin yap
+    fields.forEach((field, index) => {
+      const trimmedField = field.trim();
+      let fieldName = 'alan' + (index + 1);
+      let fieldType = 'string';
+      
+      // Akıllı alan ismi ve tip tahmini
+      if (this.isNumericId(trimmedField)) {
+        fieldName = index === 0 ? 'kullaniciId' : index === 4 ? 'cihazId' : 'numericField';
+        fieldType = 'integer';
+      } else if (this.isTime(trimmedField)) {
+        fieldName = 'saat';
+        fieldType = 'string';
+      } else if (this.isDate(trimmedField)) {
+        fieldName = 'tarih';
+        fieldType = 'string';
+      } else if (this.isDirection(trimmedField)) {
+        fieldName = 'yon';
+        fieldType = 'integer';
+      }
+      
+      this.logParserConfig.fieldMapping.push({
+        name: fieldName,
+        index: index,
+        type: fieldType,
+        format: fieldType === 'datetime' ? 'dd.MM.yyyy HH:mm:ss' : undefined
+      });
+    });
+  }
+
+  /**
+   * Sayısal ID olup olmadığını kontrol eder
+   */
+  private isNumericId(value: string): boolean {
+    return /^[0-9]+$/.test(value) && value.length >= 3;
+  }
+
+  /**
+   * Saat formatında olup olmadığını kontrol eder
+   */
+  private isTime(value: string): boolean {
+    return /^[0-9]{1,2}:[0-9]{2}(:[0-9]{2})?$/.test(value);
+  }
+
+  /**
+   * Tarih formatında olup olmadığını kontrol eder
+   */
+  private isDate(value: string): boolean {
+    return /^[0-9]{6}$/.test(value) || /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value) || /^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$/.test(value);
+  }
+
+  /**
+   * Yön değeri olup olmadığını kontrol eder (0: çıkış, 1: giriş)
+   */
+  private isDirection(value: string): boolean {
+    return value === '0' || value === '1';
   }
 
   /**
