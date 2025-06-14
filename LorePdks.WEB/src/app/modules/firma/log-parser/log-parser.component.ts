@@ -49,8 +49,7 @@ interface LogParserTemplateDto {
   selector: 'app-log-parser',
   templateUrl: './log-parser.component.html',
   styleUrls: ['./log-parser.component.scss'],
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -61,8 +60,6 @@ interface LogParserTemplateDto {
     PanelModule,
     AccordionModule,
     DividerModule,
-    TextInputComponent,
-    ButtonComponent,
     SelectComponent
   ],
   providers: [MessageService]

@@ -17,6 +17,7 @@ import { FirmaComponent } from './firma.component';
 import { FirmaListeComponent } from './firma/firma.component';
 import { FirmaCihazComponent } from './firmacihaz/firmacihaz.component';
 import { FirmaKisiComponent } from './firma-kisi/firmakisi.component';
+import { LogParserComponent } from './log-parser/log-parser.component';
 
 @NgModule({
   declarations: [],
@@ -30,10 +31,13 @@ import { FirmaKisiComponent } from './firma-kisi/firmakisi.component';
     TableModule,
     TooltipModule,
     InputNumberModule,
-    DropdownModule,    FirmaComponent,
+    DropdownModule,
+    // Standalone Components
+    FirmaComponent,
     FirmaListeComponent,
     FirmaCihazComponent,
-    FirmaKisiComponent
+    FirmaKisiComponent,
+    LogParserComponent
   ]
 })
 export class FirmaModule { }
