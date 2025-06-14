@@ -9,21 +9,45 @@ import { LogParserConfigDto, LogParserTestResultDto } from '../../models/LogPars
 export class LogParserService {
   private endpoint = 'FirmaCihaz';
 
-  constructor(private apiService: ApiService) { }
-  /**
+  constructor(private apiService: ApiService) { }  /**
    * Firma cihazının log parser konfigürasyonunu günceller
    * @param firmaCihazEid Firma cihazının encrypt edilmiş ID'si
    * @param config Log parser konfigürasyonu
    * @returns Observable<boolean>
    */
   updateLogParserConfig(firmaCihazEid: string, config: LogParserConfigDto): Observable<boolean> {
+    // FieldMappings boş olmamalı
+    if (!config.fieldMapping || config.fieldMapping.length === 0) {
+      throw new Error('En az bir alan eşleşmesi gereklidir');
+    }
+
+    // Backend'in beklediği formata dönüştür
+    const backendConfig = {
+      Type: "standard",
+      Delimiter: config.delimiter,
+      DateFormat: config.dateFormat,
+      TimeFormat: config.timeFormat,
+      RegexPattern: config.regexPattern || "",
+      FieldMappings: config.fieldMapping.map(fm => ({
+        Field: fm.name,   // Backend'de Field olarak bekleniyor
+        Name: fm.name,    // Tanımlayıcı isim 
+        Position: fm.index,
+        Index: fm.index,  // Backend'de hem Position hem Index kullanılıyor
+        Type: fm.type,
+        Format: fm.format || ""
+      }))
+    };
+
+    console.log('Backend\'e gönderilecek config:', backendConfig);
+
     return this.apiService.post<boolean>(`${this.endpoint}/updateLogConfig`, {
       eid: firmaCihazEid,  // Backend'de 'eid' bekleniyor
-      logParserConfig: JSON.stringify(config),
+      logParserConfig: JSON.stringify(backendConfig),
       logDelimiter: config.delimiter,
       logDateFormat: config.dateFormat,
       logTimeFormat: config.timeFormat,
-      logFieldMapping: JSON.stringify(config.fieldMapping)
+      logFieldMapping: JSON.stringify(config.fieldMapping),
+      sampleLogData: config.sampleLogData || ""
     });
   }
   /**

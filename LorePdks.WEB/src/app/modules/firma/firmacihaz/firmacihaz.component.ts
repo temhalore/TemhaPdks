@@ -562,39 +562,88 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     this.applyTemplate(template);
     this.showTemplateSelector = false;
   }
-
   /**
    * Seçilen şablonu konfigürasyona uygular
-   */
-  applyTemplate(template: LogParserTemplateDto): void {
+   */  applyTemplate(template: LogParserTemplateDto): void {
     try {
-      // Temel ayarları uygula
-      this.logParserConfig.delimiter = template.logDelimiter;
-      this.logParserConfig.dateFormat = template.logDateFormat;
-      this.logParserConfig.timeFormat = template.logTimeFormat;
+      console.log('Şablon verileri:', template);
+
+      // Temel ayarları uygula - combobox'larda uygun değerleri bulmak için
+      // Delimiter için uyumlu seçeneği bul
+      const delimiterOption = this.delimiterOptions.find(opt => opt.value === template.logDelimiter);
+      if (delimiterOption) {
+        this.logParserConfig.delimiter = delimiterOption.value;
+      } else {
+        this.logParserConfig.delimiter = template.logDelimiter || ',';
+      }
+
+      // Tarih formatı için uyumlu seçeneği bul
+      const dateFormatOption = this.dateFormatOptions.find(opt => opt.value === template.logDateFormat);
+      if (dateFormatOption) {
+        this.logParserConfig.dateFormat = dateFormatOption.value;
+      } else {
+        this.logParserConfig.dateFormat = template.logDateFormat || 'yyyy-MM-dd';
+      }
+
+      // Saat formatı için uyumlu seçeneği bul
+      const timeFormatOption = this.timeFormatOptions.find(opt => opt.value === template.logTimeFormat);
+      if (timeFormatOption) {
+        this.logParserConfig.timeFormat = timeFormatOption.value;
+      } else {
+        this.logParserConfig.timeFormat = template.logTimeFormat || 'HH:mm:ss';
+      }
       
       // Örnek veriyi yükle
-      this.sampleLogData = template.sampleLogData;
+      this.logParserSampleData = template.sampleLogData || '';
+      this.sampleLogData = template.sampleLogData || '';
+      this.logParserConfig.sampleLogData = template.sampleLogData || '';
       
       // Field mapping'leri uygula
       if (template.logFieldMapping) {
-        const fieldMappings: FieldMappingDetail[] = JSON.parse(template.logFieldMapping);
-        
-        // Mevcut field mapping'leri temizle
-        this.logParserConfig.fieldMapping = [];
-        
-        // Yeni field mapping'leri ekle
-        fieldMappings.forEach(detail => {
-          this.logParserConfig.fieldMapping.push({
-            name: detail.fieldName,
-            index: detail.position - 1, // Backend 1-based, frontend 0-based
-            type: detail.dataType,
-            format: detail.format || ''
+        try {
+          const fieldMappings: FieldMappingDetail[] = JSON.parse(template.logFieldMapping);
+          console.log('Şablondan gelen alan eşleşmeleri:', fieldMappings);
+          
+          // Mevcut field mapping'leri temizle
+          this.logParserConfig.fieldMapping = [];
+          
+          // Yeni field mapping'leri ekle
+          fieldMappings.forEach(detail => {
+            // Her alan için uygun tip seçeneğini bul
+            const fieldTypeOption = this.fieldTypes.find(opt => opt.value === detail.dataType);
+            
+            this.logParserConfig.fieldMapping.push({
+              name: detail.fieldName,
+              index: detail.position, // Doğrudan position'ı kullanalım
+              type: fieldTypeOption ? fieldTypeOption.value : detail.dataType, // Uyumlu tip seçeneği varsa kullan
+              format: detail.format || ''
+            });
           });
-        });
+          
+          // Eğer mapping boşsa, en az bir alan ekleyelim
+          if (this.logParserConfig.fieldMapping.length === 0) {
+            this.addLogParserFieldMapping();
+          }
+        } catch (err) {
+          console.error('Field mapping JSON parse hatası:', err);
+          // Parse hatası durumunda boş bir mapping ekle
+          this.logParserConfig.fieldMapping = [];
+          this.addLogParserFieldMapping();
+        }
+      } else {
+        // Field mapping yoksa yeni bir tane ekle
+        this.logParserConfig.fieldMapping = [];
+        this.addLogParserFieldMapping();
       }
       
+      // Dropdown seçimlerini güncelle
+      this.updateDropdownSelections();
+      
+      // Change detection'ı zorlamak için kopya oluştur
+      this.logParserConfig = {...this.logParserConfig};
+      
       console.log('Şablon uygulandı:', template.templateName);
+      console.log('Güncellenmiş konfigürasyon:', JSON.stringify(this.logParserConfig));
     } catch (error) {
       console.error('Şablon uygulanırken hata oluştu:', error);
     }
@@ -704,10 +753,46 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
    */
   saveLogParserConfig(): void {
     if (!this.selectedFirmaCihazForLogParser) {
-      console.error('Seçili firma cihazı bulunamadı');
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Hata',
+        detail: 'Seçili firma cihazı bulunamadı'
+      });
       return;
     }
 
+    // Alan eşleşmelerini kontrol et ve boş alanları filtrele
+    if (this.logParserConfig.fieldMapping && this.logParserConfig.fieldMapping.length > 0) {
+      // Boş alan adlarını filtrele
+      this.logParserConfig.fieldMapping = this.logParserConfig.fieldMapping.filter(mapping => 
+        mapping.name && mapping.name.trim() !== ''
+      );
+      
+      // Field adlarını ve indexleri düzelt
+      this.logParserConfig.fieldMapping.forEach((mapping, index) => {
+        mapping.index = index; // Indexleri düzelt
+        // Tip kontrolü
+        if (!mapping.type || mapping.type.trim() === '') {
+          mapping.type = 'string'; // Default tip
+        }
+      });
+    }
+
+    // En az bir field mapping kontrolü
+    if (!this.logParserConfig.fieldMapping || this.logParserConfig.fieldMapping.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Hata',
+        detail: 'En az bir alan eşleşmesi tanımlamalısınız'
+      });
+      return;
+    }
+
+    // Örnek veriyi ekleyelim (backend'de gerekirse kullanılabilir)
+    this.logParserConfig.sampleLogData = this.sampleLogData;
+
+    console.log('Kaydediliyor...', this.logParserConfig);
+    
     this.isLogParserSaving = true;
     this.logParserService.updateLogParserConfig(this.selectedFirmaCihazForLogParser.eid, this.logParserConfig)
       .pipe(finalize(() => this.isLogParserSaving = false))
@@ -715,11 +800,30 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
         next: (result) => {
           if (result) {
             console.log('Log parser konfigürasyonu başarıyla kaydedildi');
-            // Modal'ı kapatabilir veya başarı mesajı gösterebiliriz
+            // Başarı mesajı göster
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Başarılı',
+              detail: 'Log parser konfigürasyonu başarıyla kaydedildi'
+            });
+            
+            // Firma cihaz nesnesini de güncelle
+            if (this.selectedFirmaCihazForLogParser) {
+              this.selectedFirmaCihazForLogParser.logDelimiter = this.logParserConfig.delimiter;
+              this.selectedFirmaCihazForLogParser.logDateFormat = this.logParserConfig.dateFormat;
+              this.selectedFirmaCihazForLogParser.logTimeFormat = this.logParserConfig.timeFormat;
+              this.selectedFirmaCihazForLogParser.logFieldMapping = JSON.stringify(this.logParserConfig.fieldMapping);
+              this.selectedFirmaCihazForLogParser.logSample = this.sampleLogData;
+            }
           }
         },
         error: (error) => {
           console.error('Log parser konfigürasyonu kaydedilirken hata oluştu:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: 'Log parser konfigürasyonu kaydedilirken hata oluştu: ' + (error.message || 'Bilinmeyen hata')
+          });
         }
       });
   }
@@ -1035,5 +1139,79 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
       timeFormat: this.selectedFirmaCihazForLogParser?.logTimeFormat || 'HH:mm:ss',
       fieldMapping: this.logParserConfig?.fieldMapping || []
     };
+  }
+  /**
+   * Şablon uygulandıktan sonra dropdown eşleşmelerini günceller
+   * Şablon uygulandıktan sonra zaman zaman dropdown değerleri görünmeyebilir,
+   * bu fonksiyon dropdown değerlerinin doğru şekilde gösterilmesini sağlar
+   */
+  updateDropdownSelections(): void {
+    // timeout ile Angular change detection'ı zorlamak için
+    setTimeout(() => {
+      // Delimiter güncellemesi
+      if (this.logParserConfig.delimiter) {
+        const delimiterMatch = this.delimiterOptions.find(o => o.value === this.logParserConfig.delimiter);
+        if (!delimiterMatch) {
+          // Eşleşme yoksa yeni bir seçenek ekle
+          this.delimiterOptions.push(
+            new SelectInputModel(`Özel (${this.logParserConfig.delimiter})`, this.logParserConfig.delimiter)
+          );
+        }
+      }
+
+      // Tarih formatı güncellemesi
+      if (this.logParserConfig.dateFormat) {
+        const dateFormatMatch = this.dateFormatOptions.find(o => o.value === this.logParserConfig.dateFormat);
+        if (!dateFormatMatch) {
+          // Eşleşme yoksa yeni bir seçenek ekle
+          this.dateFormatOptions.push(
+            new SelectInputModel(`Özel (${this.logParserConfig.dateFormat})`, this.logParserConfig.dateFormat)
+          );
+        }
+      }
+
+      // Saat formatı güncellemesi
+      if (this.logParserConfig.timeFormat) {
+        const timeFormatMatch = this.timeFormatOptions.find(o => o.value === this.logParserConfig.timeFormat);
+        if (!timeFormatMatch) {
+          // Eşleşme yoksa yeni bir seçenek ekle
+          this.timeFormatOptions.push(
+            new SelectInputModel(`Özel (${this.logParserConfig.timeFormat})`, this.logParserConfig.timeFormat)
+          );
+        }
+      }
+
+      // Alan eşleşmelerindeki tip güncellemeleri
+      if (this.logParserConfig.fieldMapping && this.logParserConfig.fieldMapping.length > 0) {
+        this.logParserConfig.fieldMapping.forEach(mapping => {
+          // Boş tip kontrolü
+          if (!mapping.type || mapping.type.trim() === '') {
+            mapping.type = 'string'; // Default tip ata
+          } else {
+            // Tip eşleşmesi kontrolü
+            const typeMatch = this.fieldTypes.find(o => o.value === mapping.type);
+            if (!typeMatch) {
+              // Eşleşme yoksa yeni bir seçenek ekle
+              this.fieldTypes.push(
+                new SelectInputModel(`Özel (${mapping.type})`, mapping.type)
+              );
+            }
+          }
+
+          // Alan adı boş kontrolü
+          if (!mapping.name || mapping.name.trim() === '') {
+            const predefinedOption = this.predefinedFields[0]; // İlk öntanımlı alanı seç
+            if (predefinedOption) {
+              mapping.name = predefinedOption.value;
+            } else {
+              mapping.name = 'field_' + mapping.index;
+            }
+          }
+        });
+      }
+
+      // ConfigRef'i güncelle
+      this.logParserConfig = {...this.logParserConfig};
+    }, 100);
   }
 }

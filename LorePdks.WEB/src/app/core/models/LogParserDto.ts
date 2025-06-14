@@ -8,13 +8,14 @@ export interface LogParserConfigDto {
   timeFormat: string;
   regexPattern?: string;
   fieldMapping: FieldMappingDto[];
+  sampleLogData?: string;  // Örnek log verisi
 }
 
 export interface FieldMappingDto {
-  name: string;
-  index: number;
-  type: string;
-  format?: string;
+  name: string;      // Alan adı (userId, date, time, vb.)
+  index: number;     // Pozisyon (0, 1, 2...)
+  type: string;      // Veri tipi (string, number, date, time, datetime)
+  format?: string;   // Format (hh:mm:ss, dd.MM.yyyy vb.)
 }
 
 export interface LogParserTestResultDto {
