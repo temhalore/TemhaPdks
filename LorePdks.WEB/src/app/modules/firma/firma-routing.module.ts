@@ -4,6 +4,7 @@ import { FirmaComponent } from './firma.component';
 import { FirmaListeComponent } from './firma/firma.component';
 import { FirmaCihazComponent } from './firmacihaz/firmacihaz.component';
 import { FirmaKisiComponent } from './firma-kisi/firmakisi.component';
+import { LogParserComponent } from './log-parser/log-parser.component';
 
 const routes: Routes = [
   {
@@ -23,11 +24,15 @@ const routes: Routes = [
         path: 'cihaz',
         component: FirmaCihazComponent,
         data: { title: 'Firma Cihaz Yönetimi' }
-      },
-      {
+      },      {
         path: 'kisi',
         component: FirmaKisiComponent,
         data: { title: 'Firma Kişi Yönetimi' }
+      },
+      {
+        path: 'log-parser/:eid',
+        component: LogParserComponent,
+        data: { title: 'Log Parser Ayarları' }
       }
     ]
   }

@@ -1,5 +1,7 @@
 ﻿using Castle.Components.DictionaryAdapter.Xml;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 namespace LorePdks.COMMON.Enums
 
 {
@@ -9,7 +11,6 @@ namespace LorePdks.COMMON.Enums
         {
             FIRMA_CIHAZ_TIP = 101,
             PARSE_METODU = 205,
-
             PDKS_LOG_ALANLARI = 206,
             PDKS_YON = 207,
             ALARM_TIPI = 208,
@@ -18,11 +19,90 @@ namespace LorePdks.COMMON.Enums
             FIRMA_KISI_TIP = 102,
             ROL_TIP = 103,
             KISI_TOKEN_DELETE_REASON = 901,
-            LOG_INDEX_TIP = 1
-
-
-
+            LOG_INDEX_TIP = 1,
+            LOG_ALAN_TIPI = 218,
+            LOG_TANIMLI_ALAN = 219,
+            LOG_TARIH_FORMATI = 216,
+            LOG_SAAT_FORMATI = 217,
+            LOG_AYIRICI = 215,  
         }
+ public enum LOG_AYIRICI{
+        VIRGUL=2150001,	
+	NOKTALI_VIRGUL=2150002,	
+	TAB=2150003,	
+	BOSLUK=2150004,	
+	BORU=2150005,	
+	TIRE=2150006,	
+	IKI_NOKTA=2150007,
+        }	
+		
+		
+ public enum LOG_TARIH_FORMATI{
+            YIL_AY_GUN_1 = 2160001,	
+	GUN_AY_YIL_2 = 2160002,	
+	AY_GUN_YIL_3 = 2160003,	
+	GUN_AY_YIL_4 = 2160004,	
+	AY_GUN_YIL_5 = 2160005,	
+	YIL_AY_GUN_6 = 2160006,	
+	GUN_AY_YIL_7 = 2160007,	
+	AY_GUN_YIL_8 = 2160008,	
+        }
+	
+
+
+		
+public enum LOG_SAAT_FORMATI{
+
+
+    SAAT_DAKIKA_SANIYE_1 = 2170001,	
+	SAAT_DAKIKA_2 = 2170002,
+	_12S_D_S_AM_PM_3 = 2170003,
+	_12S_D_S_AM_PM_TEK_4 = 2170004,	
+	SAAT_DAKIKA_SANIYE_5 = 2170005,	
+	SAAT_DAKIKA_SANIYE_6 = 2170006,	
+        }	
+
+		
+ public enum LOG_ALAN_TIPI{
+
+
+    METIN = 2180001,	
+	SAYI = 2180002,	
+	TARIH = 2180003,	
+	SAAT = 2180004,	
+	TARIH_SAAT = 2180005,	
+	MANTIKSAL = 2180006,	
+        }		
+
+		
+ public enum LOG_TANIMLI_ALAN{
+      KULLANICI_ID = 2190001,	
+	TARIH = 2190002,	
+	SAAT = 2190003,	
+	TARIH_SAAT = 2190004,	
+	DURUM = 2190005,	
+	ISLEM = 2190006,	
+	OLAY_KODU = 2190007,	
+	CIHAZ_ID = 2190008,	
+	KART_NO = 2190009,	
+	PERSONEL_NO = 2190010,	
+	SICIL_NO = 2190011,	
+	MESAJ = 2190012,	
+	LOG_SEVIYESI = 2190013,	
+	KAPI_ID = 2190014,	
+	YON = 2190015,	
+	IP_ADRESI = 2190016,	
+	MAC_ADRESI = 2190017,	
+	SERI_NO = 2190018,	
+	YAZILIM_SURUMU = 2190019,	
+	KONUM = 2190020,
+        }	
+
+  	
+
+
+
+
 
         public enum FIRMA_CIHAZ_TIP{
             PDKS_CIHAZI_QR = 1010001,

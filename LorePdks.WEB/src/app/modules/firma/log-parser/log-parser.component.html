@@ -1,0 +1,384 @@
+<div class="log-parser-container">
+  <!-- Başlık ve Geri Butonu -->
+  <div class="page-header">
+    <div class="page-title">
+      <h2>Log Parser Ayarları</h2>
+      <h4 *ngIf="firmaCihaz">{{ firmaCihaz.ad }} - {{ firmaCihaz.firmaCihazTipKodDto?.kisaAd }}</h4>
+    </div>
+    <div class="page-actions">
+      <button 
+        pButton 
+        type="button" 
+        [label]="showHelp ? 'Kılavuzu Gizle' : 'Nasıl Kullanılır?'" 
+        [icon]="showHelp ? 'pi pi-eye-slash' : 'pi pi-question-circle'"
+        (click)="toggleHelp()"
+        class="p-button-help p-button-sm">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Geri Dön"
+        icon="pi pi-arrow-left"
+        (click)="goBack()"
+        class="p-button-secondary p-button-sm">
+      </button>
+    </div>
+  </div>
+
+  <!-- Yükleniyor göstergesi -->
+  <div *ngIf="isLoading" class="loading-container">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    <p>Yükleniyor...</p>
+  </div>
+
+  <!-- Ana İçerik -->
+  <div *ngIf="!isLoading" class="log-parser-content">
+    <!-- Kullanım Kılavuzu -->
+    <div *ngIf="showHelp" class="usage-guide">
+      <p-panel header="📖 Log Parser Kullanım Kılavuzu" styleClass="mb-3 help-panel">
+        <div class="help-content">
+          <h4>🎯 Amaç</h4>
+          <p>Bu araç, cihazlardan gelen log verilerinin nasıl parse edileceğini tanımlamanızı sağlar. 
+             Böylece ham log verisi anlamlı bilgilere dönüştürülür.</p>
+          
+          <h4>📋 Adım Adım Kullanım</h4>
+          <ol>
+            <li><strong>Temel Ayarlar:</strong>
+              <ul>
+                <li><strong>Delimiter:</strong> Log satırındaki verileri ayıran karakteri seçin</li>
+                <li><strong>Tarih Formatı:</strong> Cihazın kullandığı tarih formatını seçin</li>
+                <li><strong>Saat Formatı:</strong> Cihazın kullandığı saat formatını seçin</li>
+              </ul>
+            </li>
+            <li><strong>Alan Eşlemeleri:</strong>
+              <ul>
+                <li>Log satırındaki her veri parçasının ne anlama geldiğini tanımlayın</li>
+                <li><strong>Pozisyon:</strong> Verinin log satırında kaçıncı sırada olduğu (0'dan başlar)</li>
+                <li><strong>Alan Adı:</strong> Bu veriye hangi isim verilecek</li>
+                <li><strong>Tip:</strong> Verinin türü (sayı, metin, tarih, vs.)</li>
+              </ul>
+            </li>
+            <li><strong>Test:</strong>
+              <ul>
+                <li>Örnek log satırını girin</li>
+                <li>"Test Et" butonuna basın</li>
+                <li>Parse edilmiş sonucu kontrol edin</li>
+              </ul>
+            </li>
+          </ol>
+          
+          <h4>💡 Örnek</h4>
+          <div class="example-box">
+            <strong>Örnek Log Satırı:</strong><br>
+            <code>1234,10:30,060125,1,001</code><br><br>
+            
+            <strong>Delimiter:</strong> Virgül (,)<br>
+            <strong>Tarih Formatı:</strong> ddMMyy (060125 = 06.01.2025)<br>
+            <strong>Saat Formatı:</strong> HH:mm (10:30)<br><br>
+            
+            <strong>Alan Eşlemeleri:</strong><br>
+            • Pozisyon 0: Kullanıcı ID (1234)<br>
+            • Pozisyon 1: Saat (10:30)<br>
+            • Pozisyon 2: Tarih (060125)<br>
+            • Pozisyon 3: Hareket Tipi (1=Giriş)<br>
+            • Pozisyon 4: Cihaz ID (001)<br>
+          </div>
+        </div>
+      </p-panel>
+    </div>
+
+    <!-- Cihaz Bilgisi -->
+    <p-panel header="Cihaz Bilgileri" styleClass="mb-3">
+      <div class="device-info">
+        <p><strong>Firma:</strong> {{firmaCihaz?.firmaDto?.ad}}</p>
+        <p><strong>Cihaz Adı:</strong> {{firmaCihaz?.ad}}</p>
+        <p><strong>Cihaz Tipi:</strong> {{firmaCihaz?.firmaCihazTipKodDto?.kisaAd}}</p>
+        <p><strong>Cihaz ID:</strong> {{firmaCihaz?.cihazMakineGercekId}}</p>
+      </div>
+    </p-panel>
+
+    <!-- TabView ile Bölümler -->
+    <p-tabView [(activeIndex)]="activeTabIndex">
+      <!-- Temel Ayarlar -->
+      <p-tabPanel header="Temel Ayarlar">
+        <div class="config-section">
+          <div class="form-row">
+            <div class="form-item">
+              <label>Delimiter:</label>              <app-select
+                title=""
+                [itemListDto$]="delimiterOptions$"
+                [(selectedValue)]="logParserConfig.delimiter"
+                placeholder="Delimiter seçin">
+              </app-select>
+            </div>
+            <div class="form-item">
+              <label>Tarih Formatı:</label>              <app-select
+                title=""
+                [itemListDto$]="dateFormatOptions$"
+                [(selectedValue)]="logParserConfig.dateFormat"
+                placeholder="Tarih formatı seçin">
+              </app-select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-item">
+              <label>Saat Formatı:</label>              <app-select
+                title=""
+                [itemListDto$]="timeFormatOptions$"
+                [(selectedValue)]="logParserConfig.timeFormat"
+                placeholder="Saat formatı seçin">
+              </app-select>
+            </div>
+            <div class="form-item">
+              <button 
+                pButton 
+                type="button" 
+                label="Akıllı Örnek Yükle" 
+                icon="pi pi-bolt"
+                (click)="loadSampleData()"
+                pTooltip="Örnek veri yükler ve alan eşlemelerini otomatik oluşturur"
+                class="p-button-secondary">
+              </button>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Alan Eşlemeleri -->
+      <p-tabPanel header="Alan Eşlemeleri">
+        <div class="field-mappings">
+          <div class="field-mapping-header">
+            <button 
+              pButton 
+              type="button" 
+              label="Yeni Alan Ekle" 
+              icon="pi pi-plus"
+              (click)="addFieldMapping()"
+              class="p-button-sm p-button-success">
+            </button>
+          </div>
+          
+          <div *ngFor="let field of logParserConfig.fieldMapping; let i = index" class="field-mapping-row">
+            <div class="field-mapping-item">
+              <label>Alan Adı:</label>
+              <app-select                title=""
+                [itemListDto$]="predefinedFields$"
+                [(selectedValue)]="field.name"
+                placeholder="Alan adı seçin">
+              </app-select>
+            </div>
+            <div class="field-mapping-item">
+              <label>Pozisyon:</label>
+              <input 
+                pInputText 
+                type="number" 
+                [(ngModel)]="field.index" 
+                class="w-full">
+            </div>
+            <div class="field-mapping-item">
+              <label>Tip:</label>
+              <app-select                title=""
+                [itemListDto$]="fieldTypes$"
+                [(selectedValue)]="field.type"
+                placeholder="Veri tipi seçin">
+              </app-select>
+            </div>
+            <div class="field-mapping-action">
+              <button 
+                pButton 
+                icon="pi pi-times" 
+                class="p-button-rounded p-button-danger p-button-sm"
+                (click)="removeFieldMapping(i)">
+              </button>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Şablonlar -->
+      <p-tabPanel header="Hazır Şablonlar">
+        <div class="template-selector">
+          <div class="template-info">
+            <p>Cihazınız için önceden hazırlanmış şablonlardan birini seçerek hızlıca başlayabilirsiniz.</p>
+            
+            <!-- Önerilen Şablonlar -->
+            <div *ngIf="getRecommendedTemplates().length > 0" class="recommended-templates">
+              <h4>📍 {{firmaCihaz?.firmaCihazTipKodDto?.kisaAd}} Cihazlar İçin Önerilen Şablonlar</h4>
+              <div class="template-grid">
+                <div 
+                  *ngFor="let template of getRecommendedTemplates()" 
+                  class="template-card recommended"
+                  [class.selected]="selectedTemplate?.templateName === template.templateName"
+                  (click)="selectTemplate(template)">
+                  <div class="template-header">
+                    <h5>{{template.templateName}}</h5>
+                    <span class="device-badge">{{template.deviceBrand}}</span>
+                  </div>
+                  <p class="template-description">{{template.description}}</p>
+                  <div class="template-details">
+                    <small>
+                      <strong>Delimiter:</strong> {{template.logDelimiter}} | 
+                      <strong>Tarih:</strong> {{template.logDateFormat}} | 
+                      <strong>Saat:</strong> {{template.logTimeFormat}}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tüm Şablonlar -->
+            <div class="all-templates">
+              <h4>📚 Tüm Şablonlar</h4>
+              <div class="template-filter-tabs">
+                <button 
+                  type="button"
+                  pButton
+                  class="p-button-sm"
+                  [class.p-button-outlined]="templateFilter !== 'ALL'"
+                  (click)="templateFilter = 'ALL'">
+                  Tümü
+                </button>
+                <button 
+                  type="button"
+                  pButton
+                  class="p-button-sm"
+                  [class.p-button-outlined]="templateFilter !== 'PDKS'"
+                  (click)="templateFilter = 'PDKS'">
+                  PDKS
+                </button>
+                <button 
+                  type="button"
+                  pButton
+                  class="p-button-sm"
+                  [class.p-button-outlined]="templateFilter !== 'ALARM'"
+                  (click)="templateFilter = 'ALARM'">
+                  Alarm
+                </button>
+                <button 
+                  type="button"
+                  pButton
+                  class="p-button-sm"
+                  [class.p-button-outlined]="templateFilter !== 'KAMERA'"
+                  (click)="templateFilter = 'KAMERA'">
+                  Kamera
+                </button>
+              </div>
+
+              <div class="template-grid">
+                <div 
+                  *ngFor="let template of getFilteredTemplates()" 
+                  class="template-card"
+                  [class.selected]="selectedTemplate?.templateName === template.templateName"
+                  (click)="selectTemplate(template)">
+                  <div class="template-header">
+                    <h5>{{template.templateName}}</h5>
+                    <span class="device-badge" [class]="'badge-' + template.deviceType.toLowerCase()">
+                      {{template.deviceType}}
+                    </span>
+                  </div>
+                  <p class="template-description">{{template.description}}</p>
+                  <div class="template-details">
+                    <small>
+                      <strong>Marka:</strong> {{template.deviceBrand}} | 
+                      <strong>Delimiter:</strong> {{template.logDelimiter}} | 
+                      <strong>Format:</strong> {{template.logDateFormat}}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Seçilen Şablon Bilgisi -->
+            <div *ngIf="selectedTemplate" class="selected-template-info">
+              <h4>✅ Seçilen Şablon: {{selectedTemplate.templateName}}</h4>
+              <p>{{selectedTemplate.description}}</p>
+              <button 
+                type="button"
+                pButton 
+                label="Şablonu Uygula"
+                icon="pi pi-check"
+                class="p-button-success p-button-sm"
+                (click)="applyTemplate(selectedTemplate)">
+              </button>
+              <button 
+                type="button"
+                pButton 
+                label="Seçimi Temizle"
+                icon="pi pi-times"
+                class="p-button-text p-button-sm"
+                (click)="selectedTemplate = null">
+              </button>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Test -->
+      <p-tabPanel header="Log Parser Test">
+        <div class="test-section">
+          <div class="form-row">
+            <div class="form-item full-width">
+              <label>Örnek Log Verisi:</label>
+              <textarea 
+                pInputTextarea 
+                [(ngModel)]="logParserSampleData" 
+                rows="5" 
+                style="width: 100%" 
+                placeholder="Buraya test etmek istediğiniz log satırlarını girin...">
+              </textarea>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button 
+              pButton 
+              type="button" 
+              label="Test Et" 
+              icon="pi pi-check"
+              [loading]="isTesting"
+              (click)="testLogParserConfig()"
+              class="p-button-success">
+            </button>
+          </div>
+          
+          <div *ngIf="testResult" class="test-result mt-3">
+            <h4>Test Sonucu:</h4>
+            <p [class.success]="testResult.success" [class.error]="!testResult.success">
+              {{ testResult.message }}
+            </p>
+            
+            <div *ngIf="testResult.success && testResult.parsedData" class="parsed-data">
+              <h5>Parse Edilmiş Veri:</h5>
+              <pre>{{ testResult.parsedData | json }}</pre>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- JSON Konfigürasyon -->
+      <p-tabPanel header="JSON Konfigürasyon">
+        <div class="json-config">
+          <p class="help-text">
+            Bu sekme, yapılandırdığınız log parser ayarlarının JSON formatını gösterir. 
+            Bu JSON, loglama sisteminde kullanılacak olan yapılandırma dosyasıdır.
+          </p>
+          
+          <pre>{{ jsonConfig }}</pre>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+
+    <!-- Kaydet Butonu -->
+    <div class="form-actions">
+      <button 
+        pButton 
+        type="button" 
+        label="Kaydet" 
+        icon="pi pi-save"
+        [loading]="isSaving"
+        (click)="saveLogParserConfig()"
+        class="p-button-primary">
+      </button>
+    </div>
+  </div>
+</div>

@@ -28,8 +28,8 @@ export class SelectComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() isRequired: boolean = false;
   @Input() multiple: boolean = false;
   @Input() itemListDto$: BehaviorSubject<SelectInputModel[]> = new BehaviorSubject<SelectInputModel[]>([]);
-  @Input() isLoading$: Observable<boolean> = of(false);
-  @Input() selectedValue: any;
+  @Input() isLoading$: Observable<boolean> = of(false);  @Input() selectedValue: any;
+  @Output() selectedValueChange = new EventEmitter<any>();
   
   @Output() selectionChange = new EventEmitter<any>();
   
@@ -67,10 +67,15 @@ export class SelectComponent implements OnInit, OnDestroy, AfterViewInit {
       this.subscription.unsubscribe();
     }
   }
-  
-  onSelectionChange(event: any): void {
+    onSelectionChange(event: any): void {
     console.log('Select component - Seçim değişti:', event);
     // event.value değerini emit et
-    this.selectionChange.emit(event.value);
+    const newValue = event.value;
+    
+    // İki yönlü bağlama için selectedValueChange'i çalıştır
+    this.selectedValueChange.emit(newValue);
+    
+    // selectionChange Event'ini de eski uyumluluk için çalıştır
+    this.selectionChange.emit(newValue);
   }
 }

@@ -315,41 +315,27 @@
         <p-accordionTab header="Temel Parser Ayarları" [selected]="true">
           <div class="config-form">
             <div class="form-row">
-              <div class="form-item">
-                <label>Delimiter:</label>
-                <p-dropdown 
-                  [options]="delimiterOptions" 
-                  [(ngModel)]="logParserConfig.delimiter"
-                  optionLabel="label" 
-                  optionValue="value"
-                  placeholder="Delimiter seçin"
-                  styleClass="w-full">
-                </p-dropdown>
-              </div>              <div class="form-item">
-                <label>Tarih Formatı:</label>
-                <p-dropdown 
-                  [options]="dateFormatOptions" 
-                  [(ngModel)]="logParserConfig.dateFormat"
-                  [editable]="true"
-                  optionLabel="label" 
-                  optionValue="value"
-                  placeholder="Tarih formatı seçin veya yazın"
-                  styleClass="w-full">
-                </p-dropdown>
+              <div class="form-item">                <label>Delimiter:</label>                <app-select
+                  title=""
+                  [itemListDto$]="delimiterOptions$"
+                  [(selectedValue)]="logParserConfig.delimiter"
+                  placeholder="Delimiter seçin">
+                </app-select>
+              </div>              <div class="form-item">                <label>Tarih Formatı:</label>                <app-select
+                  title=""
+                  [itemListDto$]="dateFormatOptions$"
+                  [(selectedValue)]="logParserConfig.dateFormat"
+                  placeholder="Tarih formatı seçin">
+                </app-select>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-item">
-                <label>Saat Formatı:</label>
-                <p-dropdown 
-                  [options]="timeFormatOptions" 
-                  [(ngModel)]="logParserConfig.timeFormat"
-                  [editable]="true"
-                  optionLabel="label" 
-                  optionValue="value"
-                  placeholder="Saat formatı seçin veya yazın"
-                  styleClass="w-full">
-                </p-dropdown>
+              <div class="form-item">                <label>Saat Formatı:</label>                <app-select
+                  title=""
+                  [itemListDto$]="timeFormatOptions$"
+                  [(selectedValue)]="logParserConfig.timeFormat"
+                  placeholder="Saat formatı seçin">
+                </app-select>
               </div>
               <div class="form-item">                <button 
                   pButton 
@@ -380,17 +366,12 @@
             </div>
             
             <div *ngFor="let field of logParserConfig.fieldMapping; let i = index" class="field-mapping-row">
-              <div class="field-mapping-item">
-                <label>Alan Adı:</label>
-                <p-dropdown 
-                  [options]="predefinedFields" 
-                  [(ngModel)]="field.name"
-                  [editable]="true"
-                  optionLabel="label" 
-                  optionValue="value"
-                  placeholder="Alan adı seçin veya yazın"
-                  styleClass="w-full">
-                </p-dropdown>
+              <div class="field-mapping-item">                <label>Alan Adı:</label>                <app-select
+                  title=""
+                  [itemListDto$]="predefinedFields$"
+                  [(selectedValue)]="field.name"
+                  placeholder="Alan adı seçin">
+                </app-select>
               </div>
               <div class="field-mapping-item">
                 <label>Pozisyon:</label>
@@ -401,14 +382,12 @@
                   class="w-full">
               </div>
               <div class="field-mapping-item">
-                <label>Tip:</label>
-                <p-dropdown 
-                  [options]="fieldTypes" 
-                  [(ngModel)]="field.type"
-                  optionLabel="label" 
-                  optionValue="value"
-                  styleClass="w-full">
-                </p-dropdown>
+                <label>Tip:</label>                <app-select
+                  title="Veri Tipi"                  title=""
+                  [itemListDto$]="fieldTypes$"
+                  [(selectedValue)]="field.type"
+                  placeholder="Veri tipi seçin">
+                </app-select>
               </div>
               <div class="field-mapping-item">
                 <label>Format:</label>

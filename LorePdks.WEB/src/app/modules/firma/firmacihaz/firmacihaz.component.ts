@@ -109,6 +109,13 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   firmaListDto$ = new BehaviorSubject<SelectInputModel[]>([]);
   cihazTipleriListDto$ = new BehaviorSubject<SelectInputModel[]>([]);
 
+  // Log parser dropdown değerleri için BehaviorSubject'ler
+  delimiterOptions$ = new BehaviorSubject<SelectInputModel[]>([]);
+  dateFormatOptions$ = new BehaviorSubject<SelectInputModel[]>([]);
+  timeFormatOptions$ = new BehaviorSubject<SelectInputModel[]>([]);
+  fieldTypes$ = new BehaviorSubject<SelectInputModel[]>([]);
+  predefinedFields$ = new BehaviorSubject<SelectInputModel[]>([]);
+
   // Seçilen firma cihaz
   selectedFirmaCihaz: FirmaCihazDto | null = null;
   firmaCihazModel: FirmaCihazDto = {} as FirmaCihazDto;
@@ -476,22 +483,37 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     } else {
       console.warn('Cihaz tipleri henüz yüklenmedi veya boş!');
     }
-  }
-  /**
+  }  /**
    * Log Parser sayfasını açar
    */
   openLogParserPage(firmaCihaz: FirmaCihazDto): void {
-    // Artık modal açacağız sayfa yönlendirmesi yerine
-    this.openLogParserModal(firmaCihaz);
+    if (!firmaCihaz || !firmaCihaz.eid) {
+      this.messageService.add({ severity: 'error', summary: 'Hata', detail: 'Cihaz bilgisi eksik!' });
+      return;
+    }
+    
+    // Yeni Log Parser sayfasına yönlendir
+    this.router.navigate(['/firma/log-parser', firmaCihaz.eid]);
   }
 
   /**
    * Log Parser modal'ını açar
-   */
-  openLogParserModal(firmaCihaz: FirmaCihazDto): void {
+   */  openLogParserModal(firmaCihaz: FirmaCihazDto): void {
+    console.log('Log parser modal açılıyor:', firmaCihaz);
+    
+    // Önce dropdown listelerini sıfırla
+    this.resetDropdownOptions();
+    
+    // Cihaz ve config bilgilerini yükle
     this.selectedFirmaCihazForLogParser = firmaCihaz;
+    
+    // Config yükleme
     this.loadLogParserConfig(firmaCihaz.eid);
-    this.loadAvailableTemplates(); // Template'leri yükle
+    
+    // Template'leri yükle
+    this.loadAvailableTemplates();
+    
+    // Modal'ı göster
     this.logParserModalVisible = true;
   }
 
@@ -620,7 +642,7 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
             });
           });
           
-          // Eğer mapping boşsa, en az bir alan ekleyelim
+          // Eğer mapping boşsa, en az bir alan ekle
           if (this.logParserConfig.fieldMapping.length === 0) {
             this.addLogParserFieldMapping();
           }
@@ -635,15 +657,22 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
         this.logParserConfig.fieldMapping = [];
         this.addLogParserFieldMapping();
       }
+        // Dropdown listelerini tamamen sıfırla ve değerlere göre yeniden oluştur
+      this.resetDropdownOptions();
       
       // Dropdown seçimlerini güncelle
-      this.updateDropdownSelections();
-      
-      // Change detection'ı zorlamak için kopya oluştur
-      this.logParserConfig = {...this.logParserConfig};
-      
-      console.log('Şablon uygulandı:', template.templateName);
-      console.log('Güncellenmiş konfigürasyon:', JSON.stringify(this.logParserConfig));
+      setTimeout(() => {
+        this.updateDropdownSelections();
+        
+        // Change detection'ı zorlamak için kopya oluştur
+        this.logParserConfig = {...this.logParserConfig};
+        
+        console.log('Şablon uygulandı:', template.templateName);
+        console.log('Güncellenmiş konfigürasyon:', JSON.stringify(this.logParserConfig));
+        
+        // Değişikliği zorlayalım
+        this.logParserConfig = { ...this.logParserConfig };
+      }, 100);
     } catch (error) {
       console.error('Şablon uygulanırken hata oluştu:', error);
     }
@@ -705,11 +734,25 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
       .subscribe({
         next: (config) => {
           if (config) {
+            console.log('Backend\'den gelen log parser config:', config);
+            
+            // Config'i yükle
             this.logParserConfig = config;
+            
+            // Örnek veriyi de göster
+            if (config.sampleLogData) {
+              this.sampleLogData = config.sampleLogData;
+              this.logParserSampleData = config.sampleLogData;
+            }
+            
             // Eğer field mapping yoksa en az bir tane ekle
             if (!this.logParserConfig.fieldMapping || this.logParserConfig.fieldMapping.length === 0) {
               this.addLogParserFieldMapping();
             }
+            
+            // Dropdown seçeneklerini güncelle
+            this.resetDropdownOptions();
+            this.updateDropdownSelections();
           }
         },
         error: (error) => {
@@ -1045,6 +1088,7 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     new SelectInputModel('DD/MM/YYYY', 'dd/MM/yyyy'),
     new SelectInputModel('MM/DD/YYYY', 'MM/dd/yyyy'),
     new SelectInputModel('DD.MM.YYYY', 'dd.MM.yyyy'),
+    new SelectInputModel('DDMMYY', 'ddMMyy'),
   ];
   
   timeFormatOptions: SelectInputModel[] = [
@@ -1073,6 +1117,7 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     new SelectInputModel('Saat', 'time'),
     new SelectInputModel('Tarih ve Saat', 'datetime'),
     new SelectInputModel('Boolean', 'boolean'),
+    new SelectInputModel('Tamsayı', 'int'),
   ];
   
   // Log parser yardım paneli için
@@ -1144,12 +1189,18 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
    * Şablon uygulandıktan sonra dropdown eşleşmelerini günceller
    * Şablon uygulandıktan sonra zaman zaman dropdown değerleri görünmeyebilir,
    * bu fonksiyon dropdown değerlerinin doğru şekilde gösterilmesini sağlar
-   */
-  updateDropdownSelections(): void {
+   */  updateDropdownSelections(): void {
+    console.log('updateDropdownSelections çağrıldı');
+    
+    // Dropdown listelerini temizle ve yeniden oluştur
+    // Bu adım combobox'lardaki empty-empty sorununu çözecektir
+    this.resetDropdownOptions();
+    
     // timeout ile Angular change detection'ı zorlamak için
     setTimeout(() => {
-      // Delimiter güncellemesi
+      // Delimiter için uyumlu seçenek var mı kontrolü
       if (this.logParserConfig.delimiter) {
+        console.log('Delimiter:', this.logParserConfig.delimiter);
         const delimiterMatch = this.delimiterOptions.find(o => o.value === this.logParserConfig.delimiter);
         if (!delimiterMatch) {
           // Eşleşme yoksa yeni bir seçenek ekle
@@ -1157,10 +1208,18 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
             new SelectInputModel(`Özel (${this.logParserConfig.delimiter})`, this.logParserConfig.delimiter)
           );
         }
+        
+        // Modelimiz için değeri açıkça ayarlayalım
+        // Bu, p-dropdown için çok önemli, "emty emty" sorununu çözer
+        const existingDelimiter = this.logParserConfig.delimiter;
+        setTimeout(() => {
+          this.logParserConfig.delimiter = existingDelimiter;
+        }, 0);
       }
 
-      // Tarih formatı güncellemesi
+      // Tarih formatı için uyumlu seçenek var mı kontrolü
       if (this.logParserConfig.dateFormat) {
+        console.log('Tarih formatı:', this.logParserConfig.dateFormat);
         const dateFormatMatch = this.dateFormatOptions.find(o => o.value === this.logParserConfig.dateFormat);
         if (!dateFormatMatch) {
           // Eşleşme yoksa yeni bir seçenek ekle
@@ -1168,10 +1227,17 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
             new SelectInputModel(`Özel (${this.logParserConfig.dateFormat})`, this.logParserConfig.dateFormat)
           );
         }
+        
+        // Modelimiz için değeri açıkça ayarlayalım
+        const existingDateFormat = this.logParserConfig.dateFormat;
+        setTimeout(() => {
+          this.logParserConfig.dateFormat = existingDateFormat;
+        }, 0);
       }
 
-      // Saat formatı güncellemesi
+      // Saat formatı için uyumlu seçenek var mı kontrolü
       if (this.logParserConfig.timeFormat) {
+        console.log('Saat formatı:', this.logParserConfig.timeFormat);
         const timeFormatMatch = this.timeFormatOptions.find(o => o.value === this.logParserConfig.timeFormat);
         if (!timeFormatMatch) {
           // Eşleşme yoksa yeni bir seçenek ekle
@@ -1179,11 +1245,18 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
             new SelectInputModel(`Özel (${this.logParserConfig.timeFormat})`, this.logParserConfig.timeFormat)
           );
         }
+        
+        // Modelimiz için değeri açıkça ayarlayalım
+        const existingTimeFormat = this.logParserConfig.timeFormat;
+        setTimeout(() => {
+          this.logParserConfig.timeFormat = existingTimeFormat;
+        }, 0);
       }
 
       // Alan eşleşmelerindeki tip güncellemeleri
       if (this.logParserConfig.fieldMapping && this.logParserConfig.fieldMapping.length > 0) {
-        this.logParserConfig.fieldMapping.forEach(mapping => {
+        console.log('Alan eşleşmeleri:', this.logParserConfig.fieldMapping);
+        this.logParserConfig.fieldMapping.forEach((mapping, index) => {
           // Boş tip kontrolü
           if (!mapping.type || mapping.type.trim() === '') {
             mapping.type = 'string'; // Default tip ata
@@ -1196,6 +1269,12 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
                 new SelectInputModel(`Özel (${mapping.type})`, mapping.type)
               );
             }
+            
+            // Modelimiz için değeri açıkça ayarlayalım
+            const existingType = mapping.type;
+            setTimeout(() => {
+              this.logParserConfig.fieldMapping[index].type = existingType;
+            }, 0);
           }
 
           // Alan adı boş kontrolü
@@ -1213,5 +1292,132 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
       // ConfigRef'i güncelle
       this.logParserConfig = {...this.logParserConfig};
     }, 100);
+  }
+  /**
+   * Dropdown seçeneklerini sıfırlayıp tekrar oluşturur.
+   * Empty-empty sorununu çözmek için
+   */  
+  resetDropdownOptions(): void {
+    console.log('resetDropdownOptions çağrıldı');
+    
+    // Delimiter seçeneklerini yeniden oluştur
+    const delimiterOptions = [
+      new SelectInputModel('Boşluk', ' '),
+      new SelectInputModel('Virgül', ','),
+      new SelectInputModel('Tab', '\t'),
+      new SelectInputModel('Noktalı Virgül', ';'),
+      new SelectInputModel('Dikey Çizgi', '|')
+    ];
+    this.delimiterOptions$.next(delimiterOptions);
+    
+    // Tarih formatı seçeneklerini yeniden oluştur
+    const dateFormatOptions = [
+      new SelectInputModel('YYYY-MM-DD', 'yyyy-MM-dd'),
+      new SelectInputModel('DD/MM/YYYY', 'dd/MM/yyyy'),
+      new SelectInputModel('MM/DD/YYYY', 'MM/dd/yyyy'),
+      new SelectInputModel('DD.MM.YYYY', 'dd.MM.yyyy'),
+      new SelectInputModel('DDMMYY', 'ddMMyy')
+    ];
+    this.dateFormatOptions$.next(dateFormatOptions);
+    
+    // Saat formatı seçeneklerini yeniden oluştur
+    const timeFormatOptions = [
+      new SelectInputModel('HH:mm:ss', 'HH:mm:ss'),
+      new SelectInputModel('HH:mm', 'HH:mm'),
+      new SelectInputModel('hh:mm:ss a', 'hh:mm:ss a'),
+      new SelectInputModel('hh:mm a', 'hh:mm a')
+    ];
+    this.timeFormatOptions$.next(timeFormatOptions);
+    
+    // Alan tipleri seçeneklerini yeniden oluştur
+    const fieldTypes = [
+      new SelectInputModel('Metin', 'string'),
+      new SelectInputModel('Sayı', 'number'),
+      new SelectInputModel('Tarih', 'date'),
+      new SelectInputModel('Saat', 'time'),
+      new SelectInputModel('Tarih ve Saat', 'datetime'),
+      new SelectInputModel('Boolean', 'boolean'),
+      new SelectInputModel('Tamsayı', 'int')
+    ];
+    this.fieldTypes$.next(fieldTypes);
+    
+    // Alan adları seçeneklerini yeniden oluştur
+    const predefinedFields = [
+      new SelectInputModel('Kullanıcı ID', 'userId'),
+      new SelectInputModel('Tarih', 'date'),
+      new SelectInputModel('Saat', 'time'),
+      new SelectInputModel('Yön (Giriş/Çıkış)', 'direction'),
+      new SelectInputModel('Cihaz ID', 'deviceId'),
+      new SelectInputModel('Alarm Tipi', 'alarmType'),
+      new SelectInputModel('Alarm Seviyesi', 'alarmLevel'),
+      new SelectInputModel('Kamera ID', 'cameraId'),
+      new SelectInputModel('Olay Tipi', 'eventType')
+    ];
+    this.predefinedFields$.next(predefinedFields);
+  }
+
+  /**
+   * Dropdown değişimlerini yakalar ve işler
+   * @param fieldName Değişen alanın adı
+   * @param event Değişim olayı
+   */
+  onDropdownChange(fieldName: string, event: any): void {
+    console.log(`${fieldName} dropdown değişti:`, event);
+    
+    // Boş değer seçilirse default değeri ata
+    if (!event.value || event.value === '') {
+      switch (fieldName) {
+        case 'delimiter':
+          this.logParserConfig.delimiter = ',';
+          break;
+        case 'dateFormat':
+          this.logParserConfig.dateFormat = 'yyyy-MM-dd';
+          break;
+        case 'timeFormat':
+          this.logParserConfig.timeFormat = 'HH:mm:ss';
+          break;
+      }
+    }
+  }
+  
+  /**
+   * Alan eşleşmelerindeki dropdown değişimlerini yakalar
+   * @param fieldType Değişen alanın tipi (name, type, vb.)
+   * @param field Değişen alan mapping nesnesi
+   * @param event Değişim olayı
+   */
+  onFieldDropdownChange(fieldType: string, field: FieldMappingDto, event: any): void {
+    console.log(`Alan ${fieldType} dropdown değişti:`, event);
+    
+    // Boş değer seçilirse default değeri ata
+    if (!event.value || event.value === '') {
+      switch (fieldType) {
+        case 'name':
+          field.name = 'field' + field.index;
+          break;
+        case 'type':
+          field.type = 'string';
+          break;
+      }
+    }
+    
+    // Özel tipte formatları otomatik ayarla
+    if (fieldType === 'type') {
+      // Date, time, datetime için uygun formatları öner
+      switch (field.type) {
+        case 'date':
+          if (!field.format) field.format = this.logParserConfig.dateFormat;
+          break;
+        case 'time':
+          if (!field.format) field.format = this.logParserConfig.timeFormat;
+          break;
+        case 'datetime':
+          if (!field.format) field.format = `${this.logParserConfig.dateFormat} ${this.logParserConfig.timeFormat}`;
+          break;
+        default:
+          // Diğer tipler için format gerekli değil
+          field.format = '';
+      }
+    }
   }
 }
