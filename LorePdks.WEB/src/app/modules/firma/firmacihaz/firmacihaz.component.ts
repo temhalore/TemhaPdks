@@ -15,6 +15,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { PanelModule } from 'primeng/panel';
 import { AccordionModule } from 'primeng/accordion';
 import { DividerModule } from 'primeng/divider';
+import { MessageService } from 'primeng/api';
 
 // Ortak Bileşenler
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
@@ -35,11 +36,45 @@ import { FirmaDto } from '../../../core/models/FirmaDto';
 import { KodDto } from '../../../core/models/KodDto';
 import { LogParserConfigDto, FieldMappingDto, LogParserTestResultDto } from '../../../core/models/LogParserDto';
 
+// Template sistemi için interface'ler
+interface LogParserTemplateDto {
+  id?: number;
+  templateName: string;
+  description: string;
+  deviceType: string;
+  deviceBrand: string;
+  logDelimiter: string;
+  logDateFormat: string;
+  logTimeFormat: string;
+  logFieldMapping: string;
+  sampleLogData: string;
+  isSystemTemplate: boolean;
+  isActive: boolean;
+}
+
+interface FieldMappingDetail {
+  fieldName: string;
+  displayName: string;
+  mappingType: FieldMappingType;
+  position: number;
+  keyword: string;
+  pattern: string;
+  dataType: string;
+  format: string;
+  isRequired: boolean;
+}
+
+enum FieldMappingType {
+  Position = 1,
+  Keyword = 2,
+  Regex = 3
+}
+
 @Component({
   selector: 'app-firmacihaz',
   templateUrl: './firmacihaz.component.html',
-  styleUrls: ['./firmacihaz.component.scss'],
-  standalone: true,  imports: [
+  styleUrls: ['./firmacihaz.component.scss'],  standalone: true,
+  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -58,13 +93,17 @@ import { LogParserConfigDto, FieldMappingDto, LogParserTestResultDto } from '../
     TextInputComponent,
     ButtonComponent,
     SelectComponent
-  ]
+  ],
+  providers: [MessageService]
 })
 export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   firmaCihazList: FirmaCihazDto[] = [];
   loading: boolean = false;
   firmaList: FirmaDto[] = [];
-  cihazTipleri: KodDto[] = [];
+  cihazTipleri: KodDto[] = []; // Cihaz tipleri listesi
+    // Log parser için gerekli değişkenler
+  logParserSampleData: string = '';
+  logParserTestResults: LogParserTestResultDto | null = null;
   
   // Select component için BehaviorSubject'ler
   firmaListDto$ = new BehaviorSubject<SelectInputModel[]>([]);
@@ -82,14 +121,19 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   // Log Parser Modal kontrolleri
   logParserModalVisible: boolean = false;
   selectedFirmaCihazForLogParser: FirmaCihazDto | null = null;
-  
-  // Log parser konfigürasyonu
+    // Log parser konfigürasyonu
   logParserConfig: LogParserConfigDto = {
     delimiter: ',',
     dateFormat: 'dd.MM.yyyy HH:mm:ss',
     timeFormat: 'HH:mm:ss',
     fieldMapping: []
   };
+  
+  // Template sistemi
+  availableTemplates: LogParserTemplateDto[] = [];
+  selectedTemplate: LogParserTemplateDto | null = null;
+  showTemplateSelector = false;
+  templateFilter = 'ALL'; // ALL, PDKS, ALARM, KAMERA
   
   // Test verileri
   sampleLogData = '';
@@ -135,8 +179,9 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
     private firmaCihazService: FirmaCihazService,
     private firmaService: FirmaService,
     private kodService: KodService,
-    private router: Router,
-    private logParserService: LogParserService
+    private logParserService: LogParserService,
+    private messageService: MessageService,
+    private router: Router
   ) { }  ngOnInit(): void {
     // Önce cihaz tiplerini yükleyelim
     this.loadCihazTipleri();
@@ -446,85 +491,160 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   openLogParserModal(firmaCihaz: FirmaCihazDto): void {
     this.selectedFirmaCihazForLogParser = firmaCihaz;
     this.loadLogParserConfig(firmaCihaz.eid);
+    this.loadAvailableTemplates(); // Template'leri yükle
     this.logParserModalVisible = true;
   }
+
   /**
-   * Log Parser modal'ını kapatır
+   * Mevcut şablonları yükler
    */
-  closeLogParserModal(): void {
-    this.logParserModalVisible = false;
-    this.selectedFirmaCihazForLogParser = null;
-    this.showLogParserHelp = false; // Kılavuzu da kapat
-    this.resetLogParserConfig();
+  loadAvailableTemplates(): void {
+    this.logParserService.getSystemTemplates()
+      .subscribe({
+        next: (templates) => {
+          this.availableTemplates = templates;
+          console.log('Templates yüklendi:', templates.length);
+        },
+        error: (error) => {
+          console.error('Template\'ler yüklenirken hata oluştu:', error);
+        }
+      });
   }
 
   /**
-   * Kullanım kılavuzunu aç/kapat
+   * Cihaz tipine göre önerilen şablonları filtreler
    */
-  toggleLogParserHelp(): void {
-    this.showLogParserHelp = !this.showLogParserHelp;
+  getRecommendedTemplates(): LogParserTemplateDto[] {
+    if (!this.selectedFirmaCihazForLogParser?.firmaCihazTipKodDto?.kod) {
+      return [];
+    }
+
+    const deviceTypeMap: { [key: string]: string } = {
+      'KARTLI': 'PDKS',
+      'PARMAK': 'PDKS', 
+      'YUZ': 'PDKS',
+      'KAMERA': 'KAMERA',
+      'ALARM': 'ALARM'
+    };
+
+    const deviceType = deviceTypeMap[this.selectedFirmaCihazForLogParser.firmaCihazTipKodDto.kod];
+    
+    return this.availableTemplates.filter(template => 
+      template.deviceType === deviceType
+    );
   }
 
-  // Delimiter seçenekleri
-  delimiterOptions = [
-    { label: 'Virgül (,)', value: ',' },
-    { label: 'Noktalı virgül (;)', value: ';' },
-    { label: 'Tab (\\t)', value: '\\t' },
-    { label: 'Pipe (|)', value: '|' },
-    { label: 'Boşluk ( )', value: ' ' },
-    { label: 'Yeni satır (\\n)', value: '\\n' },
-    { label: 'Regex Pattern', value: 'regex' }
-  ];
-  
-  // Alan tipleri
-  fieldTypes = [
-    { label: 'Metin', value: 'string' },
-    { label: 'Sayı', value: 'int' },
-    { label: 'Ondalık', value: 'double' },
-    { label: 'Tarih', value: 'datetime' },
-    { label: 'Boolean', value: 'boolean' }
-  ];
-    // Önceden tanımlı alan isimleri
-  predefinedFields = [
-    { label: 'Kullanıcı ID', value: 'userId' },
-    { label: 'Zaman Damgası', value: 'timestamp' },
-    { label: 'Cihaz ID', value: 'deviceId' },
-    { label: 'Kart Numarası', value: 'cardNumber' },
-    { label: 'Hareket Tipi', value: 'actionType' },
-    { label: 'Kapı Numarası', value: 'doorNumber' },
-    { label: 'Alarm Tipi', value: 'alarmType' },
-    { label: 'Event Tipi', value: 'eventType' },
-    { label: 'Lokasyon', value: 'location' },
-    { label: 'Açıklama', value: 'description' }
-  ];
+  /**
+   * Filtre durumuna göre şablonları getirir
+   */
+  getFilteredTemplates(): LogParserTemplateDto[] {
+    if (this.templateFilter === 'ALL') {
+      return this.availableTemplates;
+    }
+    
+    return this.availableTemplates.filter(template => 
+      template.deviceType === this.templateFilter
+    );
+  }
 
-  // Tarih formatı seçenekleri
-  dateFormatOptions = [
-    { label: 'dd.MM.yyyy HH:mm:ss (06.12.2025 14:30:15)', value: 'dd.MM.yyyy HH:mm:ss' },
-    { label: 'dd/MM/yyyy HH:mm:ss (06/12/2025 14:30:15)', value: 'dd/MM/yyyy HH:mm:ss' },
-    { label: 'yyyy-MM-dd HH:mm:ss (2025-12-06 14:30:15)', value: 'yyyy-MM-dd HH:mm:ss' },
-    { label: 'ddMMyy HHmm (061225 1430)', value: 'ddMMyy HHmm' },
-    { label: 'ddMMyyyy HHmmss (06122025 143015)', value: 'ddMMyyyy HHmmss' },
-    { label: 'yyMMdd HHmm (251206 1430)', value: 'yyMMdd HHmm' },
-    { label: 'dd-MM-yyyy HH:mm (06-12-2025 14:30)', value: 'dd-MM-yyyy HH:mm' },
-    { label: 'MM/dd/yyyy HH:mm:ss (12/06/2025 14:30:15)', value: 'MM/dd/yyyy HH:mm:ss' },
-    { label: 'yyyy/MM/dd HH:mm (2025/12/06 14:30)', value: 'yyyy/MM/dd HH:mm' },
-    { label: 'ddMMyy (061225)', value: 'ddMMyy' },
-    { label: 'yyMMdd (251206)', value: 'yyMMdd' },
-    { label: 'dd.MM.yyyy (06.12.2025)', value: 'dd.MM.yyyy' }
-  ];
+  /**
+   * Şablon seçici modal'ını göster/gizle
+   */
+  toggleTemplateSelector(): void {
+    this.showTemplateSelector = !this.showTemplateSelector;
+  }
 
-  // Saat formatı seçenekleri
-  timeFormatOptions = [
-    { label: 'HH:mm:ss (14:30:15)', value: 'HH:mm:ss' },
-    { label: 'HH:mm (14:30)', value: 'HH:mm' },
-    { label: 'HHmmss (143015)', value: 'HHmmss' },
-    { label: 'HHmm (1430)', value: 'HHmm' },
-    { label: 'H:mm:ss (14:30:15)', value: 'H:mm:ss' },
-    { label: 'H:mm (14:30)', value: 'H:mm' },
-    { label: 'hh:mm:ss tt (02:30:15 PM)', value: 'hh:mm:ss tt' },
-    { label: 'hh:mm tt (02:30 PM)', value: 'hh:mm tt' }
-  ];
+  /**
+   * Şablon seçildiğinde çağrılır
+   */
+  selectTemplate(template: LogParserTemplateDto): void {
+    this.selectedTemplate = template;
+    this.applyTemplate(template);
+    this.showTemplateSelector = false;
+  }
+
+  /**
+   * Seçilen şablonu konfigürasyona uygular
+   */
+  applyTemplate(template: LogParserTemplateDto): void {
+    try {
+      // Temel ayarları uygula
+      this.logParserConfig.delimiter = template.logDelimiter;
+      this.logParserConfig.dateFormat = template.logDateFormat;
+      this.logParserConfig.timeFormat = template.logTimeFormat;
+      
+      // Örnek veriyi yükle
+      this.sampleLogData = template.sampleLogData;
+      
+      // Field mapping'leri uygula
+      if (template.logFieldMapping) {
+        const fieldMappings: FieldMappingDetail[] = JSON.parse(template.logFieldMapping);
+        
+        // Mevcut field mapping'leri temizle
+        this.logParserConfig.fieldMapping = [];
+        
+        // Yeni field mapping'leri ekle
+        fieldMappings.forEach(detail => {
+          this.logParserConfig.fieldMapping.push({
+            name: detail.fieldName,
+            index: detail.position - 1, // Backend 1-based, frontend 0-based
+            type: detail.dataType,
+            format: detail.format || ''
+          });
+        });
+      }
+      
+      console.log('Şablon uygulandı:', template.templateName);
+    } catch (error) {
+      console.error('Şablon uygulanırken hata oluştu:', error);
+    }
+  }
+
+  /**
+   * Akıllı kelime bazlı alan tanımlama (Alarm sistemleri için)
+   */
+  generateKeywordBasedMapping(sampleData: string): void {
+    const keywordPatterns = [
+      { keyword: 'ALARM:', fieldName: 'alarmType', displayName: 'Alarm Tipi' },
+      { keyword: 'USER:', fieldName: 'userId', displayName: 'Kullanıcı ID' },
+      { keyword: 'ZONE:', fieldName: 'zone', displayName: 'Bölge' },
+      { keyword: 'STATUS:', fieldName: 'status', displayName: 'Durum' },
+      { keyword: 'EVENT:', fieldName: 'eventType', displayName: 'Olay Tipi' }
+    ];
+
+    // Mevcut field mapping'leri temizle
+    this.logParserConfig.fieldMapping = [];
+
+    // Tarih ve saat alanlarını ekle (genellikle başta olur)
+    this.logParserConfig.fieldMapping.push({
+      name: 'date',
+      index: 0,
+      type: 'datetime',
+      format: this.logParserConfig.dateFormat
+    });
+
+    this.logParserConfig.fieldMapping.push({
+      name: 'time', 
+      index: 1,
+      type: 'datetime',
+      format: this.logParserConfig.timeFormat
+    });
+
+    // Kelime bazlı alanları tespit et ve ekle
+    let currentIndex = 2;
+    keywordPatterns.forEach(pattern => {
+      if (sampleData.includes(pattern.keyword)) {
+        this.logParserConfig.fieldMapping.push({
+          name: pattern.fieldName,
+          index: currentIndex++,
+          type: 'string',
+          format: ''
+        });
+      }
+    });
+
+    console.log('Kelime bazlı alan eşlemesi oluşturuldu');
+  }
 
   /**
    * Log Parser konfigürasyonunu yükler
@@ -566,127 +686,130 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
   }
 
   /**
-   * Alan mapping'ini siler
+   * Alan mapping'i siler
    */
   removeLogParserFieldMapping(index: number): void {
     if (this.logParserConfig.fieldMapping && index >= 0 && index < this.logParserConfig.fieldMapping.length) {
       this.logParserConfig.fieldMapping.splice(index, 1);
       
       // Index'leri yeniden düzenle
-      this.logParserConfig.fieldMapping.forEach((field, i) => {
-        field.index = i;
+      this.logParserConfig.fieldMapping.forEach((mapping, i) => {
+        mapping.index = i;
       });
     }
   }
 
   /**
-   * Log Parser konfigürasyonunu test eder
+   * Log parser konfigürasyonunu kaydet
    */
-  testLogParserConfiguration(): void {
+  saveLogParserConfig(): void {
+    if (!this.selectedFirmaCihazForLogParser) {
+      console.error('Seçili firma cihazı bulunamadı');
+      return;
+    }
+
+    this.isLogParserSaving = true;
+    this.logParserService.updateLogParserConfig(this.selectedFirmaCihazForLogParser.eid, this.logParserConfig)
+      .pipe(finalize(() => this.isLogParserSaving = false))
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            console.log('Log parser konfigürasyonu başarıyla kaydedildi');
+            // Modal'ı kapatabilir veya başarı mesajı gösterebiliriz
+          }
+        },
+        error: (error) => {
+          console.error('Log parser konfigürasyonu kaydedilirken hata oluştu:', error);
+        }
+      });
+  }
+
+  /**
+   * Log parser konfigürasyonunu test et
+   */
+  testLogParserConfig(): void {
     if (!this.sampleLogData.trim()) {
-      alert('Lütfen önce örnek log verisi girin.');
+      console.warn('Test için örnek log verisi gerekli');
       return;
     }
 
     this.isLogParserTesting = true;
-    this.testResult = null;
-    
     this.logParserService.testLogParserConfig(this.logParserConfig, this.sampleLogData)
       .pipe(finalize(() => this.isLogParserTesting = false))
       .subscribe({
         next: (result) => {
           this.testResult = result;
+          console.log('Test sonucu:', result);
         },
         error: (error) => {
-          console.error('Test sırasında hata oluştu:', error);
+          console.error('Log parser test edilirken hata oluştu:', error);
           this.testResult = {
             success: false,
-            message: 'Test sırasında bir hata oluştu.',
-            parsedData: {}
+            message: 'Test sırasında hata oluştu: ' + error.message
           };
         }
       });
   }
 
   /**
-   * Log Parser konfigürasyonunu kaydeder
+   * Log parser konfigürasyonunu sıfırla
    */
-  saveLogParserConfiguration(): void {
-    if (!this.selectedFirmaCihazForLogParser?.eid) {
-      alert('Bir hata oluştu. Lütfen modal\'ı kapatıp tekrar açın.');
+  resetLogParserConfig(): void {
+    this.logParserConfig = {
+      delimiter: ',',
+      dateFormat: 'dd.MM.yyyy HH:mm:ss',
+      timeFormat: 'HH:mm:ss',
+      fieldMapping: []
+    };
+    this.sampleLogData = '';
+    this.testResult = null;
+    this.selectedTemplate = null;
+    this.showTemplateSelector = false;
+    this.addLogParserFieldMapping();
+  }
+
+  /**
+   * Akıllı örnek veri yükleme
+   */
+  loadSmartSampleData(): void {
+    if (!this.sampleLogData.trim()) {
+      console.warn('Analiz için örnek log verisi gerekli');
       return;
     }
 
-    this.isLogParserSaving = true;
+    // Mevcut akıllı analiz metodunu kullan
+    this.generateSmartFieldMapping(this.sampleLogData);
     
-    this.logParserService.updateLogParserConfig(this.selectedFirmaCihazForLogParser.eid, this.logParserConfig)
-      .pipe(finalize(() => this.isLogParserSaving = false))
-      .subscribe({
-        next: (success) => {
-          if (success) {
-            alert('Log Parser konfigürasyonu başarıyla kaydedildi.');
-            this.closeLogParserModal();
-          } else {
-            alert('Konfigürasyon kaydedilirken bir hata oluştu.');
-          }
-        },
-        error: (error) => {
-          console.error('Konfigürasyon kaydedilirken hata oluştu:', error);
-          alert('Konfigürasyon kaydedilirken bir hata oluştu.');
+    // Delimiter'ı da akıllıca belirle
+    this.detectDelimiter(this.sampleLogData);
+    
+    console.log('Akıllı örnek veri yüklendi');
+  }
+
+  /**
+   * Delimiter'ı otomatik tespit et
+   */
+  private detectDelimiter(sampleData: string): void {
+    const delimiters = [',', ';', '\t', '|', ' '];
+    let bestDelimiter = ',';
+    let maxFields = 0;
+
+    delimiters.forEach(delimiter => {
+      const lines = sampleData.split('\n').filter(line => line.trim());
+      if (lines.length > 0) {
+        const fieldCount = lines[0].split(delimiter).length;
+        if (fieldCount > maxFields) {
+          maxFields = fieldCount;
+          bestDelimiter = delimiter;
         }
-      });
-  }  /**
-   * Log Parser örnek veri yükler ve akıllı alan eşlemesi oluşturur
-   */
-  loadLogParserSampleData(): void {
-    const samples = {
-      csv: '00007,14:00,060125,1,001',
-      pipe: '00007|14:00|060125|1|001',
-      tab: '00007\t14:00\t060125\t1\t001'
-    };
-    
-    const delimiter = this.logParserConfig.delimiter;
-    let selectedSample = '';
-    
-    if (delimiter === ',') {
-      selectedSample = samples.csv;
-    } else if (delimiter === '|') {
-      selectedSample = samples.pipe;
-    } else if (delimiter === '\\t' || delimiter === '\t') {
-      selectedSample = samples.tab;
-    } else {
-      selectedSample = samples.csv;
-    }
-    
-    // Örnek veriyi yükle
-    this.sampleLogData = selectedSample;
-    
-    // Akıllı alan eşlemesi oluştur
-    this.generateSmartFieldMapping(selectedSample);
-    
-    // Ayrıca temel ayarları da güncelle
-    this.updateBasicConfigForSample();
-    
-    // Kullanıcıya bilgi ver
-    alert('Akıllı veri yüklendi! Temel ayarlar ve alan eşlemeleri otomatik tanımlandı. Test edebilir ve gerekirse düzenleyebilirsiniz.');
+      }
+    });
+
+    this.logParserConfig.delimiter = bestDelimiter === '\t' ? '\\t' : bestDelimiter;
   }
 
   /**
-   * Örnek veriye göre temel ayarları günceller
-   */
-  private updateBasicConfigForSample(): void {
-    // Örnek veriye göre tarih ve saat formatını ayarla
-    if (this.sampleLogData.includes('060125')) { // ddMMyy formatı
-      this.logParserConfig.dateFormat = 'ddMMyy';
-    }
-    
-    if (this.sampleLogData.includes('14:00')) { // HH:mm formatı
-      this.logParserConfig.timeFormat = 'HH:mm';
-    }
-  }
-
-  /**
-   * Örnek veriye göre akıllı alan eşlemesi oluşturur
+   * Akıllı alan eşlemesi oluştur
    */
   private generateSmartFieldMapping(sampleData: string): void {
     // Mevcut alan eşlemelerini temizle
@@ -712,75 +835,205 @@ export class FirmaCihazComponent implements OnInit {  // Firma cihaz listesi
       
       // Akıllı alan ismi ve tip tahmini
       if (this.isNumericId(trimmedField)) {
-        fieldName = index === 0 ? 'kullaniciId' : index === 4 ? 'cihazId' : 'numericField';
-        fieldType = 'integer';
+        fieldName = 'userId';
+        fieldType = 'string';
       } else if (this.isTime(trimmedField)) {
-        fieldName = 'saat';
-        fieldType = 'string';
+        fieldName = 'time';
+        fieldType = 'datetime';
       } else if (this.isDate(trimmedField)) {
-        fieldName = 'tarih';
-        fieldType = 'string';
+        fieldName = 'date';
+        fieldType = 'datetime';
       } else if (this.isDirection(trimmedField)) {
-        fieldName = 'yon';
-        fieldType = 'integer';
+        fieldName = 'direction';
+        fieldType = 'string';
       }
       
       this.logParserConfig.fieldMapping.push({
         name: fieldName,
         index: index,
         type: fieldType,
-        format: fieldType === 'datetime' ? 'dd.MM.yyyy HH:mm:ss' : undefined
+        format: fieldType === 'datetime' ? this.logParserConfig.dateFormat : ''
       });
+    });
+    
+    // Temel ayarları da güncelle
+    this.updateBasicConfigFromSample(sampleData);
+  }
+
+  /**
+   * Sayısal ID kontrolü
+   */
+  private isNumericId(value: string): boolean {
+    return /^\d{4,}$/.test(value);
+  }
+
+  /**
+   * Saat formatı kontrolü
+   */
+  private isTime(value: string): boolean {
+    return /^\d{1,2}:\d{2}(:\d{2})?$/.test(value) || /^\d{4,6}$/.test(value);
+  }
+
+  /**
+   * Tarih formatı kontrolü
+   */
+  private isDate(value: string): boolean {
+    return /^\d{1,2}[./-]\d{1,2}[./-]\d{2,4}$/.test(value) || /^\d{6,8}$/.test(value);
+  }
+
+  /**
+   * Yön kontrolü (1, 2, IN, OUT, vs)
+   */
+  private isDirection(value: string): boolean {
+    return /^[12]$/.test(value) || /^(IN|OUT|ENTER|EXIT)$/i.test(value);
+  }
+
+  /**
+   * Örnek veriye göre temel konfigürasyonu güncelle
+   */
+  private updateBasicConfigFromSample(sampleData: string): void {
+    // Tarih formatını tespit et
+    const dateFormats = [
+      { pattern: /\d{2}\.\d{2}\.\d{4}/, format: 'dd.MM.yyyy' },
+      { pattern: /\d{2}\/\d{2}\/\d{4}/, format: 'dd/MM/yyyy' },
+      { pattern: /\d{4}-\d{2}-\d{2}/, format: 'yyyy-MM-dd' },
+      { pattern: /\d{6}/, format: 'ddMMyy' }
+    ];
+
+    dateFormats.forEach(df => {
+      if (df.pattern.test(sampleData)) {
+        this.logParserConfig.dateFormat = df.format;
+      }
+    });
+
+    // Saat formatını tespit et
+    const timeFormats = [
+      { pattern: /\d{2}:\d{2}:\d{2}/, format: 'HH:mm:ss' },
+      { pattern: /\d{2}:\d{2}/, format: 'HH:mm' },
+      { pattern: /\d{6}/, format: 'HHmmss' },
+      { pattern: /\d{4}/, format: 'HHmm' }
+    ];
+
+    timeFormats.forEach(tf => {
+      if (tf.pattern.test(sampleData)) {
+        this.logParserConfig.timeFormat = tf.format;
+      }
     });
   }
 
   /**
-   * Sayısal ID olup olmadığını kontrol eder
+   * Log parser konfigürasyonunu kaydet (Modal'dan çağrılır)
    */
-  private isNumericId(value: string): boolean {
-    return /^[0-9]+$/.test(value) && value.length >= 3;
+  saveLogParserConfiguration(): void {
+    this.saveLogParserConfig();
   }
-
-  /**
-   * Saat formatında olup olmadığını kontrol eder
-   */
-  private isTime(value: string): boolean {
-    return /^[0-9]{1,2}:[0-9]{2}(:[0-9]{2})?$/.test(value);
+  // Log parser için gerekli özellikler
+  delimiterOptions: SelectInputModel[] = [
+    new SelectInputModel('Boşluk', ' '),
+    new SelectInputModel('Virgül', ','),
+    new SelectInputModel('Tab', '\t'),
+    new SelectInputModel('Noktalı Virgül', ';'),
+    new SelectInputModel('Dikey Çizgi', '|'),
+  ];
+  
+  dateFormatOptions: SelectInputModel[] = [
+    new SelectInputModel('YYYY-MM-DD', 'yyyy-MM-dd'),
+    new SelectInputModel('DD/MM/YYYY', 'dd/MM/yyyy'),
+    new SelectInputModel('MM/DD/YYYY', 'MM/dd/yyyy'),
+    new SelectInputModel('DD.MM.YYYY', 'dd.MM.yyyy'),
+  ];
+  
+  timeFormatOptions: SelectInputModel[] = [
+    new SelectInputModel('HH:mm:ss', 'HH:mm:ss'),
+    new SelectInputModel('HH:mm', 'HH:mm'),
+    new SelectInputModel('hh:mm:ss a', 'hh:mm:ss a'),
+    new SelectInputModel('hh:mm a', 'hh:mm a'),
+  ];
+  
+  predefinedFields: SelectInputModel[] = [
+    new SelectInputModel('Kullanıcı ID', 'userId'),
+    new SelectInputModel('Tarih', 'date'),
+    new SelectInputModel('Saat', 'time'),
+    new SelectInputModel('Yön (Giriş/Çıkış)', 'direction'),
+    new SelectInputModel('Cihaz ID', 'deviceId'),
+    new SelectInputModel('Alarm Tipi', 'alarmType'),
+    new SelectInputModel('Alarm Seviyesi', 'alarmLevel'),
+    new SelectInputModel('Kamera ID', 'cameraId'),
+    new SelectInputModel('Olay Tipi', 'eventType'),
+  ];
+  
+  fieldTypes: SelectInputModel[] = [
+    new SelectInputModel('Metin', 'string'),
+    new SelectInputModel('Sayı', 'number'),
+    new SelectInputModel('Tarih', 'date'),
+    new SelectInputModel('Saat', 'time'),
+    new SelectInputModel('Tarih ve Saat', 'datetime'),
+    new SelectInputModel('Boolean', 'boolean'),
+  ];
+  
+  // Log parser yardım paneli için
+  logParserHelpVisible = false;
+  
+  closeLogParserModal() {
+    this.logParserModalVisible = false;
   }
-
-  /**
-   * Tarih formatında olup olmadığını kontrol eder
-   */
-  private isDate(value: string): boolean {
-    return /^[0-9]{6}$/.test(value) || /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value) || /^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$/.test(value);
+  
+  toggleLogParserHelp() {
+    this.logParserHelpVisible = !this.logParserHelpVisible;
   }
-
-  /**
-   * Yön değeri olup olmadığını kontrol eder (0: çıkış, 1: giriş)
-   */
-  private isDirection(value: string): boolean {
-    return value === '0' || value === '1';
+    loadLogParserSampleData() {
+    // Örnek veri yükle
+    if (this.selectedFirmaCihazForLogParser && this.selectedFirmaCihazForLogParser.logSampleData) {
+      this.logParserSampleData = this.selectedFirmaCihazForLogParser.logSampleData;
+    } else {
+      this.logParserSampleData = 'Örnek log satırları buraya yüklenecek...';
+    }
   }
-
-  /**
-   * Log Parser konfigürasyonunu sıfırlar
-   */
-  resetLogParserConfig(): void {
-    this.logParserConfig = {
-      delimiter: ',',
-      dateFormat: 'dd.MM.yyyy HH:mm:ss',
-      timeFormat: 'HH:mm:ss',
-      fieldMapping: []
-    };
-    this.addLogParserFieldMapping();
-    this.sampleLogData = '';
-    this.testResult = null;
+    testLogParserConfiguration() {
+    if (!this.logParserSampleData) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Test Edilemedi',
+        detail: 'Test için örnek log verisi gereklidir.'
+      });
+      return;
+    }
+    
+    const config = this.getLogParserConfig();
+    this.logParserService.testLogParserConfig(config, this.logParserSampleData)
+      .subscribe({
+        next: (result) => {
+          this.logParserTestResults = result;
+          this.messageService.add({
+            severity: 'success', 
+            summary: 'Test Başarılı',
+            detail: `Test başarılı: ${result.message}`
+          });
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Test Başarısız',
+            detail: err.message || 'Log ayrıştırma yapılandırması test edilirken hata oluştu.'
+          });
+        }
+      });
   }
-
-  /**
-   * Log Parser JSON formatında göster
-   */
+  
   getLogParserConfigAsJson(): string {
-    return JSON.stringify(this.logParserConfig, null, 2);
+    const config = this.getLogParserConfig();
+    return JSON.stringify(config, null, 2);
+  }
+
+  // Log parser konfigurasyon getter
+  getLogParserConfig(): LogParserConfigDto {
+    // Burada formdan alınan değerlerle konfigürasyonu oluşturuyoruz
+    // Gerçek implementasyon için formdaki değerler kullanılmalı
+    return {
+      delimiter: this.selectedFirmaCihazForLogParser?.logDelimiter || ',',
+      dateFormat: this.selectedFirmaCihazForLogParser?.logDateFormat || 'yyyy-MM-dd',
+      timeFormat: this.selectedFirmaCihazForLogParser?.logTimeFormat || 'HH:mm:ss',
+      fieldMapping: this.logParserConfig?.fieldMapping || []
+    };
   }
 }

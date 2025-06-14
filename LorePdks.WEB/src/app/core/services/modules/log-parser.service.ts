@@ -46,4 +46,39 @@ export class LogParserService {
   getLogParserConfig(firmaCihazEid: string): Observable<LogParserConfigDto> {
     return this.apiService.post<LogParserConfigDto>(`${this.endpoint}/getLogConfig`, { eid: firmaCihazEid });  // Backend'de 'eid' bekleniyor
   }
+
+  /**
+   * Sistem şablonlarını getirir
+   * @returns Observable<any[]>
+   */
+  getSystemTemplates(): Observable<any[]> {
+    return this.apiService.get<any[]>(`${this.endpoint}/getSystemTemplates`);
+  }
+
+  /**
+   * Cihaz tipine göre şablonları getirir
+   * @param deviceType Cihaz tipi (PDKS, ALARM, KAMERA)
+   * @returns Observable<any[]>
+   */
+  getTemplatesByDeviceType(deviceType: string): Observable<any[]> {
+    return this.apiService.get<any[]>(`${this.endpoint}/getTemplatesByDeviceType/${deviceType}`);
+  }
+
+  /**
+   * Şablondan konfigürasyon oluşturur
+   * @param templateId Şablon ID'si
+   * @returns Observable<string>
+   */
+  createConfigFromTemplate(templateId: number): Observable<string> {
+    return this.apiService.get<string>(`${this.endpoint}/createConfigFromTemplate/${templateId}`);
+  }
+
+  /**
+   * Akıllı örnek veri analizi yapar
+   * @param sampleData Örnek log verisi
+   * @returns Observable<any>
+   */
+  analyzeSampleData(sampleData: string): Observable<any> {
+    return this.apiService.post<any>(`${this.endpoint}/analyzeSampleData`, { sampleData });
+  }
 }

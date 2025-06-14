@@ -11,4 +11,13 @@ export class FirmaCihazDto extends baseDto {
   firmaCihazTipKodDto: KodDto;
   ad: string;
   aciklama: string;
+  
+  // Log Parser özellikleri
+  logParserConfig?: string;
+  logDelimiter?: string;
+  logDateFormat?: string;
+  logTimeFormat?: string;
+  logFieldMapping?: string;
+  logSample?: string;
+  logSampleData?: string;
 }

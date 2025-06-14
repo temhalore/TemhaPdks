@@ -186,10 +186,131 @@
           <p><strong>Cihaz Tipi:</strong> {{selectedFirmaCihazForLogParser?.firmaCihazTipKodDto?.kisaAd}}</p>
           <p><strong>Cihaz ID:</strong> {{selectedFirmaCihazForLogParser?.cihazMakineGercekId}}</p>
         </div>
-      </p-panel>
-
-      <!-- Konfigürasyon Formu -->
+      </p-panel>      <!-- Konfigürasyon Formu -->
       <p-accordion>
+        <!-- Template Seçici -->
+        <p-accordionTab header="🎯 Hazır Şablonlar" [selected]="false">
+          <div class="template-selector">
+            <div class="template-info">
+              <p>Cihazınız için önceden hazırlanmış şablonlardan birini seçerek hızlıca başlayabilirsiniz.</p>
+              
+              <!-- Önerilen Şablonlar -->
+              <div *ngIf="getRecommendedTemplates().length > 0" class="recommended-templates">
+                <h4>📍 {{selectedFirmaCihazForLogParser?.firmaCihazTipKodDto?.kisaAd}} Cihazlar İçin Önerilen Şablonlar</h4>
+                <div class="template-grid">
+                  <div 
+                    *ngFor="let template of getRecommendedTemplates()" 
+                    class="template-card recommended"
+                    [class.selected]="selectedTemplate?.templateName === template.templateName"
+                    (click)="selectTemplate(template)">
+                    <div class="template-header">
+                      <h5>{{template.templateName}}</h5>
+                      <span class="device-badge">{{template.deviceBrand}}</span>
+                    </div>
+                    <p class="template-description">{{template.description}}</p>
+                    <div class="template-details">
+                      <small>
+                        <strong>Delimiter:</strong> {{template.logDelimiter}} | 
+                        <strong>Tarih:</strong> {{template.logDateFormat}} | 
+                        <strong>Saat:</strong> {{template.logTimeFormat}}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tüm Şablonlar -->
+              <div class="all-templates">
+                <h4>📚 Tüm Şablonlar</h4>
+                <div class="template-filter-tabs">
+                  <button 
+                    type="button"
+                    pButton
+                    class="p-button-sm"
+                    [class.p-button-outlined]="templateFilter !== 'ALL'"
+                    (click)="templateFilter = 'ALL'">
+                    Tümü
+                  </button>
+                  <button 
+                    type="button"
+                    pButton
+                    class="p-button-sm"
+                    [class.p-button-outlined]="templateFilter !== 'PDKS'"
+                    (click)="templateFilter = 'PDKS'">
+                    PDKS
+                  </button>
+                  <button 
+                    type="button"
+                    pButton
+                    class="p-button-sm"
+                    [class.p-button-outlined]="templateFilter !== 'ALARM'"
+                    (click)="templateFilter = 'ALARM'">
+                    Alarm
+                  </button>
+                  <button 
+                    type="button"
+                    pButton
+                    class="p-button-sm"
+                    [class.p-button-outlined]="templateFilter !== 'KAMERA'"
+                    (click)="templateFilter = 'KAMERA'">
+                    Kamera
+                  </button>
+                </div>
+
+                <div class="template-grid">
+                  <div 
+                    *ngFor="let template of getFilteredTemplates()" 
+                    class="template-card"
+                    [class.selected]="selectedTemplate?.templateName === template.templateName"
+                    (click)="selectTemplate(template)">
+                    <div class="template-header">
+                      <h5>{{template.templateName}}</h5>
+                      <span class="device-badge" [class]="'badge-' + template.deviceType.toLowerCase()">
+                        {{template.deviceType}}
+                      </span>
+                    </div>
+                    <p class="template-description">{{template.description}}</p>
+                    <div class="template-details">
+                      <small>
+                        <strong>Marka:</strong> {{template.deviceBrand}} | 
+                        <strong>Delimiter:</strong> {{template.logDelimiter}} | 
+                        <strong>Format:</strong> {{template.logDateFormat}}
+                      </small>
+                    </div>
+                    <!-- Örnek Veri Önizlemesi -->
+                    <div class="template-preview" *ngIf="template.sampleLogData">
+                      <strong>Örnek:</strong>
+                      <code>{{template.sampleLogData.split('\n')[0]}}</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Seçilen Şablon Bilgisi -->
+              <div *ngIf="selectedTemplate" class="selected-template-info">
+                <h4>✅ Seçilen Şablon: {{selectedTemplate.templateName}}</h4>
+                <p>{{selectedTemplate.description}}</p>
+                <button 
+                  type="button"
+                  pButton 
+                  label="Şablonu Uygula"
+                  icon="pi pi-check"
+                  class="p-button-success p-button-sm"
+                  (click)="applyTemplate(selectedTemplate)">
+                </button>
+                <button 
+                  type="button"
+                  pButton 
+                  label="Seçimi Temizle"
+                  icon="pi pi-times"
+                  class="p-button-text p-button-sm"
+                  (click)="selectedTemplate = null">
+                </button>
+              </div>
+            </div>
+          </div>
+        </p-accordionTab>
+
         <!-- Temel Ayarlar -->
         <p-accordionTab header="Temel Parser Ayarları" [selected]="true">
           <div class="config-form">

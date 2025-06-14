@@ -103,5 +103,33 @@ namespace LorePdks.BAL.Services.LogParsing.Interfaces
         /// </summary>
         /// <param name="id">Silinecek log parser ID</param>
         void deleteLogParser(int id);
+
+        /// <summary>
+        /// Sistem şablonlarını getirir
+        /// </summary>
+        /// <returns>Sistem şablonları listesi</returns>
+        List<LogParserTemplateDTO> GetSystemTemplates();
+
+        /// <summary>
+        /// Cihaz tipine göre şablonları filtreler
+        /// </summary>
+        /// <param name="deviceType">Cihaz tipi (PDKS, ALARM, KAMERA)</param>
+        /// <returns>Filtrelenmiş şablon listesi</returns>
+        List<LogParserTemplateDTO> GetTemplatesByDeviceType(string deviceType);
+
+        /// <summary>
+        /// Şablondan konfigürasyon oluşturur
+        /// </summary>
+        /// <param name="template">Şablon verisi</param>
+        /// <returns>JSON formatında parser konfigürasyonu</returns>
+        string CreateConfigFromTemplate(LogParserTemplateDTO template);
+
+        /// <summary>
+        /// Akıllı örnek veri analizi yaparak alan eşlemesi önerir
+        /// </summary>
+        /// <param name="sampleData">Örnek log verisi</param>
+        /// <param name="delimiter">Ayırıcı karakter</param>
+        /// <returns>Önerilen alan eşlemeleri</returns>
+        List<FieldMappingDetail> AnalyzeSampleDataAndSuggestMappings(string sampleData, string delimiter);
     }
 }

@@ -5,6 +5,7 @@ using LorePdks.BAL.Managers.FirmaCihaz.Interfaces;
 using LorePdks.BAL.Services.LogParsing.Interfaces;
 using LorePdks.COMMON.DTO.FirmaCihaz;
 using LorePdks.COMMON.DTO.Firma;
+using LorePdks.COMMON.DTO.LogParser;
 using LorePdks.COMMON.Models;
 using LorePdks.COMMON.Enums;
 
@@ -246,6 +247,100 @@ namespace LorePdks.API.Controllers.Firma
                 response.message = $"Log konfigürasyonu getirilirken hata oluştu: {ex.Message}";
                 return BadRequest(response);
             }
+        }        /// <summary>
+        /// Sistem şablonlarını getirir
+        /// </summary>
+        [HttpGet]
+        [Route("getSystemTemplates")]
+        public IActionResult getSystemTemplates()
+        {
+            var response = new ServiceResponse<List<LogParserTemplateDTO>>();
+            try
+            {
+                var templates = _logParserService.GetSystemTemplates();
+                response.data = templates;
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "Sistem şablonları başarıyla getirildi";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = $"Sistem şablonları getirilirken hata oluştu: {ex.Message}";
+                return BadRequest(response);
+            }
+        }
+
+        /// <summary>
+        /// Cihaz tipine göre şablonları getirir
+        /// </summary>
+        [HttpGet]
+        [Route("getTemplatesByDeviceType/{deviceType}")]
+        public IActionResult getTemplatesByDeviceType(string deviceType)
+        {
+            var response = new ServiceResponse<List<LogParserTemplateDTO>>();
+            try
+            {
+                var templates = _logParserService.GetTemplatesByDeviceType(deviceType);
+                response.data = templates;
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = $"{deviceType} cihaz tipi için şablonlar başarıyla getirildi";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = $"Şablonlar getirilirken hata oluştu: {ex.Message}";
+                return BadRequest(response);
+            }
+        }
+
+        /// <summary>
+        /// Şablondan konfigürasyon oluşturur
+        /// </summary>
+        [HttpPost]
+        [Route("createConfigFromTemplate")]
+        public IActionResult createConfigFromTemplate([FromBody] LogParserTemplateDTO template)
+        {
+            var response = new ServiceResponse<object>();
+            try
+            {
+                var config = _logParserService.CreateConfigFromTemplate(template);
+                response.data = new { config = config, template = template };
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "Şablondan konfigürasyon başarıyla oluşturuldu";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = $"Konfigürasyon oluşturulurken hata oluştu: {ex.Message}";
+                return BadRequest(response);
+            }
+        }
+
+        /// <summary>
+        /// Akıllı örnek veri analizi yapar
+        /// </summary>
+        [HttpPost]
+        [Route("analyzeSampleData")]
+        public IActionResult analyzeSampleData([FromBody] AnalyzeSampleDataRequest request)
+        {
+            var response = new ServiceResponse<List<FieldMappingDetail>>();
+            try
+            {
+                var suggestions = _logParserService.AnalyzeSampleDataAndSuggestMappings(request.sampleData, request.delimiter);
+                response.data = suggestions;
+                response.messageType = ServiceResponseMessageType.Success;
+                response.message = "Örnek veri analizi başarıyla tamamlandı";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.messageType = ServiceResponseMessageType.Error;
+                response.message = $"Örnek veri analizi sırasında hata oluştu: {ex.Message}";
+                return BadRequest(response);
+            }
         }
     }    /// <summary>
     /// Log konfigürasyon güncelleme request modeli
@@ -276,6 +371,14 @@ namespace LorePdks.API.Controllers.Firma
     public class ParseLogDataRequest
     {
         public int firmaCihazId { get; set; }
-        public string rawLogData { get; set; } = "";
-    }
+        public string rawLogData { get; set; } = "";    }
+}
+
+/// <summary>
+/// Örnek veri analizi için istek sınıfı
+/// </summary>
+public class AnalyzeSampleDataRequest
+{
+    public string sampleData { get; set; } = "";
+    public string delimiter { get; set; } = "";
 }
