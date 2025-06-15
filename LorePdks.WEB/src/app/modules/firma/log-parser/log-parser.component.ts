@@ -225,7 +225,12 @@ export class LogParserComponent implements OnInit {
           opt.key === originalValue || 
           opt.value.includes(originalValue) ||
           // Kod kısmı eşleşiyor mu?
-          (originalValue.includes('(') && opt.value.split('(')[0].trim() === originalValue.split('(')[0].trim())
+          (originalValue.includes('(') && opt.value.split('(')[0].trim() === originalValue.split('(')[0].trim()) || 
+          // Kısa kod veya isim eşleşiyor mu?
+          originalValue === ',' && opt.value.includes('Virgül') ||
+          originalValue === ';' && opt.value.includes('Noktalı Virgül') ||
+          originalValue === '\t' && opt.value.includes('Tab') ||
+          originalValue === ' ' && opt.value.includes('Boşluk')
         );
         
         if (match) {
@@ -246,7 +251,11 @@ export class LogParserComponent implements OnInit {
           opt.key === originalValue || 
           opt.value.includes(originalValue) ||
           // Kod kısmı eşleşiyor mu?
-          (originalValue.includes('(') && opt.value.split('(')[0].trim() === originalValue.split('(')[0].trim())
+          (originalValue.includes('(') && opt.value.split('(')[0].trim() === originalValue.split('(')[0].trim()) ||
+          // Format değerleri karşılaştırması
+          originalValue.toLowerCase() === 'yyyy-mm-dd' && opt.value.toLowerCase().includes('yyyy-mm-dd') ||
+          originalValue.toLowerCase() === 'dd.mm.yyyy' && opt.value.toLowerCase().includes('dd.mm.yyyy') ||
+          originalValue.toLowerCase() === 'dd/mm/yyyy' && opt.value.toLowerCase().includes('dd/mm/yyyy')
         );
         
         if (match) {
@@ -266,7 +275,10 @@ export class LogParserComponent implements OnInit {
           opt.key === originalValue || 
           opt.value.includes(originalValue) ||
           // Kod kısmı eşleşiyor mu?
-          (originalValue.includes('(') && opt.value.split('(')[0].trim() === originalValue.split('(')[0].trim())
+          (originalValue.includes('(') && opt.value.split('(')[0].trim() === originalValue.split('(')[0].trim()) ||
+          // Format değerleri karşılaştırması
+          originalValue.toLowerCase() === 'hh:mm:ss' && opt.value.toLowerCase().includes('hh:mm:ss') ||
+          originalValue.toLowerCase() === 'hh:mm' && opt.value.toLowerCase().includes('hh:mm')
         );
         
         if (match) {
@@ -283,13 +295,23 @@ export class LogParserComponent implements OnInit {
       if (options && options.length > 0 && this.logParserConfig.fieldMapping) {
         this.logParserConfig.fieldMapping.forEach(field => {
           if (field.type) {
+            const originalType = field.type;
             const match = options.find(opt => 
-              opt.key === field.type || 
-              opt.value.includes(field.type)
+              opt.key === originalType || 
+              opt.value.includes(originalType) ||
+              // Tür karşılaştırması (kod adına göre)
+              originalType.toLowerCase() === 'string' && opt.value.toLowerCase().includes('string') ||
+              originalType.toLowerCase() === 'number' && opt.value.toLowerCase().includes('number') ||
+              originalType.toLowerCase() === 'date' && opt.value.toLowerCase().includes('date') ||
+              originalType.toLowerCase() === 'time' && opt.value.toLowerCase().includes('time') ||
+              originalType.toLowerCase() === 'boolean' && opt.value.toLowerCase().includes('boolean')
             );
             
             if (match) {
+              console.log(`Field type eşleşti: ${field.name} - ${originalType} -> ${match.value}`);
               field.type = match.value;
+            } else {
+              console.warn(`Field type eşleşmedi: ${originalType}`, options);
             }
           }
         });
@@ -378,6 +400,8 @@ export class LogParserComponent implements OnInit {
   applyTemplate(template: LogParserTemplateDto): void {
     try {
       const fieldMapping = JSON.parse(template.logFieldMapping);
+      console.log('Şablon uygulanıyor:', template);
+      console.log('Alan eşlemeleri:', fieldMapping);
       
       // t_kod tablosundan KodDto değerlerini almak için
       const delimiterPromise = this.logParserService.getDelimiterOptions().toPromise();
@@ -389,20 +413,43 @@ export class LogParserComponent implements OnInit {
       Promise.all([delimiterPromise, dateFormatPromise, timeFormatPromise, fieldTypesPromise])
         .then(([delimiterOptions, dateFormatOptions, timeFormatOptions, fieldTypes]) => {
           // Gelen şablon değerlerini t_kod formatına dönüştür
+          console.log('T_kod değerleri alındı:', { delimiterOptions, dateFormatOptions, timeFormatOptions, fieldTypes });
+          
+          // Delimiter bulma
           const matchDelimiter = delimiterOptions?.find(item => 
-            item.value.startsWith(template.logDelimiter) || 
-            item.key === template.logDelimiter
+            item.value.toLowerCase().includes(template.logDelimiter.toLowerCase()) || 
+            item.key.toLowerCase() === template.logDelimiter.toLowerCase() ||
+            // Özel karakterler için kontrol
+            (template.logDelimiter === ',' && item.value.includes('Virgül')) ||
+            (template.logDelimiter === ';' && item.value.includes('Noktalı Virgül')) ||
+            (template.logDelimiter === '\t' && item.value.includes('Tab')) ||
+            (template.logDelimiter === ' ' && item.value.includes('Boşluk'))
           );
           
+          console.log('Delimiter eşleşmesi:', matchDelimiter);
+          
+          // Tarih format bulma
           const matchDateFormat = dateFormatOptions?.find(item => 
-            item.value.startsWith(template.logDateFormat) || 
-            item.key === template.logDateFormat
+            item.value.toLowerCase().includes(template.logDateFormat.toLowerCase()) || 
+            item.key.toLowerCase() === template.logDateFormat.toLowerCase() ||
+            // Format eşleşmeleri
+            template.logDateFormat.toLowerCase() === 'yyyy-mm-dd' && item.value.toLowerCase().includes('yyyy-mm-dd') ||
+            template.logDateFormat.toLowerCase() === 'dd.mm.yyyy' && item.value.toLowerCase().includes('dd.mm.yyyy') ||
+            template.logDateFormat.toLowerCase() === 'dd/mm/yyyy' && item.value.toLowerCase().includes('dd/mm/yyyy')
           );
           
+          console.log('Tarih format eşleşmesi:', matchDateFormat);
+          
+          // Saat format bulma
           const matchTimeFormat = timeFormatOptions?.find(item => 
-            item.value.startsWith(template.logTimeFormat) || 
-            item.key === template.logTimeFormat
+            item.value.toLowerCase().includes(template.logTimeFormat.toLowerCase()) || 
+            item.key.toLowerCase() === template.logTimeFormat.toLowerCase() ||
+            // Format eşleşmeleri
+            template.logTimeFormat.toLowerCase() === 'hh:mm:ss' && item.value.toLowerCase().includes('hh:mm:ss') ||
+            template.logTimeFormat.toLowerCase() === 'hh:mm' && item.value.toLowerCase().includes('hh:mm')
           );
+          
+          console.log('Saat format eşleşmesi:', matchTimeFormat);
           
           // Fonksiyonel bir t_kod uyumlu config oluştur
           this.logParserConfig = {
@@ -410,29 +457,55 @@ export class LogParserComponent implements OnInit {
             dateFormat: matchDateFormat ? matchDateFormat.value : template.logDateFormat,
             timeFormat: matchTimeFormat ? matchTimeFormat.value : template.logTimeFormat,
             fieldMapping: fieldMapping.map((field: any) => {
+              let dataType = field.dataType || field.type || 'string';
+              console.log(`Alan tipi dönüşümü: ${field.fieldName} - ${dataType}`);
+              
               // Field tiplerini t_kod formatına dönüştür
               const matchType = fieldTypes?.find(item => 
-                item.value.toLowerCase().startsWith(field.dataType?.toLowerCase()) ||
-                item.key.toLowerCase() === field.dataType?.toLowerCase()
+                item.value.toLowerCase().includes(dataType.toLowerCase()) || 
+                item.key.toLowerCase() === dataType.toLowerCase() ||
+                // Tür eşleşmeleri
+                dataType.toLowerCase() === 'string' && item.value.toLowerCase().includes('string') ||
+                dataType.toLowerCase() === 'number' && item.value.toLowerCase().includes('number') ||
+                dataType.toLowerCase() === 'date' && item.value.toLowerCase().includes('date') ||
+                dataType.toLowerCase() === 'time' && item.value.toLowerCase().includes('time') ||
+                dataType.toLowerCase() === 'boolean' && item.value.toLowerCase().includes('boolean')
               );
               
+              console.log(`Alan tipi eşleşmesi (${field.fieldName}):`, matchType);
+              
               return {
-                name: field.fieldName,
-                index: field.position || 0,
-                type: matchType ? matchType.value : field.dataType || 'string',
+                name: field.fieldName || field.name || '',
+                index: field.position || field.index || 0,
+                type: matchType ? matchType.value : dataType,
                 format: field.format || ''
               };
             }),
             sampleLogData: template.sampleLogData
           };
           
-          this.logParserSampleData = template.sampleLogData;
+          console.log('Oluşturulan konfigürasyon:', this.logParserConfig);
+          
+          // Örnek veriyi temizle - LOG_SAMPLE verisinde Virgül (,) gibi metin içeriyor
+          if (this.logParserConfig.sampleLogData && this.logParserConfig.sampleLogData.includes('Virgül (,)')) {
+            const delimiter = ','; // Gerçek delimiter karakteri
+            // Her satır için düzeltme yap
+            const lines = this.logParserConfig.sampleLogData.split('\n');
+            const correctedLines = lines.map(line => {
+              return line.replace(/Virgül \(\,\)/g, delimiter);
+            });
+            this.logParserSampleData = correctedLines.join('\n');
+          } else {
+            this.logParserSampleData = template.sampleLogData;
+          }
+          
           this.updateJsonDisplay();
           
           // Değerler seçilir seçilmez comboları güncelle
           setTimeout(() => {
             // Dropdown değerlerinin Angular tarafından güncellenmesi için
             this.updateDropdownSelections();
+            console.log('Son konfigürasyon:', this.logParserConfig);
           }, 100);
           
           this.messageService.add({
@@ -448,7 +521,12 @@ export class LogParserComponent implements OnInit {
             delimiter: template.logDelimiter,
             dateFormat: template.logDateFormat,
             timeFormat: template.logTimeFormat,
-            fieldMapping: fieldMapping,
+            fieldMapping: fieldMapping.map((field: any) => ({
+              name: field.fieldName || field.name || '',
+              index: field.position || field.index || 0,
+              type: field.dataType || field.type || 'string',
+              format: field.format || ''
+            })),
             sampleLogData: template.sampleLogData
           };
           this.logParserSampleData = template.sampleLogData;
@@ -602,42 +680,7 @@ export class LogParserComponent implements OnInit {
         }
       });
   }
-  
-  /**
-   * Akıllı örnek veri yükler
-   */
-  loadSampleData(): void {
-    if (!this.logParserConfig.delimiter) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Uyarı', 
-        detail: 'Lütfen önce bir delimiter seçin.'
-      });
-      return;
-    }
-    
-    // Delimiter'a göre örnek veri oluştur
-    const delimiter = this.logParserConfig.delimiter;
-    const sampleData = `userId${delimiter}date${delimiter}time${delimiter}status${delimiter}action\n` +
-                      `user123${delimiter}2025-06-15${delimiter}10:30:45${delimiter}success${delimiter}login\n` +
-                      `admin456${delimiter}2025-06-15${delimiter}11:45:22${delimiter}success${delimiter}logout`;
-    
-    this.logParserSampleData = sampleData;
-    
-    // Örnek veriye göre alan eşlemeleri oluştur
-    const headers = sampleData.split('\n')[0].split(delimiter);
-    
-    this.logParserConfig.fieldMapping = headers.map((header, index) => ({
-      name: header.trim(),
-      index: index,
-      type: (header === 'date') ? 'date' : 
-            (header === 'time') ? 'time' : 'string'
-    }));
-    
-    this.updateJsonDisplay();
-    this.updateDropdownSelections();
-  }
-  
+    // Akıllı örnek veri yükleme fonksiyonu kaldırılmıştır - artık hazır şablonlar kullanıyoruz
   /**
    * Ana sayfaya geri döner
    */

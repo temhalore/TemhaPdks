@@ -331,11 +331,6 @@ export class LogParserService {
    * @param kod Kod değeri
    * @param tipId Kod tipi ID'si
    * @returns Kodun display formatı (örn: "kod (kısaAd)")
-   */  /**
-   * Kod değerini ve tip ID'sini kullanarak, t_kod tablosundaki karşılık gelen değeri döndürür
-   * @param kod Kod değeri
-   * @param tipId Kod tipi ID'si
-   * @returns Kodun display formatı (örn: "kod (kısaAd)")
    * @private
    */
   private formatKodDisplay(kod: string, tipId: number): string {
@@ -353,10 +348,39 @@ export class LogParserService {
     const kodValues = kod.split(',');
     const firstKodValue = kodValues[0].trim();
     
-    // Özel durum kontrolleri - tipine göre önceden tanımlanmış değerleri dönebilir
+    // t_kod tablosundan uygun değeri bulma (asenkron olduğu için kullanılamıyor)
+    // Burada cache olsaydı kullanabilirdik
     
-    // Tekil bir değer olarak döndür - backend ve UI arasındaki kod-kısaAd eşleşmesi 
-    // component seviyesinde dropdown'larla ve seçim anında yapılacak
+    // Backendten gelirken özel karakterlerde sorun olabiliyor, düzeltme yap
+    if (firstKodValue === 'Virgül' || firstKodValue === ',') {
+      return ", (Virgül)"; 
+    } else if (firstKodValue === 'Tab' || firstKodValue === '\t') {
+      return "\\t (Tab)";
+    } else if (firstKodValue === 'Boşluk' || firstKodValue === ' ') {
+      return "  (Boşluk)";
+    } else if (firstKodValue === 'Noktalı Virgül' || firstKodValue === ';') {
+      return "; (Noktalı Virgül)";
+    } else if (firstKodValue.toLowerCase() === 'yyyy-mm-dd') {
+      return "yyyy-MM-dd (Yıl-Ay-Gün)";
+    } else if (firstKodValue.toLowerCase() === 'dd.mm.yyyy') {
+      return "dd.MM.yyyy (Gün.Ay.Yıl)";
+    } else if (firstKodValue.toLowerCase() === 'hh:mm:ss') {
+      return "HH:mm:ss (Saat:Dakika:Saniye)";
+    } else if (firstKodValue.toLowerCase() === 'hh:mm') {
+      return "HH:mm (Saat:Dakika)";
+    } else if (firstKodValue.toLowerCase() === 'string') {
+      return "string (Metin)";
+    } else if (firstKodValue.toLowerCase() === 'number') {
+      return "number (Sayı)";
+    } else if (firstKodValue.toLowerCase() === 'date') {
+      return "date (Tarih)";
+    } else if (firstKodValue.toLowerCase() === 'time') {
+      return "time (Zaman)";
+    } else if (firstKodValue.toLowerCase() === 'boolean') {
+      return "boolean (Mantıksal)";
+    }
+    
+    // Tekil bir değer olarak döndür
     return firstKodValue; 
   }
 }
