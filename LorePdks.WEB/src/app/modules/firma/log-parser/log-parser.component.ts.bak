@@ -47,8 +47,7 @@ interface LogParserTemplateDto {
   selector: 'app-log-parser',
   templateUrl: './log-parser.component.html',
   styleUrls: ['./log-parser.component.scss'],
-  standalone: true,  
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -182,11 +181,9 @@ export class LogParserComponent implements OnInit {
         }
       });
   }
-  
-  /**
+    /**
    * t_kod tablosundan dropdown değerlerini yükler
-   */  
-  loadDropdownOptions(): void {
+   */  loadDropdownOptions(): void {
     // LogParserService içindeki metotları kullanarak t_kod tablosundan veriler çekilir
     this.logParserService.getDelimiterOptions().subscribe(
       options => this.delimiterOptions$.next(options)
@@ -211,9 +208,10 @@ export class LogParserComponent implements OnInit {
   
   /**
    * Dropdown seçimlerini config değerlerine göre günceller
+   */  /**
+   * Dropdown seçimlerini config değerlerine göre günceller
    * t_kod'dan yüklenen değerlerle mevcut logParserConfig değerlerini eşleştirir
-   */
-  updateDropdownSelections(): void {
+   */  updateDropdownSelections(): void {
     console.log('Dropdown seçimleri güncelleniyor...', this.logParserConfig);
     
     // Delimiter options ile mevcut delimiter değerini eşleştir
@@ -258,8 +256,7 @@ export class LogParserComponent implements OnInit {
       }
     });
     
-    // Time format options ile mevcut timeFormat değerini eşleştir
-    this.timeFormatOptions$.subscribe(options => {
+    // Time format options ile mevcut timeFormat değerini eşleştir    this.timeFormatOptions$.subscribe(options => {
       if (options && options.length > 0 && this.logParserConfig.timeFormat) {
         const originalValue = this.logParserConfig.timeFormat;
         const match = options.find(opt => 
@@ -374,8 +371,7 @@ export class LogParserComponent implements OnInit {
   
   /**
    * Seçilen şablonu uygular
-   */
-  applyTemplate(template: LogParserTemplateDto): void {
+   */  applyTemplate(template: LogParserTemplateDto): void {
     try {
       const fieldMapping = JSON.parse(template.logFieldMapping);
       
@@ -646,7 +642,7 @@ export class LogParserComponent implements OnInit {
   }
   
   /**
-   * Toggle yardım görünümü
+   * Toogle yardım görünümü
    */
   toggleHelp(): void {
     this.showHelp = !this.showHelp;
